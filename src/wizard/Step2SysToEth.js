@@ -182,8 +182,8 @@ class Step2 extends Component {
                   <div className={notValidClasses.ethaddressValGrpCls}>{this.state.ethaddressValMsg}</div>
                 </div>
               </div>
-              <button type="button" class="btn btn-default">
-                <span class="glyphicon glyphicon-send"></span>
+              <button type="button" className="btn btn-default">
+                <span className="glyphicon glyphicon-send"></span>
               </button>
               <div className="form-group col-md-12 content form-block-holder">
                 <label className="control-label col-md-4">

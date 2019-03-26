@@ -182,19 +182,19 @@ class Step1 extends Component {
 
               <div className="row">
                 <div className="col-md-8 col-md-offset-2">
-                  <form class="navbar-form" onsubmit="return false;" role="search">
-                    <div class="input-group add-on">
+                  <form className="navbar-form" onsubmit="return false;" role="search">
+                    <div className="input-group add-on">
                       <input
                           ref="searchText"
                           autoComplete="off"
                           type="text"
                           placeholder={this.props.t("step1SearchBox")}
                           className="form-control"/>
-                      <div class="input-group-btn">
-                        <button class="btn btn-default" type="button" onClick={this.searchSuperblock}><i class="glyphicon glyphicon-search"></i></button>
+                      <div className="input-group-btn">
+                        <button className="btn btn-default" type="button" onClick={this.searchSuperblock}><i className="glyphicon glyphicon-search"></i></button>
                       </div>
                     </div>
-                    <div class="superblocksearcherror">{this.state.searchError}</div>
+                    <div className="superblocksearcherror">{this.state.searchError}</div>
                   </form>
                 </div>
               </div>
@@ -221,8 +221,8 @@ class Step1 extends Component {
                 </div>
                 
                 <div className="col-8 col-md-offset-5 col-sm-offset-5 col-lg-offset-5">
-                  <div class="superblockpagecontainer">
-                    <div class="superblockpageicon" onClick={this.handlePrevClick}><MaterialIcon icon="arrow_left" size='large' /></div><div class="superblockpage">{this.state.superblockHeight}</div><div class="superblockpageicon" onClick={this.handleNextClick}><MaterialIcon icon="arrow_right" size='large' /></div>
+                  <div className="superblockpagecontainer">
+                    <div className="superblockpageicon" onClick={this.handlePrevClick}><MaterialIcon icon="arrow_left" size='large' /></div><div className="superblockpage">{this.state.superblockHeight}</div><div className="superblockpageicon" onClick={this.handleNextClick}><MaterialIcon icon="arrow_right" size='large' /></div>
                 </div>
                </div>
               </div>
