@@ -4,7 +4,7 @@ import web3 from './web3';
 import SysToEthWizardi18n from './wizard/SysToEthWizard';
 import { I18nextProvider } from "react-i18next";
 import i18n from "./wizard/i18n";
-import {SyscoinRpcClient} from 'syscoin-js';
+import * as SyscoinRpc from 'syscoin-js';
 class SysethereumDApp extends Component {
   // intro paragraph
   // choice a: walk to ethereum
@@ -55,9 +55,16 @@ class SysethereumDApp extends Component {
     // @param _untrustedTargetContract - the contract that is going to process the transaction
   };
 
-  componentDidMount() {
-    let syscoinClient = new SyscoinRpcClient({baseUrl: "localhost", port: "8369", username: "u", password: "p"});
+  async componentDidMount() {
+    let syscoinClient = new SyscoinRpc.default({baseUrl: "localhost", port: "8368", username: "u", password: "p"});
+
+    try {
+      console.log("RESULT", (await syscoinClient.callRpc("getinfo", [])) );
+    }catch(e) {
+      console.log("ERR getinfo", e);
+    }
   }
+
   onAuctionToEthereum = async (event) => {
     event.preventDefault();
     // get syscoin spv proof from syscoin rpc

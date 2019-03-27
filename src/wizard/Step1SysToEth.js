@@ -143,7 +143,7 @@ class Step1 extends Component {
       });
   }
     async componentDidMount() {
-    const currentSuperBlockHash = await SyscoinSuperblocks.methods.getBestSuperblock().call();
+    /*const currentSuperBlockHash = await SyscoinSuperblocks.methods.getBestSuperblock().call();
     axios.get('http://localhost:8000/superblock?hash=' + currentSuperBlockHash, { crossdomain: true })
       .then(response => {
         if(response.data.error){
@@ -160,7 +160,7 @@ class Step1 extends Component {
       })
       .catch(error => {
         this.setState({searchError: error.response});
-      });
+      });*/
   }
 
   componentWillUnmount() {}
