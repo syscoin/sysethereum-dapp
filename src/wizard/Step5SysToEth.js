@@ -1,6 +1,7 @@
 
 import React, { Component } from 'react';
 import SyscoinSuperblocks from '../SyscoinSuperblocks';
+import { getProof } from 'bitcoin-proof'
 import web3 from '../web3';
 class Step5 extends Component {
   constructor(props) {
@@ -56,23 +57,27 @@ class Step5 extends Component {
     return errMsgs;
   }
   async submitProofs() {
-    let _txBytes = web3.utils.hexToBytes("0x" + this.props.getStore().txbytes);
+    let _txBytes = "0x" + this.props.getStore().txbytes;
     let _txSiblings = [];
     for(var i = 0;i<this.props.getStore().txsiblings.length;i++){
       let _txSibling = "0x" + this.props.getStore().txsiblings[i];
       _txSiblings.push(_txSibling);
     }
-    let _syscoinBlockHeader = web3.utils.hexToBytes("0x" + this.props.getStore().syscoinblockheader);
+    let _syscoinBlockHeader = "0x" + this.props.getStore().syscoinblockheader;
     let _syscoinBlockSiblings = [];
     for(var i = 0;i<this.props.getStore().syscoinblocksiblings.length;i++){
       let _blockSibling = "0x" + this.props.getStore().syscoinblocksiblings[i];
       _syscoinBlockSiblings.push(_blockSibling);
     }  
-    let _superblockHash = web3.utils.hexToBytes("0x" + this.props.getStore().superblockhash);
-    console.log("BEFORE RELAYTX")
-    let recpt = await SyscoinSuperblocks.methods.relayTx(_txBytes, this.props.getStore().txindex, _txSiblings, _syscoinBlockHeader, 
+    let _superblockHash = "0x" + this.props.getStore().superblockhash;
+    let merkleProof = getProof(this.props.getStore().txsiblings, this.props.getStore().txindex);
+    for(var i = 0;i<merkleProof.sibling.length;i++){
+      merkleProof.sibling[i] = "0x" + merkleProof.sibling[i];
+    }
+    console.log("merkleProof" + merkleProof.toString());
+    let recpt = await SyscoinSuperblocks.methods.relayTx(_txBytes, this.props.getStore().txindex, merkleProof.sibling, _syscoinBlockHeader, 
     this.props.getStore().syscoinblockindex, _syscoinBlockSiblings, _superblockHash, this.props.getStore().untrustedtargetcontract).send({gas: 1000000,from: "0x2f038a7306449dc9bcde25d8399dba36ee8ad6bf"});
-     console.log("recpt " + recpt)
+     console.log("recpt " + recpt);
   }
 
  
