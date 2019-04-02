@@ -1,123 +1,237 @@
 
-
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import validation from 'react-validation-mixin';
-import strategy from 'joi-validation-strategy';
-import Joi from 'joi';
-
+import * as SyscoinRpc from 'syscoin-js';
+const axios = require('axios');
 class Step4 extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
-      emailEmergency: props.getStore().emailEmergency
+      txindex: props.getStore().txindex,
+      txsiblings: props.getStore().txsiblings,
+      syscoinblockheader: props.getStore().syscoinblockheader,
+      syscoinblockindex: props.getStore().syscoinblockindex,
+      superblockhash: props.getStore().superblockhash,
+      syscoinblocksiblings: props.getStore().syscoinblocksiblings,
+      txbytes: props.getStore().txbytes,
+      untrustedtargetcontract: props.getStore().untrustedtargetcontract
     };
-
-    this.validatorTypes = {
-      emailEmergency: Joi.string().email().required()
-    };
-
-    this.getValidatorData = this.getValidatorData.bind(this);
-    this.renderHelpText = this.renderHelpText.bind(this);
+          // INPUTS:
+      // enter syscoin burn txid
+      // enter block hash 
+      // OUTPUTS:
+      // _txIndex - transaction's index within the block
+      // _txSiblings - transaction's Merkle siblings
+      // _syscoinBlockHeader - block header containing transaction
+    // step 4: get superblock spv proof
+      // INPUTS:
+      // enter block hash (auto fill from step 3) (show approval status of superblock, and how many superblocks to go to approve)
+      // OUTPUTS:
+      // _syscoinBlockIndex - block's index withing superblock
+      // _syscoinBlockSiblings - block's merkle siblings
+      // _superblockHash - superblock containing block header
+    // step 5: 
+      // INPUTS:
+      // _txBytes - transaction bytes (autofilled with getrawtransaction)
+      // _untrustedTargetContract - the contract that is going to process the transaction (input from assetinfo or genesis param)
+    this._validateOnDemand = true; // this flag enables onBlur validation as user fills forms
+    this.getProofs = this.getProofs.bind(this);
+    this.validationCheck = this.validationCheck.bind(this);
     this.isValidated = this.isValidated.bind(this);
+    this.syscoinClient = new SyscoinRpc.default({baseUrl: "localhost", port: "8370", username: "u", password: "p"});
   }
 
-  isValidated() {
-    return new Promise((resolve, reject) => {
-      this.props.validate((error) => {
-        if (error) {
-          reject(); // form contains errors
-          return;
-        }
+  componentDidMount() {
+    if(!this.props.getStore().ethaddress || !this.props.getStore().amount){
+      this.props.jumpToStep(1);
+    }
+    else if(!this.props.getStore().blockhash || !this.props.getStore().txid){
+      this.props.jumpToStep(2);
+    }
+  }
 
-        if (this.props.getStore().emailEmergency !== this.getValidatorData().emailEmergency) { // only update store of something changed
+  componentWillUnmount() {}
+
+  isValidated() {
+    const userInput = this._grabUserInput(); // grab user entered vals
+    const validateNewInput = this._validateData(userInput); // run the new input against the validator
+    let isDataValid = false;
+
+    // if full validation passes then save to store and pass as valid
+    if (Object.keys(validateNewInput).every((k) => { return validateNewInput[k] === true })) {
+        if (this.props.getStore().txindex !== userInput.txindex  || 
+        this.props.getStore().txsiblings !== userInput.txsiblings ||
+        this.props.getStore().syscoinblockheader !== userInput.syscoinblockheader ||
+        this.props.getStore().syscoinblockindex !== userInput.syscoinblockindex ||
+        this.props.getStore().syscoinblocksiblings !== userInput.syscoinblocksiblings ||
+        this.props.getStore().txbytes !== userInput.txbytes ||
+        this.props.getStore().untrustedtargetcontract !== userInput.untrustedtargetcontract ||
+        this.props.getStore().superblockhash !== userInput.superblockhash 
+        ) { // only update store of something changed
           this.props.updateStore({
-            ...this.getValidatorData(),
+            ...userInput,
             savedToCloud: false // use this to notify step4 that some changes took place and prompt the user to save again
           });  // Update store here (this is just an example, in reality you will do it via redux or flux)
         }
 
-        resolve(); // form is valid, fire action
-      });
-    });
-  }
-
-  getValidatorData() {
-    return {
-      emailEmergency: this.refs.emailEmergency.value,
+        isDataValid = true;
     }
-  };
+    else {
+        // if anything fails then update the UI validation state but NOT the UI Data State
+        this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+    }
 
-  onChange(e) {
-      let newState = {};
-      newState[e.target.name] = e.target.value;
-      this.setState(newState);
+    return isDataValid;
+  }
+  async getProofs() {
+    let userInput = this._grabUserInput(); 
+    let validateNewInput = this._validateData(userInput); // run the new input against the validator
+    const args = [this.props.getStore().txid.toString(), this.props.getStore().blockhash.toString()];
+    let failed = false;
+    try {
+      let results = await this.syscoinClient.callRpc("syscoingetspvproof", args);
+      if(results){
+        validateNewInput.txbytes = results.transaction;
+        console.log("txbytesVal " + validateNewInput.txbytes);
+        validateNewInput.syscoinblockheader = results.header;
+        console.log("syscoinblockheaderVal " + validateNewInput.syscoinblockheader);
+        validateNewInput.txsiblings = results.siblings;
+        console.log("txsiblingsVal " + validateNewInput.txsiblings);
+        validateNewInput.txindex = results.index;
+        console.log("txindexVal " + validateNewInput.txindex);
+        validateNewInput.untrustedtargetcontract = results.contract;
+        console.log("untrustedtargetcontractVal " + validateNewInput.untrustedtargetcontract);
+      }
+    }catch(e) {
+      validateNewInput.buttonVal = false;
+      validateNewInput.buttonValMsg = e.message;
+      console.log("error " + e.message);
+      failed = true;
+    }
+    if(failed === false){
+      axios.get('http://localhost:8000/spvproof?hash=' + (this.props.getStore().blockhash.toString()), { crossdomain: true })
+      .then(response => {
+        console.log(response);
+        if(response.data.error){
+          console.log("spvproof error1 " + response.data.error);
+          validateNewInput.buttonVal = false;
+          validateNewInput.buttonValMsg = response.data.error;     
+        }
+        else{
+          validateNewInput.syscoinblockindex = response.data.index;
+          console.log("syscoinblockindex " + validateNewInput.syscoinblockindex);
+          validateNewInput.syscoinblocksiblings = response.data.merklePath;
+          console.log("syscoinblocksiblings1 " + validateNewInput.syscoinblocksiblings);
+          validateNewInput.superblockhash = response.data.superBlock;
+          console.log("superblockhash " + validateNewInput.superblockhash);
+          validateNewInput.buttonValMsg = this.props.t("step4SbStatusSuccess");
+
+        }
+        this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+      })
+      .catch(error => {
+        console.log("spvproof error2 " + error);
+        validateNewInput.buttonVal = false;
+        validateNewInput.buttonValMsg = error.message; 
+        this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));    
+      });   
+    }else{
+      this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+    }
+    
+
+  }
+  
+  validationCheck() {
+    if (!this._validateOnDemand)
+      return;
+
+    const userInput = this._grabUserInput(); // grab user entered vals
+    const validateNewInput = this._validateData(userInput); // run the new input against the validator
+
+    this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
   }
 
-  renderHelpText(message, id) {
-      return (<div className="val-err-tooltip" key={id}><span>{message}</span></div>);
-  };
+   _validateData(data) {
+    return  {
+      buttonVal: true,
+      txindexVal: true,
+      txsiblingsVal: true,
+      syscoinblockheaderVal: true,
+      syscoinblockindexVal: true,
+      syscoinblocksiblingsVal: true,
+      superblockhashVal: true,
+      txbytesVal: true,
+      untrustedtargetcontractVal: true
+    }
+  }
 
+  _validationErrors(val) {
+    const errMsgs = {
+      txindexValMsg: '',
+      txsiblingsValMsg: '',
+      syscoinblockheaderValMsg: '',
+      syscoinblockindexValMsg: '',
+      syscoinblocksiblingsValMsg: '',
+      superblockhashValMsg: '',
+      txbytesValMsg: '',
+      untrustedtargetcontractValMsg: ''
+    }
+    return errMsgs;
+  }
+
+  _grabUserInput() {
+    return {
+      txindex: this.state.txindex,
+      txsiblings: this.state.txsiblings,
+      syscoinblockheader: this.state.syscoinblockheader,
+      syscoinblockindex: this.state.syscoinblockindex,
+      syscoinblocksiblings: this.state.syscoinblocksiblings,
+      superblockhash: this.state.superblockhash,
+      txbytes: this.state.txbytes,
+      untrustedtargetcontract: this.state.untrustedtargetcontract
+    };
+  }
   render() {
     // explicit class assigning based on validation
-    let notValidClasses = {};
-    notValidClasses.emailEmergencyCls = this.props.isValid('emailEmergency') ?
-        'no-error col-md-8' : 'has-error col-md-8';
-
+    let notValidClasses = {};    
+    if (typeof this.state.buttonVal == 'undefined' || this.state.buttonVal) {
+      notValidClasses.buttonCls = 'has-success col-md-8';
+      notValidClasses.buttonValGrpCls = 'val-success-tooltip';
+    }
+    else {
+       notValidClasses.buttonCls = 'has-error col-md-8';
+       notValidClasses.buttonValGrpCls = 'val-err-tooltip';
+    }   
     return (
-        <div className="step step4">
-            <div className="row">
-                <form id="Form" className="form-horizontal">
-                  <div className="form-group">
-                    <label className="control-label col-md-12 ">
-                        <h1>{this.props.t("step4Head")}</h1>
-                    </label>
-                  </div>
-                  <div className="form-group col-md-12 content form-block-holder">
-                    <label className="control-label col-md-4">
-                      {this.props.t("step4EmergencyMail")}
-                    </label>
-                    <div className={notValidClasses.emailEmergencyCls}>
-                        <input
-                            ref="emailEmergency"
-                            name="emailEmergency"
-                            autoComplete="off"
-                            type="email"
-                            className="form-control"
-                            placeholder="john.smith@example.com"
-                            required
-                            defaultValue={this.state.emailEmergency}
-                            onBlur={this.props.handleValidation('emailEmergency')}
-                            onChange={this.onChange.bind(this)}
-                        />
-
-                        {this.props.getValidationMessages('emailEmergency').map(this.renderHelpText)}
-                    </div>
-                  </div>
-                  <div className="form-group hoc-alert col-md-12 form-block-holder">
-                    <label className="col-md-12 control-label">
-                      <h4>{this.props.t("step4ShownExample")} <a href="https://github.com/jurassix/react-validation-mixin" target="_blank" rel="noopener noreferrer">react-validation-mixin</a> {this.props.t("step4HandleValidations")}</h4>
-                    </label>
-                    <br />
-                    <div className="green">{this.props.t("step4StepZillaSteps")}</div>
-                  </div>
-                </form>
+      <div className="step step4">
+        <div className="row">
+          <form id="Form" className="form-horizontal">
+            <div className="form-group">
+              <label className="col-md-12 control-label">
+                <h1>{this.props.t("step4Head")}</h1>
+              </label>
             </div>
+            <div className="row content">
+              <div className="col-md-12">
+                {this.props.t("step4Description")}
+              </div>
+            </div>
+            <div className="form-group col-md-12 content form-block-holder">
+                <label className="control-label col-md-4">
+                </label>  
+                <div className={notValidClasses.buttonCls}>
+                    <button type="button" className="form-control btn btn-default" aria-label={this.props.t("step4Button")} onClick={this.getProofs}>
+                    <span className="glyphicon glyphicon-search" aria-hidden="true">&nbsp;</span>
+                    {this.props.t("step4Button")}
+                    </button>
+                  <div className={notValidClasses.buttonValGrpCls}>{this.state.buttonValMsg}</div>
+                </div>
+              </div>
+          </form>
         </div>
+      </div>
     )
   }
 }
 
-Step4.propTypes = {
-  errors: PropTypes.object,
-  validate: PropTypes.func,
-  isValid: PropTypes.func,
-  handleValidation: PropTypes.func,
-  getValidationMessages: PropTypes.func,
-  clearValidations: PropTypes.func,
-  getStore: PropTypes.func,
-  updateStore: PropTypes.func
-};
-
-export default validation(strategy)(Step4);
+export default Step4;

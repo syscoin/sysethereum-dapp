@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-import MaterialIcon, {colorPalette} from 'material-icons-react';
+import MaterialIcon from 'material-icons-react';
 import SyscoinSuperblocks from '../SyscoinSuperblocks';
 const axios = require('axios');
 class Step1 extends Component {
@@ -143,7 +143,7 @@ class Step1 extends Component {
       });
   }
     async componentDidMount() {
-    /*const currentSuperBlockHash = await SyscoinSuperblocks.methods.getBestSuperblock().call();
+    const currentSuperBlockHash = await SyscoinSuperblocks.methods.getBestSuperblock().call();
     axios.get('http://localhost:8000/superblock?hash=' + currentSuperBlockHash, { crossdomain: true })
       .then(response => {
         if(response.data.error){
@@ -160,7 +160,7 @@ class Step1 extends Component {
       })
       .catch(error => {
         this.setState({searchError: error.response});
-      });*/
+      });
   }
 
   componentWillUnmount() {}
@@ -182,7 +182,7 @@ class Step1 extends Component {
 
               <div className="row">
                 <div className="col-md-8 col-md-offset-2">
-                  <form className="navbar-form" onsubmit="return false;" role="search">
+                  <div className="navbar-form" role="search">
                     <div className="input-group add-on">
                       <input
                           ref="searchText"
@@ -195,7 +195,7 @@ class Step1 extends Component {
                       </div>
                     </div>
                     <div className="superblocksearcherror">{this.state.searchError}</div>
-                  </form>
+                  </div>
                 </div>
               </div>
               <div className="row">

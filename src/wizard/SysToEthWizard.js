@@ -18,8 +18,6 @@ class SysToEthWizard extends Component {
     this.state = {};
 
     this.sampleStore = {
-      email: '',
-      gender: '',
       savedToCloud: false
     };
   }
@@ -64,7 +62,6 @@ class SysToEthWizard extends Component {
             steps={steps}
             preventEnterSubmission={true}
             nextTextOnFinalActionStep={t("nextTextOnFinalActionStep")}
-            hocValidationAppliedTo={[3]}
             nextButtonText={t("nextButtonText")}
             backButtonText={t("backButtonText")}
             startAtStep={window.sessionStorage.getItem('step') ? parseFloat(window.sessionStorage.getItem('step')) : 0}

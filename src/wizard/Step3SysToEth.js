@@ -1,22 +1,27 @@
 
 import React, { Component } from 'react';
-
+import * as SyscoinRpc from 'syscoin-js';
 class Step3 extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
-      email: props.getStore().email,
-      gender: props.getStore().gender
+      sysrawtxunsigned: props.getStore().sysrawtxunsigned,
+      txid: props.getStore().txid,
+      blockhash: props.getStore().blockhash
     };
-
+    
     this._validateOnDemand = true; // this flag enables onBlur validation as user fills forms
-
+    this.getBlockhash = this.getBlockhash.bind(this);
     this.validationCheck = this.validationCheck.bind(this);
     this.isValidated = this.isValidated.bind(this);
+    this.syscoinClient = new SyscoinRpc.default({baseUrl: "localhost", port: "8370", username: "u", password: "p"});
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    if(!this.props.getStore().ethaddress || !this.props.getStore().amount || !this.props.getStore().sysrawtxunsigned){
+      this.props.jumpToStep(1);
+    }
+  }
 
   componentWillUnmount() {}
 
@@ -27,7 +32,8 @@ class Step3 extends Component {
 
     // if full validation passes then save to store and pass as valid
     if (Object.keys(validateNewInput).every((k) => { return validateNewInput[k] === true })) {
-        if (this.props.getStore().email !== userInput.email || this.props.getStore().gender !== userInput.gender) { // only update store of something changed
+        if (this.props.getStore().txid !== userInput.txid  || 
+        this.props.getStore().blockhash !== userInput.blockhash) { // only update store of something changed
           this.props.updateStore({
             ...userInput,
             savedToCloud: false // use this to notify step4 that some changes took place and prompt the user to save again
@@ -43,7 +49,36 @@ class Step3 extends Component {
 
     return isDataValid;
   }
+  async getBlockhash() {
+    let userInput = this._grabUserInput(); // grab user entered vals
+    let validateNewInput = this._validateData(userInput); // run the new input against the validator
+    validateNewInput.buttonVal = true;
+    validateNewInput.buttonValMsg = "";
+    validateNewInput.blockhashVal = true;
+    validateNewInput.blockhashValMsg = "";
+    let valid = true;
+    if(!userInput.txid || userInput.txid === ""){
+      validateNewInput.txidVal = false;
+      valid = false;
+    }        
+    if(valid === true){
+      let txid = userInput.txid.toString();
+      const args = [txid];
+      try {
+        let results = await this.syscoinClient.callRpc("getblockhashbytxid", args);
+        if(results){
+          validateNewInput.blockhashVal = true;
+          this.refs.blockhash.value = results;
+        }
+      }catch(e) {
+        validateNewInput.buttonVal = false;
+        validateNewInput.buttonValMsg = e.message;
+        console.log("error " + e.message);
+      }
+    } 
+    this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
 
+  }
   validationCheck() {
     if (!this._validateOnDemand)
       return;
@@ -56,23 +91,24 @@ class Step3 extends Component {
 
    _validateData(data) {
     return  {
-      genderVal: (data.gender !== 0), // required: anything besides N/A
-      emailVal: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(data.email), // required: regex w3c uses in html5
+      txidVal: true,
+      blockhashVal: data.blockhash && data.blockhash !== ""? true: false,
+      buttonVal: true
     }
   }
 
   _validationErrors(val) {
     const errMsgs = {
-      genderValMsg: val.genderVal ? '' : this.props.t("step3GenderVal"),
-      emailValMsg: val.emailVal ? '' : this.props.t("step3EmailVal")
+      txidValMsg: val.txidVal && val.txidVal === true ? '' : this.props.t("step3Txid"),
+      blockhashValMsg: val.blockhashVal && val.blockhashVal === true ? '' : this.props.t("step3Blockhash")
     }
     return errMsgs;
   }
 
   _grabUserInput() {
     return {
-      gender: this.refs.gender.value,
-      email: this.refs.email.value
+      txid: this.refs.txid.value,
+      blockhash: this.refs.blockhash.value
     };
   }
 
@@ -80,22 +116,28 @@ class Step3 extends Component {
     // explicit class assigning based on validation
     let notValidClasses = {};
 
-    if (typeof this.state.genderVal == 'undefined' || this.state.genderVal) {
-      notValidClasses.genderCls = 'no-error col-md-8';
+    if (typeof this.state.txidVal == 'undefined' || this.state.txidVal) {
+      notValidClasses.txidCls = 'no-error col-md-8';
     }
     else {
-       notValidClasses.genderCls = 'has-error col-md-8';
-       notValidClasses.genderValGrpCls = 'val-err-tooltip';
+      notValidClasses.txidCls = 'has-error col-md-8';
+      notValidClasses.txidValGrpCls = 'val-err-tooltip';
     }
 
-    if (typeof this.state.emailVal == 'undefined' || this.state.emailVal) {
-        notValidClasses.emailCls = 'no-error col-md-8';
+    if (typeof this.state.blockhashVal == 'undefined' || this.state.blockhashVal) {
+        notValidClasses.blockhashCls = 'no-error col-md-8';
     }
     else {
-       notValidClasses.emailCls = 'has-error col-md-8';
-       notValidClasses.emailValGrpCls = 'val-err-tooltip';
+       notValidClasses.blockhashCls = 'has-error col-md-8';
+       notValidClasses.blockhashValGrpCls = 'val-err-tooltip';
     }
-
+    if (typeof this.state.buttonVal == 'undefined' || this.state.buttonVal) {
+      notValidClasses.buttonCls = 'no-error col-md-8';
+    }
+    else {
+      notValidClasses.buttonCls = 'has-error col-md-8';
+      notValidClasses.buttonValGrpCls = 'val-err-tooltip';
+    }
     return (
       <div className="step step3">
         <div className="row">
@@ -107,46 +149,67 @@ class Step3 extends Component {
             </div>
             <div className="row content">
               <div className="col-md-12">
-                {this.props.t("step3JavaScriptValidation")}
+                {this.props.t("step3Description")}
               </div>
             </div>
             <div className="form-group col-md-12 content form-block-holder">
                 <label className="control-label col-md-4">
-                  {this.props.t("step3Gender")}
+                  {this.props.t("step2RawTxLabel")}
+                </label>  
+                <div className="col-md-8">
+                    <textarea
+                      rows="3"
+                      autoComplete="off"
+                      type="text"
+                      className="form-control"
+                      defaultValue={this.state.sysrawtxunsigned}
+                      />
+                </div>
+              </div>
+            <div className="form-group col-md-12 content form-block-holder">
+                <label className="control-label col-md-4">
+                  {this.props.t("step3TxidLabel")}
                 </label>
-                <div className={notValidClasses.genderCls}>
-                  <select
-                    ref="gender"
+                <div className={notValidClasses.txidCls}>
+                  <input
+                    ref="txid"
                     autoComplete="off"
+                    type="text"
+                    placeholder={this.props.t("step3EnterTxid")}
                     className="form-control"
+                    defaultValue={this.state.txid}
                     required
-                    defaultValue={this.state.gender}
-                    onBlur={this.validationCheck}>
-                      <option value="">{this.props.t("step3PleaseSelect")}</option>
-                      <option value={this.props.t("step3Male")}>{this.props.t("step3Male")}</option>
-                      <option value={this.props.t("step3Female")}>{this.props.t("step3Female")}</option>
-                      <option value={this.props.t("step3Other")}>{this.props.t("step3Other")}</option>
-                  </select>
-                  <div className={notValidClasses.genderValGrpCls}>{this.state.genderValMsg}</div>
+                     />
+                  <div className={notValidClasses.txidValGrpCls}>{this.state.txidValMsg}</div>
                 </div>
               </div>
               <div className="form-group col-md-12 content form-block-holder">
                 <label className="control-label col-md-4">
-                  Email
-                </label>
-                <div className={notValidClasses.emailCls}>
-                  <input
-                    ref="email"
-                    autoComplete="off"
-                    type="email"
-                    placeholder="john.smith@example.com"
-                    className="form-control"
-                    required
-                    defaultValue={this.state.email}
-                    onBlur={this.validationCheck} />
-                  <div className={notValidClasses.emailValGrpCls}>{this.state.emailValMsg}</div>
+                </label>  
+                <div className={notValidClasses.buttonCls}>
+                    <button type="button" className="form-control btn btn-default" aria-label={this.props.t("step3Button")} onClick={this.getBlockhash}>
+                    <span className="glyphicon glyphicon-search" aria-hidden="true">&nbsp;</span>
+                    {this.props.t("step3Button")}
+                    </button>
+                  <div className={notValidClasses.buttonValGrpCls}>{this.state.buttonValMsg}</div>
                 </div>
               </div>
+              <div className="form-group col-md-12 content form-block-holder">
+                <label className="control-label col-md-4">
+                  {this.props.t("step3BlockhashLabel")}
+                </label>
+                <div className={notValidClasses.blockhashCls}>
+                  <input
+                    ref="blockhash"
+                    autoComplete="off"
+                    type="text"
+                    placeholder={this.props.t("step3EnterBlockHash")}
+                    className="form-control"
+                    defaultValue={this.state.blockhash}
+                     />
+                  <div className={notValidClasses.blockhashValGrpCls}>{this.state.blockhashValMsg}</div>
+                </div>
+              </div>   
           </form>
         </div>
       </div>

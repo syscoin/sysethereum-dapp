@@ -1,70 +1,96 @@
 
-
 import React, { Component } from 'react';
-import Promise from 'promise';
-
-export default class Step5 extends Component {
+import SyscoinSuperblocks from '../SyscoinSuperblocks';
+import web3 from '../web3';
+class Step5 extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
-      saving: false
+ 
     };
-
+    this.submitProofs = this.submitProofs.bind(this);
     this.isValidated = this.isValidated.bind(this);
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    if(!this.props.getStore().superblockhash){
+      this.props.jumpToStep(3);
+    }
+    else if(!this.props.getStore().ethaddress || !this.props.getStore().amount){
+      this.props.jumpToStep(1);
+    }
+    else if(!this.props.getStore().blockhash || !this.props.getStore().txid){
+      this.props.jumpToStep(2);
+    }
+  }
 
   componentWillUnmount() {}
 
-  // This review screen had the 'Save' button, on clicking this is called
   isValidated() {
-    /*
-    typically this method needs to return true or false (to indicate if the local forms are validated, so StepZilla can move to the next step),
-    but in this example we simulate an ajax request which is async. In the case of async validation or server saving etc. return a Promise and StepZilla will wait
-    ... for the resolve() to work out if we can move to the next step
-    So here are the rules:
-    ~~~~~~~~~~~~~~~~~~~~~~~~
-    SYNC action (e.g. local JS form validation).. if you return:
-    true/undefined: validation has passed. Move to next step.
-    false: validation failed. Stay on current step
-    ~~~~~~~~~~~~~~~~~~~~~~~~
-    ASYNC return (server side validation or saving data to server etc).. you need to return a Promise which can resolve like so:
-    resolve(): validation/save has passed. Move to next step.
-    reject(): validation/save failed. Stay on current step
-    */
+    const userInput = this._grabUserInput(); // grab user entered vals
+    const validateNewInput = this._validateData(userInput); // run the new input against the validator
+    let isDataValid = false;
 
-    this.setState({
-      saving: true
-    });
+    this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+    
+    return isDataValid;
+  }
+  validationCheck() {
+    if (!this._validateOnDemand)
+      return;
 
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        this.setState({
-          saving: true
-        });
+    const userInput = this._grabUserInput(); // grab user entered vals
+    const validateNewInput = this._validateData(userInput); // run the new input against the validator
 
-        this.props.updateStore({savedToCloud: true});  // Update store here (this is just an example, in reality you will do it via redux or flux)
-
-        // call resolve() to indicate that server validation or other aync method was a success.
-        // ... only then will it move to the next step. reject() will indicate a fail
-        resolve();
-        // reject(); // or reject
-      }, 5000);
-    });
+    this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
   }
 
-  jumpToStep(toStep) {
-    // We can explicitly move to a step (we -1 as its a zero based index)
-    this.props.jumpToStep(toStep-1); // The StepZilla library injects this jumpToStep utility into each component
+   _validateData(data) {
+    return  {
+      buttonVal: true
+    }
   }
+  _validationErrors(val) {
+    const errMsgs = {
+    }
+    return errMsgs;
+  }
+  async submitProofs() {
+    let _txBytes = web3.utils.hexToBytes("0x" + this.props.getStore().txbytes);
+    let _txSiblings = [];
+    for(var i = 0;i<this.props.getStore().txsiblings.length;i++){
+      let _txSibling = "0x" + this.props.getStore().txsiblings[i];
+      _txSiblings.push(_txSibling);
+    }
+    let _syscoinBlockHeader = web3.utils.hexToBytes("0x" + this.props.getStore().syscoinblockheader);
+    let _syscoinBlockSiblings = [];
+    for(var i = 0;i<this.props.getStore().syscoinblocksiblings.length;i++){
+      let _blockSibling = "0x" + this.props.getStore().syscoinblocksiblings[i];
+      _syscoinBlockSiblings.push(_blockSibling);
+    }  
+    let _superblockHash = web3.utils.hexToBytes("0x" + this.props.getStore().superblockhash);
+    console.log("BEFORE RELAYTX")
+    let recpt = await SyscoinSuperblocks.methods.relayTx(_txBytes, this.props.getStore().txindex, _txSiblings, _syscoinBlockHeader, 
+    this.props.getStore().syscoinblockindex, _syscoinBlockSiblings, _superblockHash, this.props.getStore().untrustedtargetcontract).send({gas: 1000000,from: "0x2f038a7306449dc9bcde25d8399dba36ee8ad6bf"});
+     console.log("recpt " + recpt)
+  }
+
+ 
+
 
   render() {
-    const savingCls = this.state.saving ? 'saving col-md-12 show' : 'saving col-md-12 hide';
-
+    // explicit class assigning based on validation
+    let notValidClasses = {};    
+    if (typeof this.state.buttonVal == 'undefined' || this.state.buttonVal) {
+      notValidClasses.buttonCls = 'has-success col-md-8';
+      notValidClasses.buttonValGrpCls = 'val-success-tooltip';
+    }
+    else {
+       notValidClasses.buttonCls = 'has-error col-md-8';
+       notValidClasses.buttonValGrpCls = 'val-err-tooltip';
+    }   
     return (
-      <div className="step step5 review">
+      <div className="step step5">
         <div className="row">
           <form id="Form" className="form-horizontal">
             <div className="form-group">
@@ -72,41 +98,27 @@ export default class Step5 extends Component {
                 <h1>{this.props.t("step5Head")}</h1>
               </label>
             </div>
-            <div className="form-group">
-              <div className="col-md-12 control-label">
-                <div className="col-md-12 txt">
-                  <div className="col-md-4">
-                    {this.props.t("step5Gender")}
-                  </div>
-                  <div className="col-md-4">
-                    {this.props.getStore().gender}
-                  </div>
-                </div>
-                <div className="col-md-12 txt">
-                  <div className="col-md-4">
-                    {this.props.t("step5Email")}
-                  </div>
-                  <div className="col-md-4">
-                    {this.props.getStore().email}
-                  </div>
-                </div>
-                <div className="col-md-12 txt">
-                  <div className="col-md-4">
-                    {this.props.t("step5EmergencyEmail")}
-                  </div>
-                  <div className="col-md-4">
-                    {this.props.getStore().emailEmergency}
-                  </div>
-                </div>
-                <div className="col-md-12 eg-jump-lnk">
-                  <a href="#" onClick={() => this.jumpToStep(1)}>{this.props.t("step5JumpTo1")}</a>
-                </div>
-                <h2 className={savingCls}>{this.props.t("step5Promise")}</h2>
+            <div className="row content">
+              <div className="col-md-12">
+                {this.props.t("step5Description")}
               </div>
             </div>
+            <div className="form-group col-md-12 content form-block-holder">
+                <label className="control-label col-md-4">
+                </label>  
+                <div className={notValidClasses.buttonCls}>
+                    <button type="button" className="form-control btn btn-default" aria-label={this.props.t("step5Button")} onClick={this.submitProofs}>
+                    <span className="glyphicon glyphicon-send" aria-hidden="true">&nbsp;</span>
+                    {this.props.t("step5Button")}
+                    </button>
+                  <div className={notValidClasses.buttonValGrpCls}>{this.state.buttonValMsg}</div>
+                </div>
+              </div>
           </form>
         </div>
       </div>
     )
   }
 }
+
+export default Step5;

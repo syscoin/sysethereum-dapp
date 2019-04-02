@@ -1,21 +1,22 @@
 
 import React, { Component } from 'react';
-
+import * as SyscoinRpc from 'syscoin-js';
 class Step2 extends Component {
   constructor(props) {
     super(props);
     this.state = {
       asset: props.getStore().asset,
+      fundingaddress: props.getStore().fundingaddress,
       amount: props.getStore().amount,
       ethaddress: props.getStore().ethaddress,
       sysrawtxunsigned: props.getStore().sysrawtxunsigned
     };
     
     this._validateOnDemand = true; // this flag enables onBlur validation as user fills forms
-
+    this.getBurnTx = this.getBurnTx.bind(this);
     this.validationCheck = this.validationCheck.bind(this);
     this.isValidated = this.isValidated.bind(this);
-    
+    this.syscoinClient = new SyscoinRpc.default({baseUrl: "localhost", port: "28379", username: "u", password: "p"});
   }
 
   componentDidMount() {}
@@ -29,7 +30,8 @@ class Step2 extends Component {
 
     // if full validation passes then save to store and pass as valid
     if (Object.keys(validateNewInput).every((k) => { return validateNewInput[k] === true })) {
-        if (this.props.getStore().asset !== userInput.asset || this.props.getStore().amount !== userInput.amount || this.props.getStore().ethaddress !== userInput.ethaddress
+        if (this.props.getStore().asset !== userInput.asset || this.props.getStore().fundingaddress !== userInput.fundingaddress  || 
+        this.props.getStore().amount !== userInput.amount || this.props.getStore().ethaddress !== userInput.ethaddress
         || this.props.getStore().sysrawtxunsigned !== userInput.sysrawtxunsigned) { // only update store of something changed
           this.props.updateStore({
             ...userInput,
@@ -46,7 +48,70 @@ class Step2 extends Component {
 
     return isDataValid;
   }
+  async getBurnTx() {
+    let userInput = this._grabUserInput(); // grab user entered vals
+    let validateNewInput = this._validateData(userInput); // run the new input against the validator
+    validateNewInput.buttonVal = true;
+    validateNewInput.buttonValMsg = "";
+    validateNewInput.sysrawtxunsignedVal = true;
+    validateNewInput.sysrawtxunsignedValMsg = "";
+    let valid = true;
+    if(!userInput.fundingaddress || userInput.fundingaddress === ""){
+      validateNewInput.fundingaddressVal = false;
+      valid = false;
+    }
+    if(!userInput.amount || userInput.amount === ""){
+      validateNewInput.amountVal = false;
+      valid = false;
+    }  
+    if(!userInput.ethaddress || userInput.ethaddress === ""){
+      validateNewInput.ethaddressVal = false;
+      valid = false;
+    }          
+    if(valid === true){
+      let fundingAddress = userInput.fundingaddress.toString();
+      if(userInput.asset.length > 0){
+        let assetGuid = userInput.asset.toString();
+        
+        let ethAddressStripped = userInput.ethaddress.toString();
+        if(ethAddressStripped && ethAddressStripped.startsWith("0x")){
+          ethAddressStripped = ethAddressStripped.substr(2, ethAddressStripped.length);
+        }
+        const args = [assetGuid, fundingAddress, userInput.amount.toString(), ethAddressStripped];
+        try {
+          let results = await this.syscoinClient.callRpc("assetallocationburn", args);
+          if(results && results.length && results.length > 0){
+            validateNewInput.sysrawtxunsignedVal = true;
+            this.refs.sysrawtxunsigned.value = results[0];
+          }
+        }catch(e) {
+          validateNewInput.buttonVal = false;
+          validateNewInput.buttonValMsg = e.message;
+          console.log("error " + e.message);
+        }
+      }
+      else{
+        let ethAddressStripped = userInput.ethaddress.toString();
+        if(ethAddressStripped && ethAddressStripped.startsWith("0x")){
+          ethAddressStripped = ethAddressStripped.substr(2, ethAddressStripped.length);
+        }
+        const args = [userInput.amount.toString(), true, ethAddressStripped];
+        try {
+          let results = await this.syscoinClient.callRpc("syscoinburn", args);
+          if(results && results.length && results.length > 0){
+            validateNewInput.sysrawtxunsignedVal = true;
+            this.refs.sysrawtxunsigned.value = results[0];
+          }
+        
+        }catch(e) {
+          validateNewInput.buttonVal = false;
+          validateNewInput.buttonValMsg = e.message;
+        }
+      }
+    } 
+    this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
 
+  }
   validationCheck() {
     if (!this._validateOnDemand)
       return;
@@ -59,17 +124,19 @@ class Step2 extends Component {
 
    _validateData(data) {
     return  {
-      assetVal: true, // not-required: regex for positive integer
-      amountVal: true,// required: regex for positive integer
-      ethaddressVal: true, // required: regex hex string
-      sysrawtxunsignedVal: true
+      assetVal: true,
+      fundingaddressVal: true,
+      amountVal: true,
+      ethaddressVal: true, 
+      sysrawtxunsignedVal: data.sysrawtxunsigned && data.sysrawtxunsigned !== ""? true: false
     }
   }
 
   _validationErrors(val) {
     const errMsgs = {
       assetValMsg: val.assetVal ? '' : this.props.t("step2Asset"),
-      amountValMsg: val.amountVal && val.amountVal == true ? '' : this.props.t("step2Amount"),
+      fundingaddressValMsg: val.fundingaddressVal && val.fundingaddressVal === true ? '' : this.props.t("step2FundingAddress"),
+      amountValMsg: val.amountVal && val.amountVal === true ? '' : this.props.t("step2Amount"),
       ethaddressValMsg: val.ethaddressVal ? '' : this.props.t("step2EthAddress"),
       sysrawtxunsignedValMsg: val.sysrawtxunsignedVal ? '' : this.props.t("step2RawTx")
     }
@@ -78,10 +145,11 @@ class Step2 extends Component {
 
   _grabUserInput() {
     return {
-      asset: this.refs.asset,
-      amount: this.refs.amount,
-      ethaddress: this.refs.ethaddress,
-      sysrawtxunsigned: this.refs.sysrawtxunsigned
+      asset: this.refs.asset.value,
+      fundingaddress: this.refs.fundingaddress.value,
+      amount: this.refs.amount.value,
+      ethaddress: this.refs.ethaddress.value,
+      sysrawtxunsigned: this.refs.sysrawtxunsigned.value
     };
   }
 
@@ -95,6 +163,13 @@ class Step2 extends Component {
     else {
        notValidClasses.assetCls = 'has-error col-md-8';
        notValidClasses.assetValGrpCls = 'val-err-tooltip';
+    }
+    if (typeof this.state.fundingaddressVal == 'undefined' || this.state.fundingaddressVal) {
+      notValidClasses.fundingaddressCls = 'no-error col-md-8';
+    }
+    else {
+      notValidClasses.fundingaddressCls = 'has-error col-md-8';
+      notValidClasses.fundingaddressValGrpCls = 'val-err-tooltip';
     }
 
     if (typeof this.state.amountVal == 'undefined' || this.state.amountVal) {
@@ -118,6 +193,13 @@ class Step2 extends Component {
       notValidClasses.sysrawtxunsignedCls = 'has-error col-md-8';
       notValidClasses.sysrawtxunsignedValGrpCls = 'val-err-tooltip';
     }
+    if (typeof this.state.buttonVal == 'undefined' || this.state.buttonVal) {
+      notValidClasses.buttonCls = 'no-error col-md-8';
+    }
+    else {
+      notValidClasses.buttonCls = 'has-error col-md-8';
+      notValidClasses.buttonValGrpCls = 'val-err-tooltip';
+    }
     return (
       <div className="step step2">
         <div className="row">
@@ -134,14 +216,14 @@ class Step2 extends Component {
             </div>
             <div className="form-group col-md-12 content form-block-holder">
                 <label className="control-label col-md-4">
-                  Asset GUID
+                  {this.props.t("step2AssetLabel")}
                 </label>
                 <div className={notValidClasses.assetCls}>
                   <input
                     ref="asset"
                     autoComplete="off"
                     type="number"
-                    placeholder="Enter Asset GUID here if applicable..."
+                    placeholder={this.props.t("step2EnterAsset")}
                     className="form-control"
                     defaultValue={this.state.asset}
                      />
@@ -150,14 +232,30 @@ class Step2 extends Component {
               </div>
               <div className="form-group col-md-12 content form-block-holder">
                 <label className="control-label col-md-4">
-                  Amount
+                  {this.props.t("step2FundingAddressLabel")}
+                </label>
+                <div className={notValidClasses.assetCls}>
+                  <input
+                    ref="fundingaddress"
+                    autoComplete="off"
+                    type="text"
+                    placeholder={this.props.t("step2EnterFundingAddress")}
+                    className="form-control"
+                    defaultValue={this.state.fundingaddress}
+                     />
+                  <div className={notValidClasses.fundingaddressValGrpCls}>{this.state.fundingaddressValMsg}</div>
+                </div>
+              </div>
+              <div className="form-group col-md-12 content form-block-holder">
+                <label className="control-label col-md-4">
+                  {this.props.t("step2AmountLabel")}
                 </label>
                 <div className={notValidClasses.amountCls}>
                   <input
                     ref="amount"
                     autoComplete="off"
                     type="number"
-                    placeholder="Amount to transfer..."
+                    placeholder={this.props.t("step2EnterAmount")}
                     className="form-control"
                     required
                     defaultValue={this.state.amount}
@@ -167,14 +265,14 @@ class Step2 extends Component {
               </div>
               <div className="form-group col-md-12 content form-block-holder">
                 <label className="control-label col-md-4">
-                  Ethereum Address
+                  {this.props.t("step2EthAddressLabel")}
                 </label>
                 <div className={notValidClasses.ethaddressCls}>
                   <input
                     ref="ethaddress"
                     autoComplete="off"
                     type="text"
-                    placeholder="Ethereum address of recipient..."
+                    placeholder={this.props.t("step2EnterEthAddress")}
                     className="form-control"
                     required
                     defaultValue={this.state.ethaddress}
@@ -182,19 +280,31 @@ class Step2 extends Component {
                   <div className={notValidClasses.ethaddressValGrpCls}>{this.state.ethaddressValMsg}</div>
                 </div>
               </div>
-              <button type="button" className="btn btn-default">
-                <span className="glyphicon glyphicon-send"></span>
-              </button>
+
               <div className="form-group col-md-12 content form-block-holder">
                 <label className="control-label col-md-4">
-                  Raw Transaction
-                </label>
+                </label>  
+                <div className={notValidClasses.buttonCls}>
+                    <button type="button" className="form-control btn btn-default" aria-label={this.props.t("step2Button")} onClick={this.getBurnTx}>
+                    <span className="glyphicon glyphicon-send" aria-hidden="true">&nbsp;</span>
+                    {this.props.t("step2Button")}
+                    </button>
+                  <div className={notValidClasses.buttonValGrpCls}>{this.state.buttonValMsg}</div>
+                </div>
+              </div>
+
+              
+              <div className="form-group col-md-12 content form-block-holder">
+                <label className="control-label col-md-4">
+                  {this.props.t("step2RawTxLabel")}
+                </label>  
                 <div className={notValidClasses.sysrawtxunsignedCls}>
-                  <input
+                  <textarea
+                    rows="3"
                     ref="sysrawtxunsigned"
                     autoComplete="off"
                     type="text"
-                    placeholder="Syscoin raw unsigned transaction..."
+                    placeholder={this.props.t("step2EnterRawTx")}
                     className="form-control"
                     required
                     defaultValue={this.state.sysrawtxunsigned}
