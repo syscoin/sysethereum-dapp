@@ -195,11 +195,11 @@ class Step4 extends Component {
     // explicit class assigning based on validation
     let notValidClasses = {};    
     if (typeof this.state.buttonVal == 'undefined' || this.state.buttonVal) {
-      notValidClasses.buttonCls = 'has-success col-md-8';
+      notValidClasses.buttonCls = 'has-success';
       notValidClasses.buttonValGrpCls = 'val-success-tooltip';
     }
     else {
-       notValidClasses.buttonCls = 'has-error col-md-8';
+       notValidClasses.buttonCls = 'has-error';
        notValidClasses.buttonValGrpCls = 'val-err-tooltip';
     }   
     return (

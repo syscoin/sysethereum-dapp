@@ -7,7 +7,6 @@ class Step5 extends Component {
   constructor(props) {
     super(props);
     this.state = {
- 
     };
     this.submitProofs = this.submitProofs.bind(this);
     this.isValidated = this.isValidated.bind(this);
@@ -57,6 +56,18 @@ class Step5 extends Component {
     return errMsgs;
   }
   async submitProofs() {
+    if(!web3 || !web3.currentProvider || web3.currentProvider.isMetaMask === false){
+      this.setState({buttonVal: false, buttonValMsg: this.props.t("step5InstallMetamask")});
+      return;  
+    }
+    this.setState({buttonVal: true, buttonValMsg: ""});
+    let accounts = await web3.eth.getAccounts();
+    if(!accounts || !accounts[0] || accounts[0] === 'undefined')
+    {
+      this.setState({buttonVal: false, buttonValMsg: this.props.t("step5LoginMetamask")});
+      return;
+    }
+    this.setState({buttonVal: true, buttonValMsg: this.props.t("step5AuthMetamask")});
     let _txBytes = "0x" + this.props.getStore().txbytes;
     let _txSiblings = [];
     for(var i = 0;i<this.props.getStore().txsiblings.length;i++){
@@ -74,10 +85,16 @@ class Step5 extends Component {
     for(var i = 0;i<merkleProof.sibling.length;i++){
       merkleProof.sibling[i] = "0x" + merkleProof.sibling[i];
     }
-    console.log("merkleProof" + merkleProof.toString());
-    let recpt = await SyscoinSuperblocks.methods.relayTx(_txBytes, this.props.getStore().txindex, merkleProof.sibling, _syscoinBlockHeader, 
-    this.props.getStore().syscoinblockindex, _syscoinBlockSiblings, _superblockHash, this.props.getStore().untrustedtargetcontract).send({gas: 1000000,from: "0x2f038a7306449dc9bcde25d8399dba36ee8ad6bf"});
-     console.log("recpt " + recpt);
+    try{
+      let recpt = await SyscoinSuperblocks.methods.relayTx(_txBytes, this.props.getStore().txindex, merkleProof.sibling, _syscoinBlockHeader, 
+      this.props.getStore().syscoinblockindex, _syscoinBlockSiblings, _superblockHash, this.props.getStore().untrustedtargetcontract).send({from: accounts[0], gas: 1000000});
+      console.log("recpt " + recpt);
+    }
+    catch(error){
+      this.setState({buttonVal: false, buttonValMsg: error.message});
+      return;
+    }
+     this.setState({buttonVal: true, buttonValMsg:  this.props.t("step5Success")});
   }
 
  
@@ -87,11 +104,11 @@ class Step5 extends Component {
     // explicit class assigning based on validation
     let notValidClasses = {};    
     if (typeof this.state.buttonVal == 'undefined' || this.state.buttonVal) {
-      notValidClasses.buttonCls = 'has-success col-md-8';
+      notValidClasses.buttonCls = 'has-success';
       notValidClasses.buttonValGrpCls = 'val-success-tooltip';
     }
     else {
-       notValidClasses.buttonCls = 'has-error col-md-8';
+       notValidClasses.buttonCls = 'has-error';
        notValidClasses.buttonValGrpCls = 'val-err-tooltip';
     }   
     return (
