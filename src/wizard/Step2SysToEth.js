@@ -205,16 +205,12 @@ class Step2 extends Component {
         <div className="row">
           <form id="Form" className="form-horizontal">
             <div className="form-group">
-              <label className="col-md-12 control-label">
+            <label className="col-md-12 control-label">
                 <h1>{this.props.t("step2Head")}</h1>
+                <h3>{this.props.t("step2Description")}</h3>
               </label>
-            </div>
-            <div className="row content">
+              <div className="row">
               <div className="col-md-12">
-                {this.props.t("step2Description")}
-              </div>
-            </div>
-            <div className="form-group col-md-12 content form-block-holder">
                 <label className="control-label col-md-4">
                   {this.props.t("step2AssetLabel")}
                 </label>
@@ -230,7 +226,9 @@ class Step2 extends Component {
                   <div className={notValidClasses.assetValGrpCls}>{this.state.assetValMsg}</div>
                 </div>
               </div>
-              <div className="form-group col-md-12 content form-block-holder">
+              </div>
+              <div className="row">
+              <div className="col-md-12">
                 <label className="control-label col-md-4">
                   {this.props.t("step2FundingAddressLabel")}
                 </label>
@@ -246,7 +244,9 @@ class Step2 extends Component {
                   <div className={notValidClasses.fundingaddressValGrpCls}>{this.state.fundingaddressValMsg}</div>
                 </div>
               </div>
-              <div className="form-group col-md-12 content form-block-holder">
+              </div>
+              <div className="row">
+              <div className="col-md-12">
                 <label className="control-label col-md-4">
                   {this.props.t("step2AmountLabel")}
                 </label>
@@ -263,7 +263,9 @@ class Step2 extends Component {
                   <div className={notValidClasses.amountValGrpCls}>{this.state.amountValMsg}</div>
                 </div>
               </div>
-              <div className="form-group col-md-12 content form-block-holder">
+              </div>
+              <div className="row">
+              <div className="col-md-12">
                 <label className="control-label col-md-4">
                   {this.props.t("step2EthAddressLabel")}
                 </label>
@@ -280,8 +282,9 @@ class Step2 extends Component {
                   <div className={notValidClasses.ethaddressValGrpCls}>{this.state.ethaddressValMsg}</div>
                 </div>
               </div>
-
-              <div className="form-group col-md-12 content form-block-holder">
+              </div>
+              <div className="row">
+              <div className="col-md-12">
                 <label className="control-label col-md-4">
                 </label>  
                 <div className={notValidClasses.buttonCls}>
@@ -292,9 +295,10 @@ class Step2 extends Component {
                   <div className={notValidClasses.buttonValGrpCls}>{this.state.buttonValMsg}</div>
                 </div>
               </div>
+              </div>
 
-              
-              <div className="form-group col-md-12 content form-block-holder">
+              <div className="row">
+              <div className="col-md-12">
                 <label className="control-label col-md-4">
                   {this.props.t("step2RawTxLabel")}
                 </label>  
@@ -312,6 +316,8 @@ class Step2 extends Component {
                   <div className={notValidClasses.sysrawtxunsignedValGrpCls}>{this.state.sysrawtxunsignedValMsg}</div>
                 </div>
               </div>
+              </div>
+            </div>
           </form>
         </div>
       </div>

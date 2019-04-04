@@ -145,14 +145,11 @@ class Step3 extends Component {
             <div className="form-group">
               <label className="col-md-12 control-label">
                 <h1>{this.props.t("step3Head")}</h1>
+                <h3>{this.props.t("step3Description")}</h3>
               </label>
-            </div>
-            <div className="row content">
-              <div className="col-md-12">
-                {this.props.t("step3Description")}
-              </div>
-            </div>
-            <div className="form-group col-md-12 content form-block-holder">
+           
+            <div className="row">
+            <div className="col-md-12 ">
                 <label className="control-label col-md-4">
                   {this.props.t("step2RawTxLabel")}
                 </label>  
@@ -166,7 +163,9 @@ class Step3 extends Component {
                       />
                 </div>
               </div>
-            <div className="form-group col-md-12 content form-block-holder">
+            </div>
+            <div className="row">
+            <div className="col-md-12">
                 <label className="control-label col-md-4">
                   {this.props.t("step3TxidLabel")}
                 </label>
@@ -183,7 +182,9 @@ class Step3 extends Component {
                   <div className={notValidClasses.txidValGrpCls}>{this.state.txidValMsg}</div>
                 </div>
               </div>
-              <div className="form-group col-md-12 content form-block-holder">
+              </div>
+              <div className="row">
+              <div className="col-md-12">
                 <label className="control-label col-md-4">
                 </label>  
                 <div className={notValidClasses.buttonCls}>
@@ -194,7 +195,9 @@ class Step3 extends Component {
                   <div className={notValidClasses.buttonValGrpCls}>{this.state.buttonValMsg}</div>
                 </div>
               </div>
-              <div className="form-group col-md-12 content form-block-holder">
+              </div>
+              <div className="row">
+              <div className="col-md-12">
                 <label className="control-label col-md-4">
                   {this.props.t("step3BlockhashLabel")}
                 </label>
@@ -210,6 +213,8 @@ class Step3 extends Component {
                   <div className={notValidClasses.blockhashValGrpCls}>{this.state.blockhashValMsg}</div>
                 </div>
               </div>   
+              </div>
+              </div>
           </form>
         </div>
       </div>

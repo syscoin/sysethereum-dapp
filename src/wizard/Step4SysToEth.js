@@ -209,14 +209,11 @@ class Step4 extends Component {
             <div className="form-group">
               <label className="col-md-12 control-label">
                 <h1>{this.props.t("step4Head")}</h1>
+                <h3>{this.props.t("step4Description")}</h3>
               </label>
-            </div>
-            <div className="row content">
+            
+            <div className="row">
               <div className="col-md-12">
-                {this.props.t("step4Description")}
-              </div>
-            </div>
-            <div className="form-group col-md-12 content form-block-holder">
                 <label className="control-label col-md-4">
                 </label>  
                 <div className={notValidClasses.buttonCls}>
@@ -227,6 +224,8 @@ class Step4 extends Component {
                   <div className={notValidClasses.buttonValGrpCls}>{this.state.buttonValMsg}</div>
                 </div>
               </div>
+            </div>
+            </div>
           </form>
         </div>
       </div>
