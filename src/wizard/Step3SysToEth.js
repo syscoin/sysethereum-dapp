@@ -18,9 +18,7 @@ class Step3 extends Component {
   }
 
   componentDidMount() {
-    if(!this.props.getStore().ethaddress || !this.props.getStore().amount || !this.props.getStore().sysrawtxunsigned){
-      this.props.jumpToStep(1);
-    }
+    
   }
 
   componentWillUnmount() {}

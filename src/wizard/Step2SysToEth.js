@@ -128,7 +128,7 @@ class Step2 extends Component {
       fundingaddressVal: true,
       amountVal: true,
       ethaddressVal: true, 
-      sysrawtxunsignedVal: data.sysrawtxunsigned && data.sysrawtxunsigned !== ""? true: false
+      sysrawtxunsignedVal: true
     }
   }
 

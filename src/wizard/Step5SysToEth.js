@@ -29,9 +29,6 @@ class Step5 extends Component {
     if(!this.props.getStore().superblockhash){
       this.props.jumpToStep(3);
     }
-    else if(!this.props.getStore().ethaddress || !this.props.getStore().amount){
-      this.props.jumpToStep(1);
-    }
     else if(!this.props.getStore().blockhash || !this.props.getStore().txid){
       this.props.jumpToStep(2);
     }
