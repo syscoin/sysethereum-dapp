@@ -13,7 +13,7 @@ i18n.use(LanguageDetector).init({
         'step5': 'Step 5',
         'step6': 'Step 6',
         'repoUrl': 'https://github.com/syscoin/sysethereum-contracts',
-        'nextTextOnFinalActionStep': 'Save',
+        'nextTextOnFinalActionStep': 'Submit Proofs',
         'nextButtonText': 'Next',
         'backButtonText': 'Back',
         'step1Head': 'Welcome to the official Syscoin to Ethereum Bridge wizard!',

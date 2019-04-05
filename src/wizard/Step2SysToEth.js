@@ -16,7 +16,7 @@ class Step2 extends Component {
     this.getBurnTx = this.getBurnTx.bind(this);
     this.validationCheck = this.validationCheck.bind(this);
     this.isValidated = this.isValidated.bind(this);
-    this.syscoinClient = new SyscoinRpc.default({baseUrl: "localhost", port: "28379", username: "u", password: "p"});
+    this.syscoinClient = new SyscoinRpc.default({baseUrl: "localhost", port: "8370", username: "u", password: "p"});
   }
 
   componentDidMount() {}
@@ -81,8 +81,15 @@ class Step2 extends Component {
         try {
           let results = await this.syscoinClient.callRpc("assetallocationburn", args);
           if(results && results.length && results.length > 0){
-            validateNewInput.sysrawtxunsignedVal = true;
-            this.refs.sysrawtxunsigned.value = results[0];
+            try{
+              let results1 = await this.syscoinClient.callRpc("syscointxfund", [results[0], fundingAddress]);
+              validateNewInput.sysrawtxunsignedVal = true;
+              this.refs.sysrawtxunsigned.value = results1;
+            }catch(e){
+              validateNewInput.buttonVal = false;
+              validateNewInput.buttonValMsg = e.message;
+              console.log("error " + e.message);
+            }
           }
         }catch(e) {
           validateNewInput.buttonVal = false;
@@ -99,8 +106,15 @@ class Step2 extends Component {
         try {
           let results = await this.syscoinClient.callRpc("syscoinburn", args);
           if(results && results.length && results.length > 0){
-            validateNewInput.sysrawtxunsignedVal = true;
-            this.refs.sysrawtxunsigned.value = results[0];
+            try{
+              let results1 = await this.syscoinClient.callRpc("syscointxfund", [results[0],fundingAddress]);
+              validateNewInput.sysrawtxunsignedVal = true;
+              this.refs.sysrawtxunsigned.value = results1;
+            }catch(e){
+              validateNewInput.buttonVal = false;
+              validateNewInput.buttonValMsg = e.message;
+              console.log("error " + e.message);
+            }
           }
         
         }catch(e) {

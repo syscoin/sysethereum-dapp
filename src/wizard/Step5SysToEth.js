@@ -20,7 +20,6 @@ class Step5 extends Component {
 
     };
     this.submitProofs = this.submitProofs.bind(this);
-    this.isValidated = this.isValidated.bind(this);
     this.downloadReceipt = this.downloadReceipt.bind(this);
     this.setStateFromReceipt = this.setStateFromReceipt.bind(this);
   }
@@ -43,19 +42,13 @@ class Step5 extends Component {
     document.body.appendChild(element); // Required for this to work in FireFox
     element.click();
   }
-  isValidated() {
-    const userInput = this._grabUserInput(); // grab user entered vals
-    const validateNewInput = this._validateData(userInput); // run the new input against the validator
-    let isDataValid = false;
-
-    this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-    
-    return isDataValid;
-  }
+ 
   setStateFromReceipt(receipt, error, confirmation) {
+    if(receipt.transactionHash && this.state.receiptTxHash !== receipt.transactionHash){
+      return;
+    }
     if(receipt.events && receipt.events.RelayTransaction && receipt.events.RelayTransaction.returnValues && receipt.events.RelayTransaction.returnValues[0]){
-      const bigNum = web3.utils.toBN(receipt.events.RelayTransaction.returnValues[0]);
-      if(bigNum === web3.utils.toBN(0)){
+      if(receipt.events.RelayTransaction.returnValues[0] == 0 || receipt.events.RelayTransaction.returnValues[1] == 0){
         error = this.props.t("step5ErrorCheckLog");
       }
     }
@@ -77,26 +70,7 @@ class Step5 extends Component {
       buttonVal: error !== null? false: true, 
       buttonValMsg:  error !== null? error: this.props.t("step5Success")}); 
   }
-  validationCheck() {
-    if (!this._validateOnDemand)
-      return;
 
-    const userInput = this._grabUserInput(); // grab user entered vals
-    const validateNewInput = this._validateData(userInput); // run the new input against the validator
-
-    this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-  }
-
-   _validateData(data) {
-    return  {
-      buttonVal: true
-    }
-  }
-  _validationErrors(val) {
-    const errMsgs = {
-    }
-    return errMsgs;
-  }
   async submitProofs() {
     if(!web3 || !web3.currentProvider || web3.currentProvider.isMetaMask === false){
       this.setState({buttonVal: false, buttonValMsg: this.props.t("step5InstallMetamask")});
@@ -119,6 +93,9 @@ class Step5 extends Component {
     let accounts = await web3.eth.getAccounts();
     if(!accounts || !accounts[0] || accounts[0] === 'undefined')
     {
+      if(window.ethereum){
+        await window.ethereum.enable();
+      }
       this.setState({buttonVal: false, buttonValMsg: this.props.t("step5LoginMetamask")});
       return;
     }
@@ -140,7 +117,7 @@ class Step5 extends Component {
     for(let   i = 0;i<merkleProof.sibling.length;i++){
       merkleProof.sibling[i] = "0x" + merkleProof.sibling[i];
     }
-
+    
     let thisObj = this;
      SyscoinSuperblocks.methods.relayTx(_txBytes, this.props.getStore().txindex, merkleProof.sibling, _syscoinBlockHeader, 
       this.props.getStore().syscoinblockindex, _syscoinBlockSiblings, _superblockHash, this.props.getStore().untrustedtargetcontract).send({from: accounts[0], gas: 500000})
@@ -151,11 +128,15 @@ class Step5 extends Component {
         thisObj.setStateFromReceipt(receipt, null, confirmationNumber);
         })
       .on('error', (error, receipt) => {
+        if(error.message.length <= 256){
+          error = JSON.parse(error.message.substring(error.message.indexOf("{")));
+        }
+        let message = error.message.toString();
         if(receipt){
-          thisObj.setStateFromReceipt(receipt, error.message.substring(0, 40), 0);
+          thisObj.setStateFromReceipt(receipt, message, 0);
         }
         else{
-          thisObj.setState({buttonVal: false, buttonValMsg:  error.message.substring(0, 40)}); 
+          thisObj.setState({buttonVal: false, buttonValMsg:  message}); 
         }
       })
   }
