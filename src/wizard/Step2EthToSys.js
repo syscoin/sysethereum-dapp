@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import SyscoinSuperblocks from '../SyscoinSuperblocks';
 import { getProof } from 'bitcoin-proof'
 import web3 from '../web3';
-class Step5 extends Component {
+class Step2ES extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -25,12 +25,7 @@ class Step5 extends Component {
   }
 
   componentDidMount() {
-    if(!this.props.getStore().superblockhash){
-      this.props.jumpToStep(3);
-    }
-    else if(!this.props.getStore().blockhash || !this.props.getStore().txid){
-      this.props.jumpToStep(2);
-    }
+   
   }
 
   componentWillUnmount() {}
@@ -93,11 +88,10 @@ class Step5 extends Component {
     let accounts = await web3.eth.getAccounts();
     if(!accounts || !accounts[0] || accounts[0] === 'undefined')
     {
-      this.setState({buttonVal: false, buttonValMsg: this.props.t("step5LoginMetamask")});
       if(window.ethereum){
         await window.ethereum.enable();
       }
-     
+      this.setState({buttonVal: false, buttonValMsg: this.props.t("step5LoginMetamask")});
       return;
     }
     this.setState({buttonVal: true, buttonValMsg: this.props.t("step5AuthMetamask")});
@@ -129,7 +123,7 @@ class Step5 extends Component {
         thisObj.setStateFromReceipt(receipt, null, confirmationNumber);
         })
       .on('error', (error, receipt) => {
-        if(error.message.length <= 512){
+        if(error.message.length <= 256){
           error = JSON.parse(error.message.substring(error.message.indexOf("{")));
         }
         let message = error.message.toString();
@@ -157,7 +151,7 @@ class Step5 extends Component {
        notValidClasses.buttonValGrpCls = 'val-err-tooltip';
     }   
     return (
-      <div className="step step5">
+      <div className="step step2es">
         <div className="row">
           <form id="Form" className="form-horizontal">
             <div className="form-group">
@@ -220,4 +214,4 @@ class Step5 extends Component {
   }
 }
 
-export default Step5;
+export default Step2ES;

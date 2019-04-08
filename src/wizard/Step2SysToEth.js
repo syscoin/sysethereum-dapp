@@ -246,7 +246,7 @@ class Step2 extends Component {
                 <label className="control-label col-md-4">
                   {this.props.t("step2FundingAddressLabel")}
                 </label>
-                <div className={notValidClasses.assetCls}>
+                <div className={notValidClasses.fundingaddressCls}>
                   <input
                     ref="fundingaddress"
                     autoComplete="off"
