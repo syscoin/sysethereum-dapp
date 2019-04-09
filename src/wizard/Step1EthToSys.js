@@ -3,7 +3,9 @@ import React, { Component } from 'react';
 import * as SyscoinRpc from 'syscoin-js';
 import web3 from '../web3';
 import tpabi from '../SyscoinTransactionProcessor';
-import hsabi from '../HumanStandardToken';
+import hsabi from '../HumanStandardToken';  
+import EthProof from 'eth-proof';
+const rlp = require('rlp');
 class Step1ES extends Component {
   constructor(props) {
     super(props);
@@ -31,10 +33,12 @@ class Step1ES extends Component {
     this.isValidated = this.isValidated.bind(this);
     this.setStateFromReceipt = this.setStateFromReceipt.bind(this);
     this.syscoinClient = new SyscoinRpc.default({baseUrl: "localhost", port: "8370", username: "u", password: "p"});
+   
+
   }
 
   componentDidMount() {
-    
+   
   }
   isValidated() {
     const userInput = this._grabUserInput(); // grab user entered vals
@@ -169,13 +173,20 @@ class Step1ES extends Component {
     validateNewInput.buttonVal = error !== null? false: true;
     validateNewInput.buttonValMsg =  error !== null? error: this.props.t("step5Success");
   }
+  
+
+  byteToHex(b) {
+    var hexChar = ["0", "1", "2", "3", "4", "5", "6", "7","8", "9", "A", "B", "C", "D", "E", "F"];
+    return hexChar[(b >> 4) & 0x0f] + hexChar[b & 0x0f];
+  }
   async getWitnessProgram(address, validateNewInput){
     if(address.length > 0){
       const args = [address];
       try {
         let results = await this.syscoinClient.callRpc("getaddressinfo", args);
         if(results){
-          return "0x" + results.witness_version.toString(16) + results.witness_program;
+          let version = this.byteToHex(results.witness_version);
+          return "0x" + version + results.witness_program;
         }
       }catch(e) {
         validateNewInput.buttonVal = false;
@@ -186,6 +197,22 @@ class Step1ES extends Component {
     return "";
   }
   async submitProofs() {
+   
+
+    const buildEthProof = new EthProof("https://mainnet.infura.io/v3/d178aecf49154b12be98e68e998cfb8d");
+    buildEthProof.getTransactionProof('0x74bdf5450025b8806d55cfbb9b393dce630232f5bf87832ae6b675db9d286ac3').then((result)=>{
+      let tx_hex = rlp.encode(result.value).toString('hex');
+      let tx_root_hex = rlp.encode(result.header[4]).toString('hex');
+      let txmerkleproof_hex = rlp.encode(result.parentNodes).toString('hex');
+      let txmerkleroofpath_hex = result.path.toString('hex');
+      console.log("tx_root_hex " + tx_root_hex);
+      console.log("tx_hex: " + tx_hex);
+      console.log("txmerkleproof_hex: " + txmerkleproof_hex);
+      console.log("txmerkleroofpath_hex: " + txmerkleroofpath_hex);
+      console.log("block number: " + result.blockNumber);
+  });
+
+
     let userInput = this._grabUserInput(); // grab user entered vals
     let validateNewInput = this._validateData(userInput); // run the new input against the validator
     validateNewInput.buttonVal = true;

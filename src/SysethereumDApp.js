@@ -32,31 +32,23 @@ class SysethereumDApp extends Component {
       <div>
       <div  className={(this.state.introDisplay  ? "visible" : "hidden")}>
       <div className="step">
-      <div className="row">
-        <form id="Form" className="form-horizontal">
-          <div className="form-group">
-          
-          <div className="row">
-            <div className="col-md-12">
-              <label className="control-label col-md-4">
-              </label>  
-              <div>
-                  <button type="button" className="form-control btn btn-default" onClick={this.onSysToEth}>
-                  <span className="glyphicon glyphicon-search" aria-hidden="true">&nbsp;</span>
-                  Syscoin To Ethereum
-                  </button>
+      <div className="mycol">
+          <div className="mycontainer">
+            <a href="javascript:void(0)" onClick={this.onSysToEth}>
+              <div className="mybtn mybtn-two">
+              <span>SYS=>ETH</span>
               </div>
-              <div>
-                  <button type="button" className="form-control btn btn-default" onClick={this.onEthToSys}>
-                  <span className="glyphicon glyphicon-search" aria-hidden="true">&nbsp;</span>
-                  Ethereum To Syscoin
-                  </button>
-              </div>
+            </a>
+
+        &nbsp;&nbsp;&nbsp;
+
+            <a href="javascript:void(0)" onClick={this.onEthToSys}>
+            <div className="mybtn mybtn-two">
+              <span>ETH=>SYS</span>
             </div>
+            </a>
           </div>
-          </div>
-        </form>
-      </div>
+        </div> 
     </div>
     </div>
     <div className={(this.state.ethToSysDisplay  ? "visible" : "hidden")}>
