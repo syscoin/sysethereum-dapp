@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import SyscoinSuperblocks from '../SyscoinSuperblocks';
 import { getProof } from 'bitcoin-proof'
 import web3 from '../web3';
+import CONFIGURATION from '../config';
 class Step5 extends Component {
   constructor(props) {
     super(props);
@@ -75,6 +76,15 @@ class Step5 extends Component {
     if(!web3 || !web3.currentProvider || web3.currentProvider.isMetaMask === false){
       this.setState({buttonVal: false, buttonValMsg: this.props.t("step5InstallMetamask")});
       return;  
+    }
+    let chainId = web3.eth.getChainId();
+    if(CONFIGURATION.testnet && chainId !== 4){
+      this.setState({buttonVal: false, buttonValMsg: this.props.t("stepUseTestnet")});
+      return;       
+    }
+    else if(!CONFIGURATION.testnet && chainId !== 1){
+      this.setState({buttonVal: false, buttonValMsg: this.props.t("stepUseMainnet")});
+      return;       
     }
     this.setState({
       receiptStatus: '',

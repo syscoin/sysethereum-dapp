@@ -71,6 +71,7 @@ class Step2ES extends Component {
       this.setState({buttonVal: false, buttonValMsg: this.props.t("step5InstallMetamask")});
       return;  
     }
+ 
     this.setState({
       receiptStatus: '',
       receiptTxHash: '',

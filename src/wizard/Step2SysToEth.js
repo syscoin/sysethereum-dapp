@@ -1,6 +1,7 @@
 
 import React, { Component } from 'react';
 import * as SyscoinRpc from 'syscoin-js';
+import CONFIGURATION from '../config';
 class Step2 extends Component {
   constructor(props) {
     super(props);
@@ -16,7 +17,8 @@ class Step2 extends Component {
     this.getBurnTx = this.getBurnTx.bind(this);
     this.validationCheck = this.validationCheck.bind(this);
     this.isValidated = this.isValidated.bind(this);
-    this.syscoinClient = new SyscoinRpc.default({baseUrl: "localhost", port: "8370", username: "u", password: "p"});
+    this.syscoinClient = new SyscoinRpc.default({baseUrl: CONFIGURATION.syscoinRpcURL, port: CONFIGURATION.syscoinRpcPort, username: CONFIGURATION.syscoinRpcUser, password: CONFIGURATION.syscoinRpcPassword});
+   
   }
 
   componentDidMount() {}

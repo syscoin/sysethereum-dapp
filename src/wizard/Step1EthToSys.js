@@ -5,6 +5,7 @@ import web3 from '../web3';
 import tpabi from '../SyscoinTransactionProcessor';
 import hsabi from '../HumanStandardToken';  
 import EthProof from 'eth-proof';
+import CONFIGURATION from '../config';
 const rlp = require('rlp');
 class Step1ES extends Component {
   constructor(props) {
@@ -32,9 +33,7 @@ class Step1ES extends Component {
     this.validationCheck = this.validationCheck.bind(this);
     this.isValidated = this.isValidated.bind(this);
     this.setStateFromReceipt = this.setStateFromReceipt.bind(this);
-    this.syscoinClient = new SyscoinRpc.default({baseUrl: "localhost", port: "8370", username: "u", password: "p"});
-   
-
+    this.syscoinClient = new SyscoinRpc.default({baseUrl: CONFIGURATION.syscoinRpcURL, port: CONFIGURATION.syscoinRpcPort, username: CONFIGURATION.syscoinRpcUser, password: CONFIGURATION.syscoinRpcPassword});
   }
 
   componentDidMount() {
@@ -199,7 +198,7 @@ class Step1ES extends Component {
   async submitProofs() {
    
 
-    const buildEthProof = new EthProof("https://mainnet.infura.io/v3/d178aecf49154b12be98e68e998cfb8d");
+    const buildEthProof = new EthProof(CONFIGURATION.infuraURL);
     buildEthProof.getTransactionProof('0x74bdf5450025b8806d55cfbb9b393dce630232f5bf87832ae6b675db9d286ac3').then((result)=>{
       let tx_hex = rlp.encode(result.value).toString('hex');
       let tx_root_hex = rlp.encode(result.header[4]).toString('hex');
@@ -210,6 +209,10 @@ class Step1ES extends Component {
       console.log("txmerkleproof_hex: " + txmerkleproof_hex);
       console.log("txmerkleroofpath_hex: " + txmerkleroofpath_hex);
       console.log("block number: " + result.blockNumber);
+  }).catch((e)=>{      
+    validateNewInput.buttonVal = false;
+    validateNewInput.buttonValMsg = this.props.t("step1ESInvalidProof") + e;
+    this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
   });
 
 
@@ -258,6 +261,18 @@ class Step1ES extends Component {
       this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
       return;  
     }
+    let chainId = web3.eth.getChainId();
+    if(CONFIGURATION.testnet && chainId !== 4){
+      validateNewInput.buttonVal = false;
+      validateNewInput.buttonValMsg = this.props.t("stepUseTestnet");
+      this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+      return;        
+    } else if(!CONFIGURATION.testnet && chainId !== 1){
+      validateNewInput.buttonVal = false;
+      validateNewInput.buttonValMsg = this.props.t("stepUseMainnet");
+      this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+      return;        
+    }
     let accounts = await web3.eth.getAccounts();
     if(!accounts || !accounts[0] || accounts[0] === 'undefined')
     {
@@ -277,15 +292,15 @@ class Step1ES extends Component {
     validateNewInput.buttonVal = true;
     validateNewInput.buttonValMsg = this.props.t("step5AuthMetamask");
     this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-    let contract = await web3.eth.Contract(tpabi, userInput.sysxContract /*"0x0ddc3d46509e2add333c80dc28f837b88cf50ec0"*/);
+    let contract = await web3.eth.Contract(tpabi, userInput.sysxContract);
     
-    let contractBase = await web3.eth.Contract(hsabi, userInput.sysxContract /*"0x0ddc3d46509e2add333c80dc28f837b88cf50ec0"*/);
+    let contractBase = await web3.eth.Contract(hsabi, userInput.sysxContract);
     
     let decimals = await contractBase.methods.decimals().call();
     
-    let assetGUID = userInput.toSysAssetGUID /*1702063431*/;
+    let assetGUID = userInput.toSysAssetGUID;
     let amount = userInput.toSysAmount*Math.pow(10, decimals);
-    let fromAccount = userInput.sysxFromAccount/*"0x5a714c3ed4ce4f297679e733f3c476b24d8895e5"*/;
+    let fromAccount = userInput.sysxFromAccount;
 
     
     let thisObj = this;

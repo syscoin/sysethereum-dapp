@@ -1,6 +1,7 @@
 
 import React, { Component } from 'react';
 import * as SyscoinRpc from 'syscoin-js';
+import CONFIGURATION from '../config';
 const axios = require('axios');
 class Step4 extends Component {
   constructor(props) {
@@ -37,7 +38,7 @@ class Step4 extends Component {
     this.getProofs = this.getProofs.bind(this);
     this.validationCheck = this.validationCheck.bind(this);
     this.isValidated = this.isValidated.bind(this);
-    this.syscoinClient = new SyscoinRpc.default({baseUrl: "localhost", port: "8370", username: "u", password: "p"});
+    this.syscoinClient = new SyscoinRpc.default({baseUrl: CONFIGURATION.syscoinRpcURL, port: CONFIGURATION.syscoinRpcPort, username: CONFIGURATION.syscoinRpcUser, password: CONFIGURATION.syscoinRpcPassword});
   }
 
   componentDidMount() {
@@ -105,7 +106,7 @@ class Step4 extends Component {
       failed = true;
     }
     if(failed === false){
-      axios.get('http://localhost:8000/spvproof?hash=' + (this.props.getStore().blockhash.toString()), { crossdomain: true })
+      axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/spvproof?hash=' + (this.props.getStore().blockhash.toString()), { crossdomain: true })
       .then(response => {
         console.log(response);
         if(response.data.error){
