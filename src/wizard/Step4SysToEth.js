@@ -85,6 +85,7 @@ class Step4 extends Component {
     let validateNewInput = this._validateData(userInput); // run the new input against the validator
     const args = [this.props.getStore().txid.toString(), this.props.getStore().blockhash.toString()];
     let failed = false;
+    this.setState({working: true});
     try {
       let results = await this.syscoinClient.callRpc("syscoingetspvproof", args);
       if(results){
@@ -108,11 +109,12 @@ class Step4 extends Component {
     if(failed === false){
       axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/spvproof?hash=' + (this.props.getStore().blockhash.toString()), { crossdomain: true })
       .then(response => {
+        this.setState({working: false});
         console.log(response);
         if(response.data.error){
           console.log("spvproof error1 " + response.data.error);
           validateNewInput.buttonVal = false;
-          validateNewInput.buttonValMsg = response.data.error;     
+          validateNewInput.buttonValMsg = response.data.error;  
         }
         else{
           validateNewInput.syscoinblockindex = response.data.index;
@@ -122,7 +124,6 @@ class Step4 extends Component {
           validateNewInput.superblockhash = response.data.superBlock;
           console.log("superblockhash " + validateNewInput.superblockhash);
           validateNewInput.buttonValMsg = this.props.t("step4SbStatusSuccess");
-
         }
         this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
       })
@@ -130,9 +131,11 @@ class Step4 extends Component {
         console.log("spvproof error2 " + error);
         validateNewInput.buttonVal = false;
         validateNewInput.buttonValMsg = error.message; 
+        this.setState({working: false});
         this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));    
       });   
     }else{
+      this.setState({working: false});
       this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
     }
     
@@ -215,7 +218,7 @@ class Step4 extends Component {
                 <label className="control-label col-md-4">
                 </label>  
                 <div className={notValidClasses.buttonCls}>
-                    <button type="button" className="form-control btn btn-default" aria-label={this.props.t("step4Button")} onClick={this.getProofs}>
+                    <button type="button" disabled={this.state.working} className="form-control btn btn-default" aria-label={this.props.t("step4Button")} onClick={this.getProofs}>
                     <span className="glyphicon glyphicon-search" aria-hidden="true">&nbsp;</span>
                     {this.props.t("step4Button")}
                     </button>

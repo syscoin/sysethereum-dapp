@@ -25,7 +25,7 @@ class SysethereumDApp extends Component {
     this.setState({ introDisplay: false, ethToSysDisplay: false,  sysToEthDisplay: true});
   }
   onEthToSys() {
-    this.setState({ introDisplay: false, ethToSysDisplay: true,  introDisplay: false});
+    this.setState({ introDisplay: false, ethToSysDisplay: true,  sysToEthDisplay: false});
   }
   render() { 
     return (

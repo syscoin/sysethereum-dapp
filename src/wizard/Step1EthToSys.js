@@ -25,7 +25,8 @@ class Step1ES extends Component {
       receiptBlocknumber: props.getStore().receiptBlocknumber,
       receiptTotalGas: props.getStore().receiptTotalGas,
       receiptGas: props.getStore().receiptGas,
-      receiptObj: props.getStore().receiptObj
+      receiptObj: props.getStore().receiptObj,
+      working: false
 
     };
     this.submitProofs = this.submitProofs.bind(this);
@@ -196,26 +197,6 @@ class Step1ES extends Component {
     return "";
   }
   async submitProofs() {
-   
-
-    const buildEthProof = new EthProof(CONFIGURATION.infuraURL);
-    buildEthProof.getTransactionProof('0x74bdf5450025b8806d55cfbb9b393dce630232f5bf87832ae6b675db9d286ac3').then((result)=>{
-      let tx_hex = rlp.encode(result.value).toString('hex');
-      let tx_root_hex = rlp.encode(result.header[4]).toString('hex');
-      let txmerkleproof_hex = rlp.encode(result.parentNodes).toString('hex');
-      let txmerkleroofpath_hex = result.path.toString('hex');
-      console.log("tx_root_hex " + tx_root_hex);
-      console.log("tx_hex: " + tx_hex);
-      console.log("txmerkleproof_hex: " + txmerkleproof_hex);
-      console.log("txmerkleroofpath_hex: " + txmerkleroofpath_hex);
-      console.log("block number: " + result.blockNumber);
-  }).catch((e)=>{      
-    validateNewInput.buttonVal = false;
-    validateNewInput.buttonValMsg = this.props.t("step1ESInvalidProof") + e;
-    this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-  });
-
-
     let userInput = this._grabUserInput(); // grab user entered vals
     let validateNewInput = this._validateData(userInput); // run the new input against the validator
     validateNewInput.buttonVal = true;
@@ -284,9 +265,12 @@ class Step1ES extends Component {
       }
       return;
     }
+    
+    this.setState({working: true});
     let syscoinWitnessProgram = await this.getWitnessProgram(userInput.syscoinWitnessAddress, validateNewInput);
     if(syscoinWitnessProgram === ""){
       this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+      this.setState({working: false});
       return;
     }
     validateNewInput.buttonVal = true;
@@ -302,32 +286,54 @@ class Step1ES extends Component {
     let amount = userInput.toSysAmount*Math.pow(10, decimals);
     let fromAccount = userInput.sysxFromAccount;
 
-    
     let thisObj = this;
-      contract.methods.burn(amount, assetGUID, syscoinWitnessProgram).send({from: fromAccount, gas: 500000})
+    
+    contract.methods.burn(amount, assetGUID, syscoinWitnessProgram).send({from: fromAccount, gas: 500000})
       .on('transactionHash', function(hash){
         validateNewInput.buttonVal = true;
         validateNewInput.receiptTxHash = hash;
         validateNewInput.buttonValMsg = this.props.t("step5AuthMetamask");
-        this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+        thisObj.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+        thisObj.setState({working: true});
       })
       .on('confirmation', function(confirmationNumber, receipt){ 
         thisObj.setStateFromReceipt(receipt, null, confirmationNumber, validateNewInput);
-        this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-        })
+        thisObj.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+        if(thisObj.state.working){
+          const buildEthProof = new EthProof(CONFIGURATION.infuraURL);
+          buildEthProof.getTransactionProof('0x74bdf5450025b8806d55cfbb9b393dce630232f5bf87832ae6b675db9d286ac3').then((result)=>{
+              let tx_hex = rlp.encode(result.value).toString('hex');
+              let tx_root_hex = rlp.encode(result.header[4]).toString('hex');
+              let txmerkleproof_hex = rlp.encode(result.parentNodes).toString('hex');
+              let txmerkleroofpath_hex = result.path.toString('hex');
+              console.log("tx_root_hex " + tx_root_hex);
+              console.log("tx_hex: " + tx_hex);
+              console.log("txmerkleproof_hex: " + txmerkleproof_hex);
+              console.log("txmerkleroofpath_hex: " + txmerkleroofpath_hex);
+              console.log("block number: " + result.blockNumber);
+              thisObj.setState({working: false});
+          }).catch((e)=>{      
+            validateNewInput.buttonVal = false;
+            validateNewInput.buttonValMsg = this.props.t("step1ESInvalidProof") + e;
+            thisObj.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+            thisObj.setState({working: false});
+          });
+        }
+      })
       .on('error', (error, receipt) => {
+        thisObj.setState({working: false});
         if(error.message.length <= 512){
           error = JSON.parse(error.message.substring(error.message.indexOf("{")));
         }
         let message = error.message.toString();
         if(receipt){
           thisObj.setStateFromReceipt(receipt, message, 0, validateNewInput);
-          this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+          thisObj.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
         }
         else{
           validateNewInput.buttonVal = false;
           validateNewInput.buttonValMsg = message;
-          this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+          thisObj.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
         }
       })
       
@@ -494,7 +500,7 @@ class Step1ES extends Component {
                 <label className="control-label col-md-4">
                 </label>  
                 <div className={notValidClasses.buttonCls}>
-                    <button type="button" className="form-control btn btn-default" aria-label={this.props.t("step1ESButton")} onClick={this.submitProofs}>
+                    <button disabled={this.state.working} type="button" className="form-control btn btn-default" aria-label={this.props.t("step1ESButton")} onClick={this.submitProofs}>
                     <span className="glyphicon glyphicon-send" aria-hidden="true">&nbsp;</span>
                     {this.props.t("step1ESButton")}
                     </button>

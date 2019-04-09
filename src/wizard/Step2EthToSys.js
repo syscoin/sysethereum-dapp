@@ -17,6 +17,7 @@ class Step2ES extends Component {
       receiptTotalGas: '',
       receiptGas: '',
       receiptObj: null,
+      working: false
 
     };
     this.submitProofs = this.submitProofs.bind(this);
@@ -113,7 +114,7 @@ class Step2ES extends Component {
     for(let   i = 0;i<merkleProof.sibling.length;i++){
       merkleProof.sibling[i] = "0x" + merkleProof.sibling[i];
     }
-    
+    this.setState({working: true});
     let thisObj = this;
      SyscoinSuperblocks.methods.relayTx(_txBytes, this.props.getStore().txindex, merkleProof.sibling, _syscoinBlockHeader, 
       this.props.getStore().syscoinblockindex, _syscoinBlockSiblings, _superblockHash, this.props.getStore().untrustedtargetcontract).send({from: accounts[0], gas: 500000})
@@ -122,8 +123,10 @@ class Step2ES extends Component {
       })
       .on('confirmation', function(confirmationNumber, receipt){ 
         thisObj.setStateFromReceipt(receipt, null, confirmationNumber);
+        thisObj.setState({working: false});
         })
       .on('error', (error, receipt) => {
+        thisObj.setState({working: false});
         if(error.message.length <= 256){
           error = JSON.parse(error.message.substring(error.message.indexOf("{")));
         }

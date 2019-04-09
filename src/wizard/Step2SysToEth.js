@@ -10,7 +10,8 @@ class Step2 extends Component {
       fundingaddress: props.getStore().fundingaddress,
       amount: props.getStore().amount,
       ethaddress: props.getStore().ethaddress,
-      sysrawtxunsigned: props.getStore().sysrawtxunsigned
+      sysrawtxunsigned: props.getStore().sysrawtxunsigned,
+      working: false
     };
     
     this._validateOnDemand = true; // this flag enables onBlur validation as user fills forms
@@ -69,7 +70,9 @@ class Step2 extends Component {
     if(!userInput.ethaddress || userInput.ethaddress === ""){
       validateNewInput.ethaddressVal = false;
       valid = false;
-    }          
+    }         
+    let self = this;
+    this.setState({working: true});
     if(valid === true){
       let fundingAddress = userInput.fundingaddress.toString();
       if(userInput.asset.length > 0){
@@ -87,9 +90,11 @@ class Step2 extends Component {
               let results1 = await this.syscoinClient.callRpc("syscointxfund", [results[0], fundingAddress]);
               validateNewInput.sysrawtxunsignedVal = true;
               this.refs.sysrawtxunsigned.value = results1;
+              self.setState({working: false});
             }catch(e){
               validateNewInput.buttonVal = false;
               validateNewInput.buttonValMsg = e.message;
+              self.setState({working: false});
               console.log("error " + e.message);
             }
           }
@@ -97,6 +102,7 @@ class Step2 extends Component {
           validateNewInput.buttonVal = false;
           validateNewInput.buttonValMsg = e.message;
           console.log("error " + e.message);
+          self.setState({working: false});
         }
       }
       else{
@@ -112,16 +118,19 @@ class Step2 extends Component {
               let results1 = await this.syscoinClient.callRpc("syscointxfund", [results[0],fundingAddress]);
               validateNewInput.sysrawtxunsignedVal = true;
               this.refs.sysrawtxunsigned.value = results1;
+              self.setState({working: false});
             }catch(e){
               validateNewInput.buttonVal = false;
               validateNewInput.buttonValMsg = e.message;
               console.log("error " + e.message);
+              self.setState({working: false});
             }
           }
         
         }catch(e) {
           validateNewInput.buttonVal = false;
           validateNewInput.buttonValMsg = e.message;
+          self.setState({working: false});
         }
       }
     } 
@@ -304,7 +313,7 @@ class Step2 extends Component {
                 <label className="control-label col-md-4">
                 </label>  
                 <div className={notValidClasses.buttonCls}>
-                    <button type="button" className="form-control btn btn-default" aria-label={this.props.t("step2Button")} onClick={this.getBurnTx}>
+                    <button type="button" disabled={this.state.working} className="form-control btn btn-default" aria-label={this.props.t("step2Button")} onClick={this.getBurnTx}>
                     <span className="glyphicon glyphicon-send" aria-hidden="true">&nbsp;</span>
                     {this.props.t("step2Button")}
                     </button>

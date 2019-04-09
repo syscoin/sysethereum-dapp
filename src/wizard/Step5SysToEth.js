@@ -18,6 +18,7 @@ class Step5 extends Component {
       receiptTotalGas: '',
       receiptGas: '',
       receiptObj: null,
+      working: false
 
     };
     this.submitProofs = this.submitProofs.bind(this);
@@ -128,7 +129,7 @@ class Step5 extends Component {
     for(let   i = 0;i<merkleProof.sibling.length;i++){
       merkleProof.sibling[i] = "0x" + merkleProof.sibling[i];
     }
-    
+    this.setState({working: true});
     let thisObj = this;
      SyscoinSuperblocks.methods.relayTx(_txBytes, this.props.getStore().txindex, merkleProof.sibling, _syscoinBlockHeader, 
       this.props.getStore().syscoinblockindex, _syscoinBlockSiblings, _superblockHash, this.props.getStore().untrustedtargetcontract).send({from: accounts[0], gas: 500000})
@@ -137,8 +138,10 @@ class Step5 extends Component {
       })
       .on('confirmation', function(confirmationNumber, receipt){ 
         thisObj.setStateFromReceipt(receipt, null, confirmationNumber);
+        thisObj.setState({working: false});
         })
       .on('error', (error, receipt) => {
+        thisObj.setState({working: false});
         if(error.message.length <= 512){
           error = JSON.parse(error.message.substring(error.message.indexOf("{")));
         }
@@ -180,7 +183,7 @@ class Step5 extends Component {
                 <label className="control-label col-md-4">
                 </label>  
                 <div className={notValidClasses.buttonCls}>
-                    <button type="button" className="form-control btn btn-default" aria-label={this.props.t("step5Button")} onClick={this.submitProofs}>
+                    <button type="button" disabled={this.state.working} className="form-control btn btn-default" aria-label={this.props.t("step5Button")} onClick={this.submitProofs}>
                     <span className="glyphicon glyphicon-send" aria-hidden="true">&nbsp;</span>
                     {this.props.t("step5Button")}
                     </button>

@@ -8,7 +8,8 @@ class Step3 extends Component {
     this.state = {
       sysrawtxunsigned: props.getStore().sysrawtxunsigned,
       txid: props.getStore().txid,
-      blockhash: props.getStore().blockhash
+      blockhash: props.getStore().blockhash,
+      working: false
     };
     
     this._validateOnDemand = true; // this flag enables onBlur validation as user fills forms
@@ -62,6 +63,7 @@ class Step3 extends Component {
       valid = false;
     }        
     if(valid === true){
+      this.setState({working: true});
       let txid = userInput.txid.toString();
       const args = [txid];
       try {
@@ -69,10 +71,12 @@ class Step3 extends Component {
         if(results){
           validateNewInput.blockhashVal = true;
           this.refs.blockhash.value = results;
+          this.setState({working: false});
         }
       }catch(e) {
         validateNewInput.buttonVal = false;
         validateNewInput.buttonValMsg = e.message;
+        this.setState({working: false});
         console.log("error " + e.message);
       }
     } 
@@ -188,7 +192,7 @@ class Step3 extends Component {
                 <label className="control-label col-md-4">
                 </label>  
                 <div className={notValidClasses.buttonCls}>
-                    <button type="button" className="form-control btn btn-default" aria-label={this.props.t("step3Button")} onClick={this.getBlockhash}>
+                    <button type="button" disabled={this.state.working} className="form-control btn btn-default" aria-label={this.props.t("step3Button")} onClick={this.getBlockhash}>
                     <span className="glyphicon glyphicon-search" aria-hidden="true">&nbsp;</span>
                     {this.props.t("step3Button")}
                     </button>
