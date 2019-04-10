@@ -155,4 +155,9 @@
   #exList .eg.sel {
     background-color: #000;
   }
+  .closeButton {
+    font-size: 36px !important;
+    margin-right:10px;
+    margin-top:5px;
+  }
 

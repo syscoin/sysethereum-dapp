@@ -24,8 +24,11 @@ class Step5 extends Component {
     this.submitProofs = this.submitProofs.bind(this);
     this.downloadReceipt = this.downloadReceipt.bind(this);
     this.setStateFromReceipt = this.setStateFromReceipt.bind(this);
+    this.isValidated = this.isValidated.bind(this);
   }
-
+  isValidated() {
+    return this.state.receiptObj !== null;
+  }
   componentDidMount() {
     if(!this.props.getStore().superblockhash){
       this.props.jumpToStep(3);

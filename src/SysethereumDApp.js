@@ -16,6 +16,7 @@ class SysethereumDApp extends Component {
       
     this.onSysToEth = this.onSysToEth.bind(this);
     this.onEthToSys = this.onEthToSys.bind(this);
+    this.onHome = this.onHome.bind(this);
   }
 
 
@@ -26,6 +27,9 @@ class SysethereumDApp extends Component {
   }
   onEthToSys() {
     this.setState({ introDisplay: false, ethToSysDisplay: true,  sysToEthDisplay: false});
+  }
+  onHome() {
+    this.setState({ introDisplay: true, ethToSysDisplay: false,  sysToEthDisplay: false});
   }
   render() { 
     return (
@@ -52,11 +56,17 @@ class SysethereumDApp extends Component {
     </div>
     </div>
     <div className={(this.state.ethToSysDisplay  ? "visible" : "hidden")}>
+    <button type="button" className="close closeButton" aria-label="Close" onClick={this.onHome}>
+      <span aria-hidden="true">&times;</span>
+    </button>
       <I18nextProvider i18n={i18n}>
         <EthToSysWizardi18n />
       </I18nextProvider>
     </div>
     <div  className={(this.state.sysToEthDisplay  ? "visible" : "hidden")}>
+      <button type="button" className="close closeButton" aria-label="Close" onClick={this.onHome}>
+        <span aria-hidden="true">&times;</span>
+      </button>
       <I18nextProvider i18n={i18n}>
         <SysToEthWizardi18n />
       </I18nextProvider>

@@ -4,9 +4,7 @@ import * as SyscoinRpc from 'syscoin-js';
 import web3 from '../web3';
 import tpabi from '../SyscoinTransactionProcessor';
 import hsabi from '../HumanStandardToken';  
-import EthProof from 'eth-proof';
 import CONFIGURATION from '../config';
-const rlp = require('rlp');
 class Step1ES extends Component {
   constructor(props) {
     super(props);
@@ -299,26 +297,6 @@ class Step1ES extends Component {
       .on('confirmation', function(confirmationNumber, receipt){ 
         thisObj.setStateFromReceipt(receipt, null, confirmationNumber, validateNewInput);
         thisObj.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-        if(thisObj.state.working){
-          const buildEthProof = new EthProof(CONFIGURATION.infuraURL);
-          buildEthProof.getTransactionProof('0x74bdf5450025b8806d55cfbb9b393dce630232f5bf87832ae6b675db9d286ac3').then((result)=>{
-              let tx_hex = rlp.encode(result.value).toString('hex');
-              let tx_root_hex = rlp.encode(result.header[4]).toString('hex');
-              let txmerkleproof_hex = rlp.encode(result.parentNodes).toString('hex');
-              let txmerkleroofpath_hex = result.path.toString('hex');
-              console.log("tx_root_hex " + tx_root_hex);
-              console.log("tx_hex: " + tx_hex);
-              console.log("txmerkleproof_hex: " + txmerkleproof_hex);
-              console.log("txmerkleroofpath_hex: " + txmerkleroofpath_hex);
-              console.log("block number: " + result.blockNumber);
-              thisObj.setState({working: false});
-          }).catch((e)=>{      
-            validateNewInput.buttonVal = false;
-            validateNewInput.buttonValMsg = this.props.t("step1ESInvalidProof") + e;
-            thisObj.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-            thisObj.setState({working: false});
-          });
-        }
       })
       .on('error', (error, receipt) => {
         thisObj.setState({working: false});
