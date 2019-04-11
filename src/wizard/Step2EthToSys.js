@@ -4,6 +4,7 @@ import * as SyscoinRpc from 'syscoin-js';
 import CONFIGURATION from '../config';
 import EthProof from 'eth-proof';
 const rlp = require('rlp');
+
 class Step2ES extends Component {
   constructor(props) {
     super(props);
@@ -17,7 +18,6 @@ class Step2ES extends Component {
     this.validationCheck = this.validationCheck.bind(this);
     this.isValidated = this.isValidated.bind(this);
     this.syscoinClient = new SyscoinRpc.default({baseUrl: CONFIGURATION.syscoinRpcURL, port: CONFIGURATION.syscoinRpcPort, username: CONFIGURATION.syscoinRpcUser, password: CONFIGURATION.syscoinRpcPassword});
-   
   }
 
   componentDidMount() {
@@ -62,27 +62,28 @@ class Step2ES extends Component {
     let self = this;
     this.setState({working: true});
 
-    let toSysAssetGUID = this.props.getStore().toSysAssetGUID;
-    let toSysAmount =  this.props.getStore().toSysAmount;
+    let toSysAssetGUID = this.props.getStore().toSysAssetGUID ;
+    let toSysAmount =  this.props.getStore().toSysAmount.toString();
     let syscoinWitnessAddress =  this.props.getStore().syscoinWitnessAddress;
     let ethTXID = this.props.getStore().receiptTxHash;
     const buildEthProof = new EthProof(CONFIGURATION.infuraURL);
     try{
         let result = await buildEthProof.getTransactionProof(ethTXID);
-        let tx_hex = rlp.encode(result.value).toString('hex');
-        let tx_root_hex = rlp.encode(result.header[4]).toString('hex');
-        let txmerkleproof_hex = rlp.encode(result.parentNodes).toString('hex');
-        let txmerkleroofpath_hex = result.path.toString('hex');
+        let tx_hex = "'" + rlp.encode(result.value).toString('hex') + "'";
+        let tx_root_hex = "'" + rlp.encode(result.header[4]).toString('hex') + "'";
+        let txmerkleproof_hex = "'" + rlp.encode(result.parentNodes).toString('hex') + "'";
+        let txmerkleproofpath_hex = "'" + result.path.toString('hex') + "'";
         let blockNumber = result.blockNumber;
         console.log("tx_root_hex " + tx_root_hex);
         console.log("tx_hex: " + tx_hex);
         console.log("txmerkleproof_hex: " + txmerkleproof_hex);
-        console.log("txmerkleroofpath_hex: " + txmerkleroofpath_hex);
+        console.log("txmerkleroofpath_hex: " + txmerkleproofpath_hex);
         console.log("block number: " + blockNumber);
 
-        if(toSysAssetGUID.length > 0){
-          const args = [toSysAssetGUID, syscoinWitnessAddress, toSysAmount, blockNumber, tx_hex, tx_root_hex, txmerkleproof_hex, txmerkleroofpath_hex, ""];
+        if(toSysAssetGUID.length > 0 && toSysAssetGUID !== "0" && toSysAssetGUID !== 0){
+          
           try {
+            let args = [toSysAssetGUID, syscoinWitnessAddress, toSysAmount, blockNumber, tx_hex, tx_root_hex, txmerkleproof_hex, txmerkleproofpath_hex, "''"];
             // [asset] [address] [amount] [blocknumber] [tx_hex] [txroot_hex] [txmerkleproof_hex] [txmerkleroofpath_hex] [witness]
             let results = await this.syscoinClient.callRpc("assetallocationmint", args);
             if(results && results.length && results.length > 0){
@@ -108,8 +109,9 @@ class Step2ES extends Component {
           }
         }
         else{
-          const args = [syscoinWitnessAddress, toSysAmount, blockNumber, tx_hex, tx_root_hex, txmerkleproof_hex, txmerkleroofpath_hex, ""];
+          
           try {
+            let args = [syscoinWitnessAddress, toSysAmount, blockNumber, tx_hex, tx_root_hex, txmerkleproof_hex, txmerkleproofpath_hex, "''"];
             //  [address] [amount] [blocknumber] [tx_hex] [txroot_hex] [txmerkleproof_hex] [txmerkleroofpath_hex] [witness]
             let results = await this.syscoinClient.callRpc("syscoinmint", args);
             if(results && results.length && results.length > 0){

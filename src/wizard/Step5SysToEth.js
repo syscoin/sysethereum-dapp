@@ -27,7 +27,14 @@ class Step5 extends Component {
     this.isValidated = this.isValidated.bind(this);
   }
   isValidated() {
-    return this.state.receiptObj !== null;
+    if(this.state.receiptObj === null){
+      return false;
+    }
+    this.props.updateStore({
+      ...this.state,
+      savedToCloud: false // use this to notify step4 that some changes took place and prompt the user to save again
+    });
+    return true;
   }
   componentDidMount() {
     if(!this.props.getStore().superblockhash){
@@ -81,7 +88,7 @@ class Step5 extends Component {
       this.setState({buttonVal: false, buttonValMsg: this.props.t("step5InstallMetamask")});
       return;  
     }
-    let chainId = web3.eth.getChainId();
+    let chainId = await web3.eth.getChainId();
     if(CONFIGURATION.testnet && chainId !== 4){
       this.setState({buttonVal: false, buttonValMsg: this.props.t("stepUseTestnet")});
       return;       
@@ -134,18 +141,24 @@ class Step5 extends Component {
     }
     this.setState({working: true});
     let thisObj = this;
+    thisObj.state.receiptObj = null;
      SyscoinSuperblocks.methods.relayTx(_txBytes, this.props.getStore().txindex, merkleProof.sibling, _syscoinBlockHeader, 
       this.props.getStore().syscoinblockindex, _syscoinBlockSiblings, _superblockHash, this.props.getStore().untrustedtargetcontract).send({from: accounts[0], gas: 500000})
       .on('transactionHash', function(hash){
         thisObj.setState({receiptTxHash: hash, buttonVal: true, buttonValMsg: thisObj.props.t("step5PleaseWait")});
       })
       .on('confirmation', function(confirmationNumber, receipt){ 
-        thisObj.setStateFromReceipt(receipt, null, confirmationNumber);
-        thisObj.setState({working: false});
-        })
+        if(thisObj.state.receiptObj === null){
+          thisObj.setStateFromReceipt(receipt, null, confirmationNumber);
+          thisObj.setState({working: false});
+          
+        } else {
+          thisObj.setState({receiptConf: confirmationNumber});
+        }
+      })
       .on('error', (error, receipt) => {
         thisObj.setState({working: false});
-        if(error.message.length <= 512){
+        if(error.message.length <= 512 && error.message.indexOf("{") != -1){
           error = JSON.parse(error.message.substring(error.message.indexOf("{")));
         }
         let message = error.message.toString();
@@ -221,7 +234,7 @@ class Step5 extends Component {
                 <label className="control-label col-md-4">
                 </label>  
                   <div>
-                    <button type="button" disabled={!this.state.receiptObj} className="form-control btn btn-default" aria-label={this.props.t("step5Download")} onClick={this.downloadReceipt}>
+                    <button type="button" disabled={!this.state.receiptObj || this.state.working} className="form-control btn btn-default" aria-label={this.props.t("step5Download")} onClick={this.downloadReceipt}>
                     <span className="glyphicon glyphicon-download" aria-hidden="true">&nbsp;</span>
                     {this.props.t("step5Download")}
                     </button>

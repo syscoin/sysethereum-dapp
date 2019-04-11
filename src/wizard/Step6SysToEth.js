@@ -12,7 +12,8 @@ class Step6 extends Component {
 
   componentDidMount() {
     if(!this.props.getStore().receiptObj){
-      this.props.jumpToStep(5);
+      this.props.jumpToStep(4);
+      return;
     }
     let baseURL = "";
     if(CONFIGURATION.testnet){

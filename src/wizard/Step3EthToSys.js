@@ -164,7 +164,6 @@ class Step3ES extends Component {
                 </label>  
                 <div className="col-md-8">
                     <textarea
-                      disabled="true"
                       rows="3"
                       autoComplete="off"
                       type="text"

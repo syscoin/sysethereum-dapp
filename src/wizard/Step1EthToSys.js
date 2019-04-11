@@ -39,41 +39,14 @@ class Step1ES extends Component {
    
   }
   isValidated() {
-    const userInput = this._grabUserInput(); // grab user entered vals
-    const validateNewInput = this._validateData(userInput); // run the new input against the validator
-    let isDataValid = false;
-
-    // if full validation passes then save to store and pass as valid
-    if (Object.keys(validateNewInput).every((k) => { return validateNewInput[k] === true })) {
-        if (this.props.getStore().sysxContract !== userInput.sysxContract  || 
-        this.props.getStore().sysxFromAccount !== userInput.sysxFromAccount || 
-        this.props.getStore().toSysAssetGUID !== userInput.toSysAssetGUID || 
-        this.props.getStore().toSysAmount !== userInput.toSysAmount || 
-        this.props.getStore().syscoinWitnessAddress !== userInput.syscoinWitnessAddress ||
-        this.props.getStore().receiptStatus !== userInput.receiptStatus || 
-        this.props.getStore().receiptTxHash !== userInput.receiptTxHash || 
-        this.props.getStore().receiptTxIndex !== userInput.receiptTxIndex || 
-        this.props.getStore().receiptFrom !== userInput.receiptFrom || 
-        this.props.getStore().receiptTo !== userInput.receiptTo || 
-        this.props.getStore().receiptBlockhash !== userInput.receiptBlockhash || 
-        this.props.getStore().receiptBlocknumber !== userInput.receiptBlocknumber || 
-        this.props.getStore().receiptTotalGas !== userInput.receiptTotalGas || 
-        this.props.getStore().receiptGas !== userInput.receiptGas  || 
-        this.props.getStore().receiptObj !== userInput.receiptObj ) { // only update store of something changed
-          this.props.updateStore({
-            ...userInput,
-            savedToCloud: false // use this to notify step4 that some changes took place and prompt the user to save again
-          });  // Update store here (this is just an example, in reality you will do it via redux or flux)
-        }
-
-        isDataValid = true;
+    if(this.state.receiptObj === null){
+      return false;
     }
-    else {
-        // if anything fails then update the UI validation state but NOT the UI Data State
-        this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-    }
-
-    return isDataValid;
+    this.props.updateStore({
+      ...this.state,
+      savedToCloud: false // use this to notify step4 that some changes took place and prompt the user to save again
+    });
+    return true;
   }
   componentWillUnmount() {}
   downloadReceipt () {
@@ -141,15 +114,16 @@ class Step1ES extends Component {
       toSysAssetGUID: this.refs.toSysAssetGUID.value,
       sysxFromAccount: this.refs.sysxFromAccount.value,
       toSysAmount: this.refs.toSysAmount.value,
-      syscoinWitnessAddress: this.refs.syscoinWitnessAddress.value
+      syscoinWitnessAddress: this.refs.syscoinWitnessAddress.value,
+      receiptTxHash: this.state.receiptTxHash
     };
   }
   setStateFromReceipt(receipt, error, confirmation, validateNewInput) {
     if(receipt.transactionHash && this.state.receiptTxHash !== receipt.transactionHash){
       return;
     }
-    if(receipt.events && receipt.events.RelayTransaction && receipt.events.RelayTransaction.returnValues && receipt.events.RelayTransaction.returnValues[0]){
-      if(receipt.events.RelayTransaction.returnValues[0] == 0 || receipt.events.RelayTransaction.returnValues[1] == 0){
+    if(receipt.events  && receipt.events[0] && receipt.events[0].raw && receipt.events[0].raw.data){
+      if(receipt.events[0].raw.data.length <= 66){
         error = this.props.t("step5ErrorCheckLog");
       }
     }
@@ -240,7 +214,7 @@ class Step1ES extends Component {
       this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
       return;  
     }
-    let chainId = web3.eth.getChainId();
+    let chainId = await web3.eth.getChainId();
     if(CONFIGURATION.testnet && chainId !== 4){
       validateNewInput.buttonVal = false;
       validateNewInput.buttonValMsg = this.props.t("stepUseTestnet");
@@ -285,33 +259,39 @@ class Step1ES extends Component {
     let fromAccount = userInput.sysxFromAccount;
 
     let thisObj = this;
-    
+    thisObj.state.receiptObj = null;
     contract.methods.burn(amount, assetGUID, syscoinWitnessProgram).send({from: fromAccount, gas: 500000})
       .on('transactionHash', function(hash){
         validateNewInput.buttonVal = true;
         validateNewInput.receiptTxHash = hash;
-        validateNewInput.buttonValMsg = this.props.t("step5AuthMetamask");
-        thisObj.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+        validateNewInput.buttonValMsg = thisObj.props.t("step5AuthMetamask");
+        thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
         thisObj.setState({working: true});
       })
       .on('confirmation', function(confirmationNumber, receipt){ 
-        thisObj.setStateFromReceipt(receipt, null, confirmationNumber, validateNewInput);
-        thisObj.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+        if(thisObj.state.receiptObj === null){
+          thisObj.setStateFromReceipt(receipt, null, confirmationNumber, validateNewInput);
+          thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
+          thisObj.setState({working: false});
+        } else {
+          validateNewInput.receiptConf = confirmationNumber;
+          thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
+        }
       })
       .on('error', (error, receipt) => {
         thisObj.setState({working: false});
-        if(error.message.length <= 512){
+        if(error.message.length <= 512 && error.message.indexOf("{") != -1){
           error = JSON.parse(error.message.substring(error.message.indexOf("{")));
         }
         let message = error.message.toString();
         if(receipt){
           thisObj.setStateFromReceipt(receipt, message, 0, validateNewInput);
-          thisObj.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+          thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
         }
         else{
           validateNewInput.buttonVal = false;
           validateNewInput.buttonValMsg = message;
-          thisObj.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+          thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
         }
       })
       
@@ -513,7 +493,7 @@ class Step1ES extends Component {
                 <label className="control-label col-md-4">
                 </label>  
                   <div>
-                    <button type="button" disabled={!this.state.receiptObj} className="form-control btn btn-default" aria-label={this.props.t("step5Download")} onClick={this.downloadReceipt}>
+                    <button type="button" disabled={!this.state.receiptObj || this.state.working} className="form-control btn btn-default" aria-label={this.props.t("step5Download")} onClick={this.downloadReceipt}>
                     <span className="glyphicon glyphicon-download" aria-hidden="true">&nbsp;</span>
                     {this.props.t("step5Download")}
                     </button>

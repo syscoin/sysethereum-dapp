@@ -75,7 +75,7 @@ class Step2 extends Component {
     this.setState({working: true});
     if(valid === true){
       let fundingAddress = userInput.fundingaddress.toString();
-      if(userInput.asset.length > 0){
+      if(userInput.asset.length > 0 && userInput.asset !== 0 && userInput.asset !== "0"){
         let assetGuid = userInput.asset.toString();
         
         let ethAddressStripped = userInput.ethaddress.toString();
