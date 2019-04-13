@@ -1,10 +1,11 @@
+![Preview](./home.png)
 ## Sysethereum DAPP
 This is a reference implementation of a user interface showcasing the Syscoin <=> Ethereum bridge. It will create a SPV proof of Syscoin burn transactions as well as a SPV proof of a Superblock and post to the Superblock smart contract which will validate and call a Token contract which extends SyscoinTransactionProcessor (depending on if its an asset it will call the right contract based on the details in the burn transaction). The Token contract will mint tokens into existence based on the details of the burn transaction.
 
 On the way back to Syscoin. An SPV proof of the Ethereum transaction is created using [eth-proof](http://github.com/syscoin/eth-proof) and will call a burn function from the SyscoinTransactionProcessor base of the Syscoin Token contract that holds the minted tokens. It's purpose is to burn tokens and the function parameters are used via ABI data to detect the value of the burn once Syscoin consensus reads the transaction data.
 
 Syscoin itself enforces the SPV proof by running Geth in light mode to sync up to the last few weeks of headers on Ethereum. It uses a NodeJS relayer which is compiled as a binary and launched when Syscoind is run. The relayer connects to Ethereum using a websocket connection and pushes Transaction Roots of Ethereum headers to Syscoin core which saves a tuple of Ethereum Blockheight, Transaction Roots into a database. The Transaction root is queried for when a Syscoin mint transaction is created (when Ethereum contract burns Syscoin tokens on the ERC contract). The calculated Transaction Root must match the Transaction Root saved in the database which validates that the Ethereum transaction was valid and subsequently minting new Syscoin or Syscoin assets into existence. The total supply of Syscoin/Syscoin assets should remain constant throughout the process as the bridge represents a zero-sum game.
-
+![Superblock Explorer](./superblockexplorer.png)
 ## Dependencies
 
 1) You should be running Syscoin Agent which is used to get SPV Superblock proofs aswell as query for Superblocks in general. 
