@@ -8,8 +8,8 @@ Syscoin itself enforces the SPV proof by running Geth in light mode to sync up t
 ![Superblock Explorer](./superblockexplorer.png)
 ## Dependencies
 
-1) You should be running Syscoin Agent which is used to get SPV Superblock proofs aswell as query for Superblocks in general. 
-2) You should be running Syscoin Core with `-blockindex` configuration set so that `getblockhashbytxid` can be queried for blocks based on txid needed for the Syscoin to Ethereum wizard.
+1) You should be running a [Syscoin Agent](https://github.com/syscoin/sysethereum-agents) which is used to get SPV Superblock proofs aswell as query for Superblocks in general. 
+2) You should be running [Syscoin Core](https://github.com/syscoin/syscoin) with `-blockindex` configuration set so that `getblockhashbytxid` can be queried for blocks based on txid needed for the Syscoin to Ethereum wizard. You should also configure the RPC parameters for the dapp to talk to Syscoin Core. This is done via the syscoin.conf file in your Syscoin data directory.
 3) You should configure `config.js` to point to the Agent and Syscoin core authentication, URL, and ports.
 
 ## Available Scripts
