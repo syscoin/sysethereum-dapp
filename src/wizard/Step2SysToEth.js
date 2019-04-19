@@ -102,7 +102,7 @@ class Step2 extends Component {
         if(ethAddressStripped && ethAddressStripped.startsWith("0x")){
           ethAddressStripped = ethAddressStripped.substr(2, ethAddressStripped.length);
         }
-        const args = [userInput.amount.toString(), true, ethAddressStripped];
+        const args = [fundingAddress, userInput.amount.toString(), true, ethAddressStripped];
         try {
           let results = await this.syscoinClient.callRpc("syscoinburn", args);
           if(results && results.length && results.length > 0){
