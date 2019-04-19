@@ -86,17 +86,9 @@ class Step2 extends Component {
         try {
           let results = await this.syscoinClient.callRpc("assetallocationburn", args);
           if(results && results.length && results.length > 0){
-            try{
-              let results1 = await this.syscoinClient.callRpc("syscointxfund", [results[0], fundingAddress]);
-              validateNewInput.sysrawtxunsignedVal = true;
-              this.refs.sysrawtxunsigned.value = results1;
-              self.setState({working: false});
-            }catch(e){
-              validateNewInput.buttonVal = false;
-              validateNewInput.buttonValMsg = e.message;
-              self.setState({working: false});
-              console.log("error " + e.message);
-            }
+            validateNewInput.sysrawtxunsignedVal = true;
+            this.refs.sysrawtxunsigned.value = results[0];
+            self.setState({working: false});
           }
         }catch(e) {
           validateNewInput.buttonVal = false;
@@ -114,17 +106,9 @@ class Step2 extends Component {
         try {
           let results = await this.syscoinClient.callRpc("syscoinburn", args);
           if(results && results.length && results.length > 0){
-            try{
-              let results1 = await this.syscoinClient.callRpc("syscointxfund", [results[0],fundingAddress]);
-              validateNewInput.sysrawtxunsignedVal = true;
-              this.refs.sysrawtxunsigned.value = results1;
-              self.setState({working: false});
-            }catch(e){
-              validateNewInput.buttonVal = false;
-              validateNewInput.buttonValMsg = e.message;
-              console.log("error " + e.message);
-              self.setState({working: false});
-            }
+            validateNewInput.sysrawtxunsignedVal = true;
+            this.refs.sysrawtxunsigned.value = results[0];
+            self.setState({working: false});
           }
         
         }catch(e) {

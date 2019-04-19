@@ -87,19 +87,11 @@ class Step2ES extends Component {
             // [asset] [address] [amount] [blocknumber] [tx_hex] [txroot_hex] [txmerkleproof_hex] [txmerkleroofpath_hex] [witness]
             let results = await this.syscoinClient.callRpc("assetallocationmint", args);
             if(results && results.length && results.length > 0){
-              try{
-                let results1 = await this.syscoinClient.callRpc("syscointxfund", [results[0], syscoinWitnessAddress]);
-                validateNewInput.mintsysrawtxunsignedVal = true;
-                this.refs.mintsysrawtxunsigned.value = results1;
-                userInput.mintsysrawtxunsigned = results1;
-                self.setState({working: false});
-                self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-              }catch(e){
-                validateNewInput.buttonVal = false;
-                validateNewInput.buttonValMsg = e.message;
-                self.setState({working: false});
-                console.log("error " + e.message);
-              }
+              validateNewInput.mintsysrawtxunsignedVal = true;
+              this.refs.mintsysrawtxunsigned.value = results[0];
+              userInput.mintsysrawtxunsigned = results[0];
+              self.setState({working: false});
+              self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
             }
           }catch(e) {
             validateNewInput.buttonVal = false;
@@ -115,19 +107,11 @@ class Step2ES extends Component {
             //  [address] [amount] [blocknumber] [tx_hex] [txroot_hex] [txmerkleproof_hex] [txmerkleroofpath_hex] [witness]
             let results = await this.syscoinClient.callRpc("syscoinmint", args);
             if(results && results.length && results.length > 0){
-              try{
-                let results1 = await this.syscoinClient.callRpc("syscointxfund", [results[0],syscoinWitnessAddress]);
-                validateNewInput.mintsysrawtxunsignedVal = true;
-                this.refs.mintsysrawtxunsigned.value = results1;
-                userInput.mintsysrawtxunsigned = results1;
-                self.setState({working: false});
-                self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-              }catch(e){
-                validateNewInput.buttonVal = false;
-                validateNewInput.buttonValMsg = e.message;
-                console.log("error " + e.message);
-                self.setState({working: false});
-              }
+              validateNewInput.mintsysrawtxunsignedVal = true;
+              this.refs.mintsysrawtxunsigned.value = results[0];
+              userInput.mintsysrawtxunsigned = results[0];
+              self.setState({working: false});
+              self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
             }
           
           }catch(e) {
