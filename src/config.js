@@ -1,8 +1,8 @@
   class CONFIGURATION {
     constructor() {
-      this.testnet = true;
+      this.testnet = false;
       this.syscoinRpcURL = "localhost";
-      this.syscoinRpcPort = 18370;
+      this.syscoinRpcPort = 8370;
       this.syscoinRpcUser = "u";
       this.syscoinRpcPassword = "p";
       this.agentURL = "localhost";
