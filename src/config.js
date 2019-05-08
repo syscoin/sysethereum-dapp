@@ -2,7 +2,7 @@
     constructor() {
       this.testnet = true;
       this.syscoinRpcURL = "localhost";
-      this.syscoinRpcPort = 8370;
+      this.syscoinRpcPort = 18370;
       this.syscoinRpcUser = "u";
       this.syscoinRpcPassword = "p";
       this.agentURL = "localhost";
