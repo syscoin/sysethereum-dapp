@@ -284,7 +284,7 @@ class Step1ES extends Component {
       })
       .on('error', (error, receipt) => {
         thisObj.setState({working: false});
-        if(error.message.length <= 512 && error.message.indexOf("{") != -1){
+        if(error.message.length <= 512 && error.message.indexOf("{") !== -1){
           error = JSON.parse(error.message.substring(error.message.indexOf("{")));
         }
         let message = error.message.toString();
