@@ -60,7 +60,7 @@ class Step5 extends Component {
       return;
     }
     if(receipt.events && receipt.events.RelayTransaction && receipt.events.RelayTransaction.returnValues && receipt.events.RelayTransaction.returnValues[0]){
-      if(receipt.events.RelayTransaction.returnValues[0] == 0 || receipt.events.RelayTransaction.returnValues[1] == 0){
+      if(receipt.events.RelayTransaction.returnValues[0] === 0 || receipt.events.RelayTransaction.returnValues[1] === 0){
         error = this.props.t("step5ErrorCheckLog");
       }
     }
@@ -158,7 +158,7 @@ class Step5 extends Component {
       })
       .on('error', (error, receipt) => {
         thisObj.setState({working: false});
-        if(error.message.length <= 512 && error.message.indexOf("{") != -1){
+        if(error.message.length <= 512 && error.message.indexOf("{") !== -1){
           error = JSON.parse(error.message.substring(error.message.indexOf("{")));
         }
         let message = error.message.toString();
