@@ -1,10 +1,6 @@
   class CONFIGURATION {
     constructor() {
       this.testnet = false;
-      this.syscoinRpcURL = "localhost";
-      this.syscoinRpcPort = 8370;
-      this.syscoinRpcUser = "u";
-      this.syscoinRpcPassword = "p";
       this.agentURL = "localhost";
       this.agentPort = 8000;
       this.infuraURL = "https://rinkeby.infura.io/v3/d178aecf49154b12be98e68e998cfb8d";
