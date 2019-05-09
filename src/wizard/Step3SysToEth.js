@@ -64,7 +64,6 @@ class Step3 extends Component {
     if(valid === true){
       this.setState({working: true});
       let txid = userInput.txid.toString();
-      const args = [txid];
       try {
         let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=getblockhashbytxid&txid=' + txid);
         results = results.data;
