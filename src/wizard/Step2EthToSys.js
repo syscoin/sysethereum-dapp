@@ -1,10 +1,9 @@
 
 import React, { Component } from 'react';
-import * as SyscoinRpc from 'syscoin-js';
 import CONFIGURATION from '../config';
 import EthProof from 'eth-proof';
 const rlp = require('rlp');
-
+const axios = require('axios');
 class Step2ES extends Component {
   constructor(props) {
     super(props);
@@ -17,7 +16,6 @@ class Step2ES extends Component {
     this.getMintTx = this.getMintTx.bind(this);
     this.validationCheck = this.validationCheck.bind(this);
     this.isValidated = this.isValidated.bind(this);
-    this.syscoinClient = new SyscoinRpc.default({baseUrl: CONFIGURATION.syscoinRpcURL, port: CONFIGURATION.syscoinRpcPort, username: CONFIGURATION.syscoinRpcUser, password: CONFIGURATION.syscoinRpcPassword});
   }
 
   componentDidMount() {
@@ -69,23 +67,23 @@ class Step2ES extends Component {
     const buildEthProof = new EthProof(CONFIGURATION.infuraURL);
     try{
         let result = await buildEthProof.getTransactionProof(ethTXID);
-        let tx_hex = "'" + rlp.encode(result.value).toString('hex') + "'";
-        let tx_root_hex = "'" + rlp.encode(result.header[4]).toString('hex') + "'";
-        let txmerkleproof_hex = "'" + rlp.encode(result.parentNodes).toString('hex') + "'";
-        let txmerkleproofpath_hex = "'" + result.path.toString('hex') + "'";
+        let tx_hex = rlp.encode(result.value).toString('hex');
+        let tx_root_hex = rlp.encode(result.header[4]).toString('hex') ;
+        let txmerkleproof_hex =  rlp.encode(result.parentNodes).toString('hex');
+        let txmerkleproofpath_hex = result.path.toString('hex');
         let blockNumber = result.blockNumber;
         console.log("tx_root_hex " + tx_root_hex);
         console.log("tx_hex: " + tx_hex);
         console.log("txmerkleproof_hex: " + txmerkleproof_hex);
-        console.log("txmerkleroofpath_hex: " + txmerkleproofpath_hex);
+        console.log("txmerkleproofpath_hex: " + txmerkleproofpath_hex);
         console.log("block number: " + blockNumber);
 
         if(toSysAssetGUID.length > 0 && toSysAssetGUID !== "0" && toSysAssetGUID !== 0){
           
           try {
-            let args = [toSysAssetGUID, syscoinWitnessAddress, toSysAmount, blockNumber, tx_hex, tx_root_hex, txmerkleproof_hex, txmerkleproofpath_hex, "''"];
             // [asset] [address] [amount] [blocknumber] [tx_hex] [txroot_hex] [txmerkleproof_hex] [txmerkleroofpath_hex] [witness]
-            let results = await this.syscoinClient.callRpc("assetallocationmint", args);
+            let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=assetallocationmint&asset=' + toSysAssetGUID + '&address=' + syscoinWitnessAddress + '&amount=' + toSysAmount + '&blocknumber=' + blockNumber + '&tx_hex=' + tx_hex + '&txroot_hex=' + tx_root_hex + '&txmerkleproof_hex=' + txmerkleproof_hex + '&txmerkleproofpath_hex=' + txmerkleproofpath_hex + "&witness=''");
+            results = results.data;
             if(results && results.length && results.length > 0){
               validateNewInput.mintsysrawtxunsignedVal = true;
               this.refs.mintsysrawtxunsigned.value = results[0];
@@ -103,9 +101,9 @@ class Step2ES extends Component {
         else{
           
           try {
-            let args = [syscoinWitnessAddress, toSysAmount, blockNumber, tx_hex, tx_root_hex, txmerkleproof_hex, txmerkleproofpath_hex, "''"];
-            //  [address] [amount] [blocknumber] [tx_hex] [txroot_hex] [txmerkleproof_hex] [txmerkleroofpath_hex] [witness]
-            let results = await this.syscoinClient.callRpc("syscoinmint", args);
+            //  [address] [amount] [blocknumber] [tx_hex] [txroot_hex] [txmerkleproof_hex] [txmerkleproofpath_hex] [witness]
+            let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=syscoinmint&address=' + syscoinWitnessAddress + '&amount=' + toSysAmount + '&blocknumber=' + blockNumber + '&tx_hex=' + tx_hex + '&txroot_hex=' + tx_root_hex + '&txmerkleproof_hex=' + txmerkleproof_hex + '&txmerkleproofpath_hex=' + txmerkleproofpath_hex + "&witness=''");
+            results = results.data;
             if(results && results.length && results.length > 0){
               validateNewInput.mintsysrawtxunsignedVal = true;
               this.refs.mintsysrawtxunsigned.value = results[0];

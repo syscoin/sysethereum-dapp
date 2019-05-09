@@ -1,10 +1,10 @@
 
 import React, { Component } from 'react';
-import * as SyscoinRpc from 'syscoin-js';
 import web3 from '../web3';
 import tpabi from '../SyscoinTransactionProcessor';
 import hsabi from '../HumanStandardToken';  
 import CONFIGURATION from '../config';
+const axios = require('axios');
 class Step1ES extends Component {
   constructor(props) {
     super(props);
@@ -32,7 +32,6 @@ class Step1ES extends Component {
     this.validationCheck = this.validationCheck.bind(this);
     this.isValidated = this.isValidated.bind(this);
     this.setStateFromReceipt = this.setStateFromReceipt.bind(this);
-    this.syscoinClient = new SyscoinRpc.default({baseUrl: CONFIGURATION.syscoinRpcURL, port: CONFIGURATION.syscoinRpcPort, username: CONFIGURATION.syscoinRpcUser, password: CONFIGURATION.syscoinRpcPassword});
   }
 
   componentDidMount() {
@@ -153,9 +152,9 @@ class Step1ES extends Component {
   }
   async getWitnessProgram(address, validateNewInput){
     if(address.length > 0){
-      const args = [address];
       try {
-        let results = await this.syscoinClient.callRpc("getaddressinfo", args);
+        let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=getaddressinfo&address=' + address);
+        results = results.data;
         if(results){
           let version = this.byteToHex(results.witness_version);
           return "0x" + version + results.witness_program;

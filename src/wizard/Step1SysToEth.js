@@ -27,7 +27,7 @@ class Step1 extends Component {
   handleNextClick() {
     console.log("next");
     console.log( this.state.superblockHeight+1);
-    axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/superblock?height=' + (this.state.superblockHeight+1), { crossdomain: true })
+    axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/superblock?height=' + (this.state.superblockHeight+1))
     .then(response => {
       console.log(response);
       if(response.data.error){
@@ -49,7 +49,7 @@ class Step1 extends Component {
   handlePrevClick() {
     console.log("prev");
     console.log( this.state.superblockHeight-1);
-    axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/superblock?height=' + (this.state.superblockHeight-1), { crossdomain: true })
+    axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/superblock?height=' + (this.state.superblockHeight-1))
     .then(response => {
       console.log(response);
       if(response.data.error){
@@ -73,19 +73,19 @@ class Step1 extends Component {
     const userInput = this.refs.searchText.value;
     if(!userInput || userInput === "")
       return;
-    axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/superblock?hash=' + userInput, { crossdomain: true })
+    axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/superblock?hash=' + userInput)
       .then(response => {
         console.log(response);
         if(response.data.error){
-          axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/superblock?height=' + userInput, { crossdomain: true })
+          axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/superblock?height=' + userInput)
             .then(response => {
               console.log(response);
               if(response.data.error){
-                axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/superblockbysyscoinblock?hash=' + userInput, { crossdomain: true })
+                axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/superblockbysyscoinblock?hash=' + userInput)
                 .then(response => {
                   console.log(response);
                   if(response.data.error){
-                    axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/superblockbysyscoinblock?height=' + userInput, { crossdomain: true })
+                    axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/superblockbysyscoinblock?height=' + userInput)
                     .then(response => {
                       console.log(response);
                       if(response.data.error){
@@ -145,7 +145,7 @@ class Step1 extends Component {
   }
     async componentDidMount() {
     const currentSuperBlockHash = await SyscoinSuperblocks.methods.getBestSuperblock().call();
-    axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/superblock?hash=' + currentSuperBlockHash, { crossdomain: true })
+    axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/superblock?hash=' + currentSuperBlockHash)
       .then(response => {
         if(response.data.error){
           this.setState({searchError: response.error});
