@@ -1,6 +1,5 @@
 
 import React, { Component } from 'react';
-import * as SyscoinRpc from 'syscoin-js';
 import CONFIGURATION from '../config';
 const axios = require('axios');
 class Step4 extends Component {
@@ -38,7 +37,6 @@ class Step4 extends Component {
     this.getProofs = this.getProofs.bind(this);
     this.validationCheck = this.validationCheck.bind(this);
     this.isValidated = this.isValidated.bind(this);
-    this.syscoinClient = new SyscoinRpc.default({baseUrl: CONFIGURATION.syscoinRpcURL, port: CONFIGURATION.syscoinRpcPort, username: CONFIGURATION.syscoinRpcUser, password: CONFIGURATION.syscoinRpcPassword});
   }
 
   componentDidMount() {
@@ -83,11 +81,11 @@ class Step4 extends Component {
   async getProofs() {
     let userInput = this._grabUserInput(); 
     let validateNewInput = this._validateData(userInput); // run the new input against the validator
-    const args = [this.props.getStore().txid.toString(), this.props.getStore().blockhash.toString()];
     let failed = false;
     this.setState({working: true});
     try {
-      let results = await this.syscoinClient.callRpc("syscoingetspvproof", args);
+      let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=syscoingetspvproof&txid=' + this.props.getStore().txid.toString() + '&blockhash=' + this.props.getStore().blockhash.toString());
+      results = results.data;
       if(results){
         validateNewInput.txbytes = results.transaction;
         console.log("txbytesVal " + validateNewInput.txbytes);
@@ -107,7 +105,7 @@ class Step4 extends Component {
       failed = true;
     }
     if(failed === false){
-      axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/spvproof?hash=' + (this.props.getStore().blockhash.toString()), { crossdomain: true })
+      axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/spvproof?hash=' + (this.props.getStore().blockhash.toString()))
       .then(response => {
         this.setState({working: false});
         console.log(response);

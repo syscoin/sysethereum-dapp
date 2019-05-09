@@ -1,7 +1,7 @@
 
 import React, { Component } from 'react';
-import * as SyscoinRpc from 'syscoin-js';
 import CONFIGURATION from '../config';
+const axios = require('axios');
 class Step2 extends Component {
   constructor(props) {
     super(props);
@@ -18,7 +18,6 @@ class Step2 extends Component {
     this.getBurnTx = this.getBurnTx.bind(this);
     this.validationCheck = this.validationCheck.bind(this);
     this.isValidated = this.isValidated.bind(this);
-    this.syscoinClient = new SyscoinRpc.default({baseUrl: CONFIGURATION.syscoinRpcURL, port: CONFIGURATION.syscoinRpcPort, username: CONFIGURATION.syscoinRpcUser, password: CONFIGURATION.syscoinRpcPassword});
    
   }
 
@@ -82,9 +81,9 @@ class Step2 extends Component {
         if(ethAddressStripped && ethAddressStripped.startsWith("0x")){
           ethAddressStripped = ethAddressStripped.substr(2, ethAddressStripped.length);
         }
-        const args = [assetGuid, fundingAddress, userInput.amount.toString(), ethAddressStripped];
         try {
-          let results = await this.syscoinClient.callRpc("assetallocationburn", args);
+          let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=assetallocationburn&asset_guid=' + assetGuid + '&address=' + fundingAddress + '&amount=' + userInput.amount.toString() + '&ethereum_destination_address=ethAddressStripped');
+          results = results.data;
           if(results && results.length && results.length > 0){
             validateNewInput.sysrawtxunsignedVal = true;
             this.refs.sysrawtxunsigned.value = results[0];
@@ -102,9 +101,9 @@ class Step2 extends Component {
         if(ethAddressStripped && ethAddressStripped.startsWith("0x")){
           ethAddressStripped = ethAddressStripped.substr(2, ethAddressStripped.length);
         }
-        const args = [fundingAddress, userInput.amount.toString(), true, ethAddressStripped];
         try {
-          let results = await this.syscoinClient.callRpc("syscoinburn", args);
+          let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=syscoinburn&address=' + fundingAddress + '&amount=' + userInput.amount.toString() + '&ethereum_destination_address=ethAddressStripped');
+          results = results.data;
           if(results && results.length && results.length > 0){
             validateNewInput.sysrawtxunsignedVal = true;
             this.refs.sysrawtxunsigned.value = results[0];
