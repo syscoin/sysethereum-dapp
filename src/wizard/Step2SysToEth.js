@@ -84,7 +84,12 @@ class Step2 extends Component {
         try {
           let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=assetallocationburn&asset_guid=' + assetGuid + '&address=' + fundingAddress + '&amount=' + userInput.amount.toString() + '&ethereum_destination_address=' + ethAddressStripped);
           results = results.data;
-          if(results && results.length && results.length > 0){
+          if(results.error){
+            validateNewInput.buttonVal = false;
+            validateNewInput.buttonValMsg = results.error;
+            self.setState({working: false});      
+          }
+          else if(results && results.length && results.length > 0){
             validateNewInput.sysrawtxunsignedVal = true;
             this.refs.sysrawtxunsigned.value = results[0];
             self.setState({working: false});
@@ -104,7 +109,12 @@ class Step2 extends Component {
         try {
           let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=syscoinburn&address=' + fundingAddress + '&amount=' + userInput.amount.toString() + '&ethereum_destination_address=' + ethAddressStripped);
           results = results.data;
-          if(results && results.length && results.length > 0){
+          if(results.error){
+            validateNewInput.buttonVal = false;
+            validateNewInput.buttonValMsg = results.error;
+            self.setState({working: false});      
+          }
+          else if(results && results.length && results.length > 0){
             validateNewInput.sysrawtxunsignedVal = true;
             this.refs.sysrawtxunsigned.value = results[0];
             self.setState({working: false});
