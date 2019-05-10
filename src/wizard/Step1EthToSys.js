@@ -155,7 +155,12 @@ class Step1ES extends Component {
       try {
         let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=getaddressinfo&address=' + address);
         results = results.data;
-        if(results){
+        if(results.error){
+          validateNewInput.buttonVal = false;
+          validateNewInput.buttonValMsg = results.error;
+          return "";
+        }
+        else if(results){
           let version = this.byteToHex(results.witness_version);
           return "0x" + version + results.witness_program;
         }

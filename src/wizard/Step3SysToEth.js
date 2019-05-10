@@ -67,9 +67,15 @@ class Step3 extends Component {
       try {
         let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=getblockhashbytxid&txid=' + txid);
         results = results.data;
-        if(results){
+        if(results.error){
+          validateNewInput.buttonVal = false;
+          validateNewInput.buttonValMsg = results.error;
+          this.setState({working: false});
+          console.log("error " + results.error);
+        }
+        else if(results && results.hex){
           validateNewInput.blockhashVal = true;
-          this.refs.blockhash.value = results;
+          this.refs.blockhash.value = results.hex;
           this.setState({working: false});
         }
       }catch(e) {

@@ -86,7 +86,13 @@ class Step4 extends Component {
     try {
       let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=syscoingetspvproof&txid=' + this.props.getStore().txid.toString() + '&blockhash=' + this.props.getStore().blockhash.toString());
       results = results.data;
-      if(results){
+      if(results.error){
+        validateNewInput.buttonVal = false;
+        validateNewInput.buttonValMsg = results.error;
+        console.log("error " + results.error);
+        failed = true;
+      }
+      else if(results){
         validateNewInput.txbytes = results.transaction;
         console.log("txbytesVal " + validateNewInput.txbytes);
         validateNewInput.syscoinblockheader = results.header;

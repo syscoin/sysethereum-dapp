@@ -89,9 +89,9 @@ class Step2 extends Component {
             validateNewInput.buttonValMsg = results.error;
             self.setState({working: false});      
           }
-          else if(results && results.length && results.length > 0){
+          else if(results && results.hex){
             validateNewInput.sysrawtxunsignedVal = true;
-            this.refs.sysrawtxunsigned.value = results[0];
+            this.refs.sysrawtxunsigned.value = results.hex;
             self.setState({working: false});
           }
         }catch(e) {
@@ -114,9 +114,9 @@ class Step2 extends Component {
             validateNewInput.buttonValMsg = results.error;
             self.setState({working: false});      
           }
-          else if(results && results.length && results.length > 0){
+          else if(results && results.hex){
             validateNewInput.sysrawtxunsignedVal = true;
-            this.refs.sysrawtxunsigned.value = results[0];
+            this.refs.sysrawtxunsigned.value = results.hex;
             self.setState({working: false});
           }
         

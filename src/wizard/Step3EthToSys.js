@@ -71,10 +71,16 @@ class Step3ES extends Component {
       try {
         let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=getblockhashbytxid&txid=' + minttxid);
         results = results.data;
-        if(results){
+        if(results.error){
+          validateNewInput.buttonVal = false;
+          validateNewInput.buttonValMsg = results.error;
+          this.setState({working: false});
+          console.log("error " + results.error);
+        }
+        else if(results && results.hex){
           validateNewInput.mintblockhashVal = true;
-          this.refs.mintblockhash.value = results;
-          userInput.mintblockhash = results;
+          this.refs.mintblockhash.value = results.hex;
+          userInput.mintblockhash = results.hex;
           this.setState({working: false});
         }
       }catch(e) {
