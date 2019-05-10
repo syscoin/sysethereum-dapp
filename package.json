@@ -18,8 +18,7 @@
     "react-search-field": "^1.0.0",
     "react-stepzilla": "^6.0.0",
     "react-validation-mixin": "^5.4.0",
-    "syscoin-js": "git+https://github.com/syscoin/syscoin-js.git",
-    "web3": "^1.0.0-beta.52",
+    "web3": "^1.0.0-beta.55",
     "rlp": "^2.2.3",
     "eth-proof": "git+https://github.com/syscoin/eth-proof.git"
   },
