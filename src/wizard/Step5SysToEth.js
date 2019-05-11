@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-import SyscoinSuperblocks from '../SyscoinSuperblocks';
+import sbconfig from '../SyscoinSuperblocks';
 import { getProof } from 'bitcoin-proof'
 import Web3 from 'web3';
 import CONFIGURATION from '../config';
@@ -98,6 +98,11 @@ class Step5 extends Component {
       this.setState({buttonVal: false, buttonValMsg: this.props.t("stepUseMainnet")});
       return;       
     }
+    let SyscoinSuperblocks = new web3.eth.Contract(sbconfig.data, sbconfig.contract); 
+    if(!SyscoinSuperblocks || !SyscoinSuperblocks.methods || !SyscoinSuperblocks.methods.relayTx){
+      this.setState({buttonVal: false, buttonValMsg: this.props.t("stepSuperblock")});
+      return;  
+    }
     this.setState({
       receiptStatus: '',
       receiptTxHash: '',
@@ -143,6 +148,7 @@ class Step5 extends Component {
     this.setState({working: true});
     let thisObj = this;
     thisObj.state.receiptObj = null;
+
      SyscoinSuperblocks.methods.relayTx(_txBytes, this.props.getStore().txindex, merkleProof.sibling, _syscoinBlockHeader, 
       this.props.getStore().syscoinblockindex, _syscoinBlockSiblings, _superblockHash, this.props.getStore().untrustedtargetcontract).send({from: accounts[0], gas: 500000})
       .on('transactionHash', function(hash){

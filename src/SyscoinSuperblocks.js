@@ -1,4 +1,3 @@
-import web3 from './web3';
 const address = '0xb021f3e1d90cccdcac0311b2e8d1ef49a8a5689e';
 const abi = [
   {
@@ -1041,4 +1040,9 @@ const abi = [
     "type": "function"
   }
 ]
-  export default new web3.eth.Contract(abi, address);
+var sbconfig = {
+  data: abi,
+  contract: address
+}
+
+export default sbconfig;

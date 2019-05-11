@@ -1,7 +1,8 @@
 
 import React, { Component } from 'react';
 import MaterialIcon from 'material-icons-react';
-import SyscoinSuperblocks from '../SyscoinSuperblocks';
+import web3 from '../web3';
+import sbconfig from '../SyscoinSuperblocks';
 import CONFIGURATION from '../config';
 const axios = require('axios');
 class Step1 extends Component {
@@ -144,8 +145,13 @@ class Step1 extends Component {
       });
   }
     async componentDidMount() {
-    const currentSuperBlockHash = await SyscoinSuperblocks.methods.getBestSuperblock().call();
-    axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/superblock?hash=' + currentSuperBlockHash)
+      let SyscoinSuperblocks = new web3.eth.Contract(sbconfig.data, sbconfig.contract); 
+      if(!SyscoinSuperblocks || !SyscoinSuperblocks.methods || !SyscoinSuperblocks.methods.getBestSuperblock){
+        this.setState({searchError: this.props.t("stepSuperblock")});
+        return;  
+      }
+      const currentSuperBlockHash = await SyscoinSuperblocks.methods.getBestSuperblock().call();
+      axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/superblock?hash=' + currentSuperBlockHash)
       .then(response => {
         if(response.data.error){
           this.setState({searchError: response.error});
