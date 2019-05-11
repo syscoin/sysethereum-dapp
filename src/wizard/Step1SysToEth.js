@@ -11,6 +11,13 @@ class Step1 extends Component {
     this.searchSuperblock = this.searchSuperblock.bind(this);
     this.handlePrevClick = this.handlePrevClick.bind(this);
     this.handleNextClick = this.handleNextClick.bind(this);
+    this.sbContract = sbconfig.contract;
+    this.sbURL = "https://";
+    if(CONFIGURATION.testnet){
+      this.sbURL += "rinkeby.";
+    }
+    this.sbURL += "etherscan.io/address/" + this.sbContract + "#events";
+    
     this.state = {
       superblockApproved: false,
       superblockBlockHeight: 0,
@@ -211,9 +218,10 @@ class Step1 extends Component {
                     <code>
                         {this.props.t("step1SuperblockId")}: {this.state.superblockId}<br />
                         {this.props.t("step1SuperblockBlockHeight")}: {this.state.superblockBlockHeight}<br />
-                        {this.props.t("step1superblockHeight")}: {this.state.superblockHeight}<br />
+                        {this.props.t("step1SuperblockHeight")}: {this.state.superblockHeight}<br />
                         {this.props.t("step1LastBlockTime")}: {this.state.superblockLastBlockTime}<br />
                         {this.props.t("step1SuperblockApproved")}: {this.state.superblockApproved.toString()}<br />
+                        {this.props.t("step1SuperblockAddress")}: <a href={this.sbURL} target="_blank" rel="noopener noreferrer">{this.sbContract}</a><br />
                     </code>
                   </div>
                   <div className="col-md-6">
