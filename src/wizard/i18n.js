@@ -87,7 +87,7 @@ i18n.use(LanguageDetector).init({
         'step4ButtonEnter': 'Please get SPV Proofs before proceeding',
         'step4SbStatusSuccess': 'SPV Proofs were sucessfully saved! Please proceed to click on the "Next" button below',
         'step4ESHead': 'Step 4: Complete!',
-        'step4ESDescription': 'Transaction was successfully completed. You now can use your Syscoin or Syscoin Asset through the Syscoin network.',
+        'step4ESDescription': 'Transaction was successfully completed. You now can use your Syscoin or Syscoin Asset through the Syscoin network. You can view your transaction here: ',
         'step5Head': 'Step 5: Submit SPV Proof to Ethereum',
         'step5Description': 'The button below will submit the SPV proofs to the Superblock contract.',
         'step5Button': 'Submit SPV Proofs',

@@ -1,4 +1,5 @@
-const address = '0xb021f3e1d90cccdcac0311b2e8d1ef49a8a5689e';
+import CONFIGURATION from './config';
+const address = CONFIGURATION.superblockContract;
 const abi = [
   {
     "constant": true,
