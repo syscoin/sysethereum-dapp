@@ -43,7 +43,7 @@ i18n.use(LanguageDetector).init({
         'step1SuperblockParentId': 'Previous Superblock ID',
         'step1SearchBox': 'Enter a hash or height to locate a Superblock...',
         'step1ESHead': 'Welcome to the official Ethereum to Syscoin Bridge wizard!',
-        'step1ESDescription': 'This is a wizard for a bridge for users of Ethereum who has previously walked over from Syscoin to move back trustlessly. An SPV proof of the Ethereum burn transaction is required to move back to Syscoin. Please enter details about which asset to move back to Syscoin. Enter "0" for Asset GUID and "0x5f6e74ba20bf26161612eac8f7e8b3b6c9baaadd" as the Ethereum SYSX Contract if moving Syscoin over otherwise enter the GUID and contract of the Asset token you are moving back to Syscoin.',
+        'step1ESDescription': 'This is a wizard for a bridge for users of Ethereum who has previously walked over from Syscoin to move back trustlessly. An SPV proof of the Ethereum burn transaction is required to move back to Syscoin. Please enter details about which asset to move back to Syscoin. Enter "0" for Asset GUID and "0xdeaa65c2162a141bc768ef624c6b7d1342f629fb" as the Ethereum SYSX Contract if moving Syscoin over otherwise enter the GUID and contract of the Asset token you are moving back to Syscoin.',
         'step1ESContractLabel': 'Ethereum SYSX Contract',
         'step1SEContract': 'A valid Ethereum contract representing the SYSX token is required',
         'step1ESEnterContract': 'Enter contract address...',
