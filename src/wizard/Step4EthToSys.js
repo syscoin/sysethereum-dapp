@@ -10,9 +10,15 @@ class Step4ES extends Component {
   }
 
   componentDidMount() {
-    if(!this.props.getStore().mintblockhash){
+    if(!this.props.getStore().mintblockhash || !this.props.getStore().minttxid){
       this.props.jumpToStep(3);
+      return;
     }
+    let baseURL = "";
+    
+    baseURL = "http://explorer.blockchainfoundry.co/tx/" + this.props.getStore().minttxid;
+    
+    this.setState({explorerLink: baseURL});
   }
 
   componentWillUnmount() {}
@@ -27,7 +33,7 @@ class Step4ES extends Component {
             <div className="form-group">
               <label className="col-md-12 control-label">
                 <h1>{this.props.t("step4ESHead")}</h1>
-                <h3>{this.props.t("step4ESDescription")}</h3>
+                <h3>{this.props.t("step4ESDescription")}<a href={this.state.explorerLink} target="_blank" rel="noopener noreferrer">{this.state.explorerLink}</a></h3>
               </label>
             </div>
           </form>
