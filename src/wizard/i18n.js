@@ -107,7 +107,8 @@ i18n.use(LanguageDetector).init({
         'step5ReceiptGas': 'Gas Used',
         'step5ReceiptConfirmations': 'Confirmations',
         'step5Download': 'Download Receipt Log',
-        'step5ErrorCheckLog': 'Error! Please check the Receipt Log for more details',
+        'step5ErrorEVMCheckLog': 'Error! EVM Rejection. Please check the Receipt Log for more details',
+        'step5ErrorEventCheckLog': 'Error! Cannot find event in Transaction Receipt. Please check the Receipt Log for more details',
         'step6Head': 'Step 6: Complete!',
         'step6Description': 'Transaction was successfully completed. You now can use your Syscoin or Syscoin Asset on the Ethereum network through an ERC20. You can view your transaction here: '
       }
