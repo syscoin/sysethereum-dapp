@@ -61,11 +61,22 @@ class Step5 extends Component {
     }
     if(receipt.events && receipt.events.RelayTransaction && receipt.events.RelayTransaction.returnValues && receipt.events.RelayTransaction.returnValues[0]){
       if(receipt.events.RelayTransaction.returnValues[0] === 0 || receipt.events.RelayTransaction.returnValues[1] === 0){
-        error = this.props.t("step5ErrorCheckLog");
+        error = this.props.t("step5ErrorEVMCheckLog");
+      }
+    }
+    else if(receipt.logs){
+      for(let i = 0;i< receipt.logs.length;i++){
+        if(receipt[i].address = CONFIGURATION.superblockContract){
+          let topic1 = "0x" + receipt[i].data.substring(2, 34);
+          let topic2 = "0x" + receipt[i].data.substring(34, 66);
+          if(parseInt(topic1) === 0 || parseInt(topic2) === 0){
+            error = this.props.t("step5ErrorEVMCheckLog");
+          }
+        }
       }
     }
     else{
-      error = this.props.t("step5ErrorCheckLog");
+      error = this.props.t("step5ErrorEventCheckLog");
     }
     this.setState({
       receiptObj: receipt,
