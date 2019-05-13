@@ -128,15 +128,12 @@ class Step1ES extends Component {
     }
     else if(receipt.logs){
       for(let i = 0;i< receipt.logs.length;i++){
-        console.log("receipt[i].address " + receipt.logs[i].address.toLowerCase());
-        console.log("CONFIGURATION.superblockContract " + CONFIGURATION.superblockContract.toLowerCase());
         if(receipt.logs[i].address.toLowerCase() === CONFIGURATION.superblockContract.toLowerCase()){
           let topic1 = "0x" + receipt.logs[i].data.substring(2, 34);
           let topic2 = "0x" + receipt.logs[i].data.substring(34, 66);
-          console.log("topic1 " + topic1);
-          console.log("topic1 " + topic2);
           if(parseInt(topic1) === 0 || parseInt(topic2) === 0){
             error = this.props.t("step5ErrorEVMCheckLog");
+            break;
           }
         }
       }
