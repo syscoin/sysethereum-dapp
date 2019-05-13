@@ -129,8 +129,8 @@ class Step1ES extends Component {
     else if(receipt.logs){
       for(let i = 0;i< receipt.logs.length;i++){
         if(receipt.logs[i].address.toLowerCase() === CONFIGURATION.superblockContract.toLowerCase()){
-          let topic1 = "0x" + receipt.logs[i].data.substring(2, 34);
-          let topic2 = "0x" + receipt.logs[i].data.substring(34, 66);
+          let topic1 = "0x" + receipt.logs[i].data.substring(2, 66);
+          let topic2 = "0x" + receipt.logs[i].data.substring(66, 130);
           if(parseInt(topic1) === 0 || parseInt(topic2) === 0){
             error = this.props.t("step5ErrorEVMCheckLog");
             break;
