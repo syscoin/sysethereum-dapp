@@ -121,23 +121,9 @@ class Step1ES extends Component {
     if(receipt.transactionHash && this.state.receiptTxHash !== receipt.transactionHash){
       return;
     }
-    if(receipt.events  && receipt.events[0] && receipt.events[0].raw && receipt.events[0].raw.data){
-      if(receipt.events[0].raw.data.length <= 66){
-        error = this.props.t("step5ErrorEVMCheckLog");
-      }
+    if(receipt.status  && receipt.status != "1" && receipt.status != true && receipt.status != "true" && receipt.status != "0x1"){
+      error = this.props.t("step5ErrorEVMCheckLog");
     }
-    else if(receipt.logs){
-      for(let i = 0;i< receipt.logs.length;i++){
-        if(receipt.logs[i].address.toLowerCase() === CONFIGURATION.superblockContract.toLowerCase()){
-          let topic1 = "0x" + receipt.logs[i].data.substring(2, 66);
-          let topic2 = "0x" + receipt.logs[i].data.substring(66, 130);
-          if(parseInt(topic1) === 0 || parseInt(topic2) === 0){
-            error = this.props.t("step5ErrorEVMCheckLog");
-            break;
-          }
-        }
-      }
-    } 
     else{
       error = this.props.t("step5ErrorEventCheckLog");
     }
