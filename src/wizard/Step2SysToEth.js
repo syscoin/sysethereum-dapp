@@ -71,8 +71,9 @@ class Step2 extends Component {
       valid = false;
     }         
     let self = this;
-    this.setState({working: true});
+    
     if(valid === true){
+      this.setState({working: true});
       let fundingAddress = userInput.fundingaddress.toString();
       if(userInput.asset.length > 0 && userInput.asset !== 0 && userInput.asset !== "0"){
         let assetGuid = userInput.asset.toString();
