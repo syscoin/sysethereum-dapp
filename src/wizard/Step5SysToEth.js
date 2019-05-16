@@ -63,6 +63,7 @@ class Step5 extends Component {
       if(receipt.events.RelayTransaction.returnValues[0] === 0 || receipt.events.RelayTransaction.returnValues[1] === 0){
         error = this.props.t("step5ErrorEVMCheckLog");
       }
+    }
     else if(receipt.logs){
       for(let i = 0;i< receipt.logs.length;i++){
         if(receipt.logs[i].address.toLowerCase() === CONFIGURATION.superblockContract.toLowerCase()){
