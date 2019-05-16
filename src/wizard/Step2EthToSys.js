@@ -64,6 +64,7 @@ class Step2ES extends Component {
     let toSysAmount =  this.props.getStore().toSysAmount.toString();
     let syscoinWitnessAddress =  this.props.getStore().syscoinWitnessAddress;
     let ethTXID = this.props.getStore().receiptTxHash;
+    let blockNumber = this.props.getStore().receiptBlocknumber;
     const buildEthProof = new EthProof(CONFIGURATION.infuraURL);
     try{
         let result = await buildEthProof.getTransactionProof(ethTXID);
@@ -76,22 +77,21 @@ class Step2ES extends Component {
         let receipt_hex = rlp.encode(result.value).toString('hex');
         let receipt_root_hex = rlp.encode(result.header[5]).toString('hex') ;
         let receiptmerkleproof_hex =  rlp.encode(result.parentNodes).toString('hex');
-        let blockNumber = result.blockNumber;
+
         console.log("tx_root_hex " + tx_root_hex);
         console.log("tx_hex: " + tx_hex);
         console.log("txmerkleproof_hex: " + txmerkleproof_hex);
         console.log("txmerkleproofpath_hex: " + txmerkleproofpath_hex);
-        console.log("block number: " + blockNumber);
         
         console.log("receipt_root_hex " + receipt_root_hex);
         console.log("receipt_hex: " + receipt_hex);
         console.log("receiptmerkleproof_hex: " + receiptmerkleproof_hex);
-
+        console.log("block number: " + blockNumber);
         if(toSysAssetGUID.length > 0 && toSysAssetGUID !== "0" && toSysAssetGUID !== 0){
           
           try {
             // [asset] [address] [amount] [tx_hex] [txroot_hex] [txmerkleproof_hex] [txmerkleroofpath_hex] [receipt_hex] [receiptroot_hex] [receiptmerkleproof_hex] [receiptmerkleroofpath_hex] [witness]
-            let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=assetallocationmint&asset=' + toSysAssetGUID + '&address=' + syscoinWitnessAddress + '&amount=' + toSysAmount + '&tx_hex=' + tx_hex + '&txroot_hex=' + tx_root_hex + '&txmerkleproof_hex=' + txmerkleproof_hex + '&txmerkleproofpath_hex=' + txmerkleproofpath_hex + '&receipt_hex=' + receipt_hex + '&receiptroot_hex=' + receipt_root_hex + '&receiptmerkleproof_hex=' + receiptmerkleproof_hex + "&witness=''");
+            let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=assetallocationmint&asset=' + toSysAssetGUID + '&address=' + syscoinWitnessAddress + '&amount=' + toSysAmount + '&blocknumber=' + blockNumber + '&tx_hex=' + tx_hex + '&txroot_hex=' + tx_root_hex + '&txmerkleproof_hex=' + txmerkleproof_hex + '&txmerkleproofpath_hex=' + txmerkleproofpath_hex + '&receipt_hex=' + receipt_hex + '&receiptroot_hex=' + receipt_root_hex + '&receiptmerkleproof_hex=' + receiptmerkleproof_hex + "&witness=''");
             results = results.data;
             if(results.error){
               validateNewInput.buttonVal = false;
@@ -117,7 +117,7 @@ class Step2ES extends Component {
           
           try {
             //  [address] [amount] [tx_hex] [txroot_hex] [txmerkleproof_hex] [txmerkleproofpath_hex] [receipt_hex] [receiptroot_hex] [receiptmerkleproof_hex] [receiptmerkleroofpath_hex] [witness]
-            let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=syscoinmint&address=' + syscoinWitnessAddress + '&amount=' + toSysAmount + '&tx_hex=' + tx_hex + '&txroot_hex=' + tx_root_hex + '&txmerkleproof_hex=' + txmerkleproof_hex + '&txmerkleproofpath_hex=' + txmerkleproofpath_hex + '&receipt_hex=' + receipt_hex + '&receiptroot_hex=' + receipt_root_hex + '&receiptmerkleproof_hex=' + receiptmerkleproof_hex + "&witness=''");
+            let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=syscoinmint&address=' + syscoinWitnessAddress + '&amount=' + toSysAmount + '&blocknumber=' + blockNumber + '&tx_hex=' + tx_hex + '&txroot_hex=' + tx_root_hex + '&txmerkleproof_hex=' + txmerkleproof_hex + '&txmerkleproofpath_hex=' + txmerkleproofpath_hex + '&receipt_hex=' + receipt_hex + '&receiptroot_hex=' + receipt_root_hex + '&receiptmerkleproof_hex=' + receiptmerkleproof_hex + "&witness=''");
             results = results.data;
             if(results.error){
               validateNewInput.buttonVal = false;
