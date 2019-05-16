@@ -9,6 +9,7 @@ class Step2ES extends Component {
     super(props);
     this.state = {
       mintsysrawtxunsigned: props.getStore().mintsysrawtxunsigned,
+      ethburntxid: this.props.getStore().ethburntxid,
       working: false
     };
     
@@ -19,8 +20,13 @@ class Step2ES extends Component {
   }
 
   componentDidMount() {
-    if(!this.props.getStore().receiptTxHash){
+    if((!this.props.getStore().toSysAssetGUID && !this.props.getStore().toSysAssetGUID == 0) ||
+    !this.props.getStore().toSysAmount ||
+    !this.props.getStore().syscoinWitnessAddress){
       this.props.jumpToStep(0);
+    }
+    if(this.props.getStore().receiptTxHash){
+      this.state.ethburntxid = this.props.getStore().receiptTxHash;
     }
   }
 
@@ -34,7 +40,7 @@ class Step2ES extends Component {
 
     // if full validation passes then save to store and pass as valid
     if (Object.keys(validateNewInput).every((k) => { return validateNewInput[k] === true })) {
-        if(this.props.getStore().mintsysrawtxunsigned !== userInput.mintsysrawtxunsigned) { // only update store of something changed
+        if(this.props.getStore().mintsysrawtxunsigned !== userInput.mintsysrawtxunsigned || this.props.getStore().ethburntxid !== userInput.ethburntxid) { // only update store of something changed
           this.props.updateStore({
             ...userInput,
             savedToCloud: false // use this to notify step4 that some changes took place and prompt the user to save again
@@ -55,16 +61,21 @@ class Step2ES extends Component {
     let validateNewInput = this._validateData(userInput); // run the new input against the validator
     validateNewInput.buttonVal = true;
     validateNewInput.buttonValMsg = "";
-    validateNewInput.mintsysrawtxunsignedVal = true;
-    validateNewInput.mintsysrawtxunsignedValMsg = "";       
+    validateNewInput.mintsysrawtxunsignedVal = true; 
+    if(!userInput.ethburntxid || userInput.ethburntxid === ""){
+      validateNewInput.ethburntxidVal = false;
+      this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+      return;
+    } 
+       
     let self = this;
     this.setState({working: true});
 
     let toSysAssetGUID = this.props.getStore().toSysAssetGUID ;
     let toSysAmount =  this.props.getStore().toSysAmount.toString();
     let syscoinWitnessAddress =  this.props.getStore().syscoinWitnessAddress;
-    let ethTXID = this.props.getStore().receiptTxHash;
-    let blockNumber = this.props.getStore().receiptBlocknumber;
+    let ethTXID = userInput.ethburntxid;
+
     const buildEthProof = new EthProof(CONFIGURATION.infuraURL);
     try{
         let result = await buildEthProof.getTransactionProof(ethTXID);
@@ -72,6 +83,7 @@ class Step2ES extends Component {
         let tx_root_hex = rlp.encode(result.header[4]).toString('hex') ;
         let txmerkleproof_hex =  rlp.encode(result.parentNodes).toString('hex');
         let txmerkleproofpath_hex = result.path.toString('hex');
+        let blockNumber = result.blockNumber;
 
         result = await buildEthProof.getReceiptProof(ethTXID);
         let receipt_hex = rlp.encode(result.value).toString('hex');
@@ -103,8 +115,8 @@ class Step2ES extends Component {
           }catch(e) {
             validateNewInput.buttonVal = false;
             validateNewInput.buttonValMsg = e.message;
-            console.log("error " + e.message);
             self.setState({working: false});
+            self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
           }
         }
         else{
@@ -125,6 +137,7 @@ class Step2ES extends Component {
             validateNewInput.buttonVal = false;
             validateNewInput.buttonValMsg = e.message;
             self.setState({working: false});
+            self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
           }
         }
 
@@ -149,12 +162,14 @@ class Step2ES extends Component {
 
    _validateData(data) {
     return  {
+      ethburntxidVal: true,
       mintsysrawtxunsignedVal: true
     }
   }
 
   _validationErrors(val) {
     const errMsgs = {
+      ethburntxidValMsg: val.ethburntxidVal && val.ethburntxidVal === true ? '' : this.props.t("step2ESTxid"),
       mintsysrawtxunsignedValMsg: val.mintsysrawtxunsignedVal ? '' : this.props.t("step2ESRawTx")
     }
     return errMsgs;
@@ -162,6 +177,7 @@ class Step2ES extends Component {
 
   _grabUserInput() {
     return {
+      ethburntxid: this.refs.ethburntxid.value,
       mintsysrawtxunsigned: this.refs.mintsysrawtxunsigned.value
     };
   }
@@ -170,6 +186,13 @@ class Step2ES extends Component {
     // explicit class assigning based on validation
     let notValidClasses = {};
 
+    if (typeof this.state.ethburntxidVal == 'undefined' || this.state.ethburntxidVal) {
+      notValidClasses.ethburntxidCls = 'no-error col-md-8';
+    }
+    else {
+      notValidClasses.ethburntxidCls = 'has-error col-md-8';
+      notValidClasses.ethburntxidValGrpCls = 'val-err-tooltip';
+    }
     if (typeof this.state.mintsysrawtxunsignedVal == 'undefined' || this.state.mintsysrawtxunsignedVal) {
       notValidClasses.mintsysrawtxunsignedCls = 'no-error col-md-8';
     }
@@ -190,11 +213,29 @@ class Step2ES extends Component {
           <form id="Form" className="form-horizontal">
             <div className="form-group">
             <label className="col-md-12 control-label">
-                <h1>{this.props.t("step2Head")}</h1>
-                <h3>{this.props.t("step2Description")}</h3>
+                <h1>{this.props.t("step2ESHead")}</h1>
+                <h3>{this.props.t("step2ESDescription")}</h3>
               </label>
              
-              
+              <div className="row">
+              <div className="col-md-12">
+                <label className="control-label col-md-4">
+                  {this.props.t("step3TxidLabel")}
+                </label>
+                <div className={notValidClasses.ethburntxidCls}>
+                  <input
+                    ref="ethburntxid"
+                    autoComplete="off"
+                    type="text"
+                    placeholder={this.props.t("step2ESEnterTxid")}
+                    className="form-control"
+                    defaultValue={this.state.ethburntxid}
+                    required
+                     />
+                  <div className={notValidClasses.ethburntxidValGrpCls}>{this.state.ethburntxidValMsg}</div>
+                </div>
+              </div>
+              </div>          
               <div className="row">
               <div className="col-md-12">
                 <label className="control-label col-md-4">
