@@ -36,7 +36,7 @@ i18n.use(LanguageDetector).init({
         'step1MerkleRoot': 'Merkle Root',
         'step1LastBlockTime': 'Current Syscoin Block Time',
         'step1LastBlockHash': 'Current Syscoin Blockhash',
-        'step1PreviousBlockTime': 'Previous Syscoin Block Time',
+        'step1PreviousBlockTime': 'Difficulty Adjustment Time',
         'step1PreviousBlockBits': 'Previous Syscoin Difficulty Bits',
         'step1SuperblockApproved': 'Superblock Approved',
         'step1SuperblockAddress' : 'Superblock Contract Address',

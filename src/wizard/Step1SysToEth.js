@@ -43,7 +43,7 @@ class Step1 extends Component {
       }
       else{
         this.setState({superblockApproved: response.data.approved, superblockBlockHeight: response.data.blockHeight,
-          superblockLastBlockHash: response.data.lastSyscoinBlockHash, superblockLastBlockTime: response.data.previousSyscoinBlockTime,
+          superblockLastBlockHash: response.data.lastSyscoinBlockHash, superblockLastBlockTime: response.data.lastSyscoinBlockTime,
           superblockMerkleRoot: response.data.merkleRoot, superblockParentId: response.data.parentId,
           superblockPreviousBlockBits: response.data.previousSyscoinBlockBits,superblockPreviousBlockTime: response.data.previousSyscoinBlockTime,
           superblockHeight: response.data.superblockHeight, superblockId:  response.data.superblockId
@@ -65,7 +65,7 @@ class Step1 extends Component {
       }
       else{
         this.setState({superblockApproved: response.data.approved, superblockBlockHeight: response.data.blockHeight,
-          superblockLastBlockHash: response.data.lastSyscoinBlockHash, superblockLastBlockTime: response.data.previousSyscoinBlockTime,
+          superblockLastBlockHash: response.data.lastSyscoinBlockHash, superblockLastBlockTime: response.data.lastSyscoinBlockTime,
           superblockMerkleRoot: response.data.merkleRoot, superblockParentId: response.data.parentId,
           superblockPreviousBlockBits: response.data.previousSyscoinBlockBits,superblockPreviousBlockTime: response.data.previousSyscoinBlockTime,
           superblockHeight: response.data.superblockHeight, superblockId:  response.data.superblockId
@@ -101,7 +101,7 @@ class Step1 extends Component {
                       }
                       else{
                         this.setState({superblockApproved: response.data.approved, superblockBlockHeight: response.data.blockHeight,
-                          superblockLastBlockHash: response.data.lastSyscoinBlockHash, superblockLastBlockTime: response.data.previousSyscoinBlockTime,
+                          superblockLastBlockHash: response.data.lastSyscoinBlockHash, superblockLastBlockTime: response.data.lastSyscoinBlockTime,
                           superblockMerkleRoot: response.data.merkleRoot, superblockParentId: response.data.parentId,
                           superblockPreviousBlockBits: response.data.previousSyscoinBlockBits,superblockPreviousBlockTime: response.data.previousSyscoinBlockTime,
                           superblockHeight: response.data.superblockHeight, superblockId:  response.data.superblockId
@@ -114,7 +114,7 @@ class Step1 extends Component {
                   }
                   else{
                     this.setState({superblockApproved: response.data.approved, superblockBlockHeight: response.data.blockHeight,
-                      superblockLastBlockHash: response.data.lastSyscoinBlockHash, superblockLastBlockTime: response.data.previousSyscoinBlockTime,
+                      superblockLastBlockHash: response.data.lastSyscoinBlockHash, superblockLastBlockTime: response.data.lastSyscoinBlockTime,
                       superblockMerkleRoot: response.data.merkleRoot, superblockParentId: response.data.parentId,
                       superblockPreviousBlockBits: response.data.previousSyscoinBlockBits,superblockPreviousBlockTime: response.data.previousSyscoinBlockTime,
                       superblockHeight: response.data.superblockHeight, superblockId:  response.data.superblockId
@@ -127,7 +127,7 @@ class Step1 extends Component {
               }
               else{
                 this.setState({superblockApproved: response.data.approved, superblockBlockHeight: response.data.blockHeight,
-                  superblockLastBlockHash: response.data.lastSyscoinBlockHash, superblockLastBlockTime: response.data.previousSyscoinBlockTime,
+                  superblockLastBlockHash: response.data.lastSyscoinBlockHash, superblockLastBlockTime: response.data.lastSyscoinBlockTime,
                   superblockMerkleRoot: response.data.merkleRoot, superblockParentId: response.data.parentId,
                   superblockPreviousBlockBits: response.data.previousSyscoinBlockBits,superblockPreviousBlockTime: response.data.previousSyscoinBlockTime,
                   superblockHeight: response.data.superblockHeight, superblockId:  response.data.superblockId
@@ -140,7 +140,7 @@ class Step1 extends Component {
         }
         else{
           this.setState({superblockApproved: response.data.approved, superblockBlockHeight: response.data.blockHeight,
-            superblockLastBlockHash: response.data.lastSyscoinBlockHash, superblockLastBlockTime: response.data.previousSyscoinBlockTime,
+            superblockLastBlockHash: response.data.lastSyscoinBlockHash, superblockLastBlockTime: response.data.lastSyscoinBlockTime,
             superblockMerkleRoot: response.data.merkleRoot, superblockParentId: response.data.parentId,
             superblockPreviousBlockBits: response.data.previousSyscoinBlockBits,superblockPreviousBlockTime: response.data.previousSyscoinBlockTime,
             superblockHeight: response.data.superblockHeight, superblockId:  response.data.superblockId
@@ -165,7 +165,7 @@ class Step1 extends Component {
         }
         else{
           this.setState({superblockApproved: response.data.approved, superblockBlockHeight: response.data.blockHeight,
-            superblockLastBlockHash: response.data.lastSyscoinBlockHash, superblockLastBlockTime: response.data.previousSyscoinBlockTime,
+            superblockLastBlockHash: response.data.lastSyscoinBlockHash, superblockLastBlockTime: response.data.lastSyscoinBlockTime,
             superblockMerkleRoot: response.data.merkleRoot, superblockParentId: response.data.parentId,
             superblockPreviousBlockBits: response.data.previousSyscoinBlockBits,superblockPreviousBlockTime: response.data.previousSyscoinBlockTime,
             superblockHeight: response.data.superblockHeight, superblockId:  response.data.superblockId
