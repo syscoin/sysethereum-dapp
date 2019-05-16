@@ -94,12 +94,13 @@ class Step2 extends Component {
             validateNewInput.sysrawtxunsignedVal = true;
             this.refs.sysrawtxunsigned.value = results.hex;
             self.setState({working: false});
+            self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
           }
         }catch(e) {
           validateNewInput.buttonVal = false;
           validateNewInput.buttonValMsg = e.message;
-          console.log("error " + e.message);
           self.setState({working: false});
+          self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
         }
       }
       else{
@@ -119,16 +120,17 @@ class Step2 extends Component {
             validateNewInput.sysrawtxunsignedVal = true;
             this.refs.sysrawtxunsigned.value = results.hex;
             self.setState({working: false});
+            self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
           }
         
         }catch(e) {
           validateNewInput.buttonVal = false;
           validateNewInput.buttonValMsg = e.message;
           self.setState({working: false});
+          self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
         }
       }
     } 
-    this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
 
   }
   validationCheck() {

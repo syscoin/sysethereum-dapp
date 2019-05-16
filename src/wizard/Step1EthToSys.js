@@ -39,14 +39,28 @@ class Step1ES extends Component {
    
   }
   isValidated() {
-    if(this.state.receiptObj === null){
-      return false;
+    const userInput = this._grabUserInput(); // grab user entered vals
+    const validateNewInput = this._validateData(userInput); // run the new input against the validator
+    let isDataValid = false;
+
+    // if full validation passes then save to store and pass as valid
+    if (Object.keys(validateNewInput).every((k) => { return validateNewInput[k] === true })) {
+        if(this.props.getStore().toSysAssetGUID !== userInput.toSysAssetGUID || this.props.getStore().toSysAmount !== userInput.toSysAmount ||
+        this.props.getStore().sysxContract !== userInput.sysxContract || this.props.getStore().sysxFromAccount !== userInput.sysxFromAccount || this.props.getStore().syscoinWitnessAddress !== userInput.syscoinWitnessAddress) { // only update store of something changed
+          this.props.updateStore({
+            ...userInput,
+            savedToCloud: false // use this to notify step4 that some changes took place and prompt the user to save again
+          });  // Update store here (this is just an example, in reality you will do it via redux or flux)
+        }
+
+        isDataValid = true;
     }
-    this.props.updateStore({
-      ...this.state,
-      savedToCloud: false // use this to notify step4 that some changes took place and prompt the user to save again
-    });
-    return true;
+    else {
+        // if anything fails then update the UI validation state but NOT the UI Data State
+        this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+    }
+
+    return isDataValid;
   }
   componentWillUnmount() {}
   downloadReceipt () {
@@ -173,17 +187,11 @@ class Step1ES extends Component {
     let userInput = this._grabUserInput(); // grab user entered vals
     let validateNewInput = this._validateData(userInput); // run the new input against the validator
     validateNewInput.buttonVal = true;
-    validateNewInput.buttonValMsg = "";
     validateNewInput.sysxContractVal = true;
-    validateNewInput.sysxContractValMsg = "";
     validateNewInput.toSysAssetGUIDVal = true;
-    validateNewInput.toSysAssetGUIDValMsg = "";
     validateNewInput.toSysAmountVal = true;
-    validateNewInput.toSysAmountValMsg = "";
     validateNewInput.syscoinWitnessAddressVal = true;
-    validateNewInput.syscoinWitnessAddressValMsg = "";
     validateNewInput.sysxFromAccountVal = true;
-    validateNewInput.sysxFromAccountValMsg = "";
     let valid = true;
     if(!userInput.sysxContract || userInput.sysxContract === ""){
       validateNewInput.sysxContractVal = false;
@@ -295,7 +303,6 @@ class Step1ES extends Component {
           thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
         }
       })
-      
   }
 
  
