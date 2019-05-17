@@ -83,11 +83,16 @@ class Step2 extends Component {
           ethAddressStripped = ethAddressStripped.substr(2, ethAddressStripped.length);
         }
         try {
-          let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=assetallocationburn&asset_guid=' + assetGuid + '&address=' + fundingAddress + '&amount=' + userInput.amount.toString() + '&ethereum_destination_address=ethAddressStripped');
+          let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=assetallocationburn&asset_guid=' + assetGuid + '&address=' + fundingAddress + '&amount=' + userInput.amount.toString() + '&ethereum_destination_address=' + ethAddressStripped);
           results = results.data;
-          if(results && results.length && results.length > 0){
+          if(results.error){
+            validateNewInput.buttonVal = false;
+            validateNewInput.buttonValMsg = results.error;
+            self.setState({working: false});      
+          }
+          else if(results && results.hex){
             validateNewInput.sysrawtxunsignedVal = true;
-            this.refs.sysrawtxunsigned.value = results[0];
+            this.refs.sysrawtxunsigned.value = results.hex;
             self.setState({working: false});
             self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
           }
@@ -104,11 +109,16 @@ class Step2 extends Component {
           ethAddressStripped = ethAddressStripped.substr(2, ethAddressStripped.length);
         }
         try {
-          let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=syscoinburn&address=' + fundingAddress + '&amount=' + userInput.amount.toString() + '&ethereum_destination_address=ethAddressStripped');
+          let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=syscoinburn&address=' + fundingAddress + '&amount=' + userInput.amount.toString() + '&ethereum_destination_address=' + ethAddressStripped);
           results = results.data;
-          if(results && results.length && results.length > 0){
+          if(results.error){
+            validateNewInput.buttonVal = false;
+            validateNewInput.buttonValMsg = results.error;
+            self.setState({working: false});      
+          }
+          else if(results && results.hex){
             validateNewInput.sysrawtxunsignedVal = true;
-            this.refs.sysrawtxunsigned.value = results[0];
+            this.refs.sysrawtxunsigned.value = results.hex;
             self.setState({working: false});
             self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
           }

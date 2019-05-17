@@ -2,8 +2,9 @@
 import React, { Component } from 'react';
 import sbconfig from '../SyscoinSuperblocks';
 import { getProof } from 'bitcoin-proof'
-import web3 from '../web3';
+import Web3 from 'web3';
 import CONFIGURATION from '../config';
+const web3 = new Web3(Web3.givenProvider);
 class Step5 extends Component {
   constructor(props) {
     super(props);

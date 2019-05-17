@@ -105,10 +105,16 @@ class Step2ES extends Component {
             // [asset] [address] [amount] [tx_hex] [txroot_hex] [txmerkleproof_hex] [txmerkleroofpath_hex] [receipt_hex] [receiptroot_hex] [receiptmerkleproof_hex] [receiptmerkleroofpath_hex] [witness]
             let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=assetallocationmint&asset=' + toSysAssetGUID + '&address=' + syscoinWitnessAddress + '&amount=' + toSysAmount + '&blocknumber=' + blockNumber + '&tx_hex=' + tx_hex + '&txroot_hex=' + tx_root_hex + '&txmerkleproof_hex=' + txmerkleproof_hex + '&txmerkleproofpath_hex=' + txmerkleproofpath_hex + '&receipt_hex=' + receipt_hex + '&receiptroot_hex=' + receipt_root_hex + '&receiptmerkleproof_hex=' + receiptmerkleproof_hex + "&witness=''");
             results = results.data;
-            if(results && results.length && results.length > 0){
+            if(results.error){
+              validateNewInput.buttonVal = false;
+              validateNewInput.buttonValMsg = results.error;
+              console.log("error " + results.error);
+              self.setState({working: false});
+            }
+            else if(results && results.hex){
               validateNewInput.mintsysrawtxunsignedVal = true;
-              this.refs.mintsysrawtxunsigned.value = results[0];
-              userInput.mintsysrawtxunsigned = results[0];
+              this.refs.mintsysrawtxunsigned.value = results.hex;
+              userInput.mintsysrawtxunsigned = results.hex;
               self.setState({working: false});
               self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
             }
@@ -125,10 +131,15 @@ class Step2ES extends Component {
             //  [address] [amount] [tx_hex] [txroot_hex] [txmerkleproof_hex] [txmerkleproofpath_hex] [receipt_hex] [receiptroot_hex] [receiptmerkleproof_hex] [receiptmerkleroofpath_hex] [witness]
             let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=syscoinmint&address=' + syscoinWitnessAddress + '&amount=' + toSysAmount + '&blocknumber=' + blockNumber + '&tx_hex=' + tx_hex + '&txroot_hex=' + tx_root_hex + '&txmerkleproof_hex=' + txmerkleproof_hex + '&txmerkleproofpath_hex=' + txmerkleproofpath_hex + '&receipt_hex=' + receipt_hex + '&receiptroot_hex=' + receipt_root_hex + '&receiptmerkleproof_hex=' + receiptmerkleproof_hex + "&witness=''");
             results = results.data;
-            if(results && results.length && results.length > 0){
+            if(results.error){
+              validateNewInput.buttonVal = false;
+              validateNewInput.buttonValMsg = results.error;
+              self.setState({working: false});
+            }
+            else if(results && results.hex){
               validateNewInput.mintsysrawtxunsignedVal = true;
-              this.refs.mintsysrawtxunsigned.value = results[0];
-              userInput.mintsysrawtxunsigned = results[0];
+              this.refs.mintsysrawtxunsigned.value = results.hex;
+              userInput.mintsysrawtxunsigned = results.hex;
               self.setState({working: false});
               self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
             }

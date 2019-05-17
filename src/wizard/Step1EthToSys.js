@@ -1,10 +1,11 @@
 
 import React, { Component } from 'react';
-import web3 from '../web3';
+import Web3 from 'web3';
 import tpabi from '../SyscoinTransactionProcessor';
 import hsabi from '../HumanStandardToken';  
 import CONFIGURATION from '../config';
 const axios = require('axios');
+const web3 = new Web3(Web3.givenProvider);
 class Step1ES extends Component {
   constructor(props) {
     super(props);
@@ -165,7 +166,12 @@ class Step1ES extends Component {
       try {
         let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=getaddressinfo&address=' + address);
         results = results.data;
-        if(results){
+        if(results.error){
+          validateNewInput.buttonVal = false;
+          validateNewInput.buttonValMsg = results.error;
+          return "";
+        }
+        else if(results){
           let version = this.byteToHex(results.witness_version);
           return "0x" + version + results.witness_program;
         }
