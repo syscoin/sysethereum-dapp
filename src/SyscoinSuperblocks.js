@@ -4,20 +4,6 @@ const abi = [
   {
     "constant": true,
     "inputs": [],
-    "name": "queryMerkleRootHashesCost",
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [],
     "name": "trustedClaimManager",
     "outputs": [
       {
@@ -37,20 +23,6 @@ const abi = [
       {
         "name": "",
         "type": "bytes32"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [],
-    "name": "queryBlockHeaderCost",
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256"
       }
     ],
     "payable": false,
