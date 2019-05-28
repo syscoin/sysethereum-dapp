@@ -9,10 +9,9 @@ class Step2ES extends Component {
     super(props);
     this.state = {
       mintsysrawtxunsigned: props.getStore().mintsysrawtxunsigned,
-      ethburntxid: this.props.getStore().ethburntxid,
+      ethburntxid: this.props.getStore().receiptTxHash,
       working: false
     };
-    
     this._validateOnDemand = true; // this flag enables onBlur validation as user fills forms
     this.getMintTx = this.getMintTx.bind(this);
     this.validationCheck = this.validationCheck.bind(this);
@@ -24,9 +23,6 @@ class Step2ES extends Component {
     !this.props.getStore().toSysAmount ||
     !this.props.getStore().syscoinWitnessAddress){
       this.props.jumpToStep(0);
-    }
-    if(this.props.getStore().receiptTxHash){
-      this.state.ethburntxid = this.props.getStore().receiptTxHash;
     }
   }
 
@@ -240,8 +236,8 @@ class Step2ES extends Component {
                     type="text"
                     placeholder={this.props.t("step2ESEnterTxid")}
                     className="form-control"
-                    defaultValue={this.state.ethburntxid}
                     required
+                    defaultValue={this.state.ethburntxid}
                      />
                   <div className={notValidClasses.ethburntxidValGrpCls}>{this.state.ethburntxidValMsg}</div>
                 </div>
