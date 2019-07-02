@@ -18,6 +18,20 @@ const abi = [
   {
     "constant": true,
     "inputs": [],
+    "name": "respondLastBlockHeaderCost",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
     "name": "bestSuperblock",
     "outputs": [
       {
@@ -33,20 +47,6 @@ const abi = [
     "constant": true,
     "inputs": [],
     "name": "minProposalDeposit",
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [],
-    "name": "respondBlockHeaderCost",
     "outputs": [
       {
         "name": "",
@@ -327,24 +327,12 @@ const abi = [
         "type": "uint256"
       },
       {
-        "name": "_prevTimestamp",
-        "type": "uint256"
-      },
-      {
         "name": "_lastHash",
         "type": "bytes32"
       },
       {
-        "name": "_lastBits",
-        "type": "uint32"
-      },
-      {
         "name": "_parentId",
         "type": "bytes32"
-      },
-      {
-        "name": "_blockHeight",
-        "type": "uint32"
       }
     ],
     "name": "initialize",
@@ -378,24 +366,12 @@ const abi = [
         "type": "uint256"
       },
       {
-        "name": "_prevTimestamp",
-        "type": "uint256"
-      },
-      {
         "name": "_lastHash",
         "type": "bytes32"
       },
       {
-        "name": "_lastBits",
-        "type": "uint32"
-      },
-      {
         "name": "_parentId",
         "type": "bytes32"
-      },
-      {
-        "name": "_blockHeight",
-        "type": "uint32"
       },
       {
         "name": "submitter",
@@ -434,10 +410,6 @@ const abi = [
       {
         "name": "",
         "type": "uint256"
-      },
-      {
-        "name": "",
-        "type": "bytes32"
       }
     ],
     "payable": false,
@@ -461,10 +433,6 @@ const abi = [
       {
         "name": "",
         "type": "uint256"
-      },
-      {
-        "name": "",
-        "type": "bytes32"
       }
     ],
     "payable": false,
@@ -623,24 +591,12 @@ const abi = [
         "type": "uint256"
       },
       {
-        "name": "_prevTimestamp",
-        "type": "uint256"
-      },
-      {
         "name": "_lastHash",
         "type": "bytes32"
       },
       {
-        "name": "_lastBits",
-        "type": "uint32"
-      },
-      {
         "name": "_parentId",
         "type": "bytes32"
-      },
-      {
-        "name": "_blockHeight",
-        "type": "uint32"
       }
     ],
     "name": "calcSuperblockHash",
@@ -670,6 +626,20 @@ const abi = [
   },
   {
     "constant": true,
+    "inputs": [],
+    "name": "getBestSuperblockAccumulatedWork",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
     "inputs": [
       {
         "name": "superblockHash",
@@ -691,16 +661,8 @@ const abi = [
         "type": "uint256"
       },
       {
-        "name": "_prevTimestamp",
-        "type": "uint256"
-      },
-      {
         "name": "_lastHash",
         "type": "bytes32"
-      },
-      {
-        "name": "_lastBits",
-        "type": "uint32"
       },
       {
         "name": "_parentId",
@@ -713,10 +675,6 @@ const abi = [
       {
         "name": "_status",
         "type": "uint8"
-      },
-      {
-        "name": "_blockHeight",
-        "type": "uint32"
       }
     ],
     "payable": false,
@@ -808,25 +766,6 @@ const abi = [
       }
     ],
     "name": "getSuperblockTimestamp",
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [
-      {
-        "name": "_superblockHash",
-        "type": "bytes32"
-      }
-    ],
-    "name": "getSuperblockPrevTimestamp",
     "outputs": [
       {
         "name": "",
@@ -955,6 +894,25 @@ const abi = [
       }
     ],
     "name": "isApproved",
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "_superblockHash",
+        "type": "bytes32"
+      }
+    ],
+    "name": "isSemiApproved",
     "outputs": [
       {
         "name": "",
