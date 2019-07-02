@@ -331,6 +331,10 @@ const abi = [
         "type": "bytes32"
       },
       {
+        "name": "_lastBits",
+        "type": "uint32"
+      },
+      {
         "name": "_parentId",
         "type": "bytes32"
       }
@@ -368,6 +372,10 @@ const abi = [
       {
         "name": "_lastHash",
         "type": "bytes32"
+      },
+      {
+        "name": "_lastBits",
+        "type": "uint32"
       },
       {
         "name": "_parentId",
@@ -595,6 +603,10 @@ const abi = [
         "type": "bytes32"
       },
       {
+        "name": "_lastBits",
+        "type": "uint32"
+      },
+      {
         "name": "_parentId",
         "type": "bytes32"
       }
@@ -665,6 +677,10 @@ const abi = [
         "type": "bytes32"
       },
       {
+        "name": "_lastBits",
+        "type": "uint32"
+      },
+      {
         "name": "_parentId",
         "type": "bytes32"
       },
@@ -675,6 +691,10 @@ const abi = [
       {
         "name": "_status",
         "type": "uint8"
+      },
+      {
+        "name": "_height",
+        "type": "uint32"
       }
     ],
     "payable": false,
