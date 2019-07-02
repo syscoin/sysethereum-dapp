@@ -20,13 +20,11 @@ class Step1 extends Component {
     
     this.state = {
       superblockApproved: false,
-      superblockBlockHeight: 0,
       superblockLastBlockHash: "",
       superblockLastBlockTime: 0,
       superblockMerkleRoot: "",
       superblockParentId: "",
-      superblockPreviousBlockBits: 0,
-      superblockPreviousBlockTime: 0,
+      superblockLastBlockBits: 0,
       superblockHeight: 0,
       superblockId: "",
       searchError: ""
@@ -42,10 +40,10 @@ class Step1 extends Component {
      
       }
       else{
-        this.setState({superblockApproved: response.data.approved, superblockBlockHeight: response.data.blockHeight,
+        this.setState({superblockApproved: response.data.approved,
           superblockLastBlockHash: response.data.lastSyscoinBlockHash, superblockLastBlockTime: response.data.lastSyscoinBlockTime,
           superblockMerkleRoot: response.data.merkleRoot, superblockParentId: response.data.parentId,
-          superblockPreviousBlockBits: response.data.previousSyscoinBlockBits,superblockPreviousBlockTime: response.data.previousSyscoinBlockTime,
+          superblockLastBlockBits: response.data.lastSyscoinBlockBits,
           superblockHeight: response.data.superblockHeight, superblockId:  response.data.superblockId
         });
       }
@@ -64,10 +62,10 @@ class Step1 extends Component {
        
       }
       else{
-        this.setState({superblockApproved: response.data.approved, superblockBlockHeight: response.data.blockHeight,
+        this.setState({superblockApproved: response.data.approved,
           superblockLastBlockHash: response.data.lastSyscoinBlockHash, superblockLastBlockTime: response.data.lastSyscoinBlockTime,
           superblockMerkleRoot: response.data.merkleRoot, superblockParentId: response.data.parentId,
-          superblockPreviousBlockBits: response.data.previousSyscoinBlockBits,superblockPreviousBlockTime: response.data.previousSyscoinBlockTime,
+          superblockLastBlockBits: response.data.lastSyscoinBlockBits,
           superblockHeight: response.data.superblockHeight, superblockId:  response.data.superblockId
         });
       }
@@ -100,10 +98,10 @@ class Step1 extends Component {
                         this.setState({searchError: response.data.error});
                       }
                       else{
-                        this.setState({superblockApproved: response.data.approved, superblockBlockHeight: response.data.blockHeight,
+                        this.setState({superblockApproved: response.data.approved,
                           superblockLastBlockHash: response.data.lastSyscoinBlockHash, superblockLastBlockTime: response.data.lastSyscoinBlockTime,
                           superblockMerkleRoot: response.data.merkleRoot, superblockParentId: response.data.parentId,
-                          superblockPreviousBlockBits: response.data.previousSyscoinBlockBits,superblockPreviousBlockTime: response.data.previousSyscoinBlockTime,
+                          superblockLastBlockBits: response.data.lastSyscoinBlockBits,
                           superblockHeight: response.data.superblockHeight, superblockId:  response.data.superblockId
                         });
                       }
@@ -113,10 +111,10 @@ class Step1 extends Component {
                     });
                   }
                   else{
-                    this.setState({superblockApproved: response.data.approved, superblockBlockHeight: response.data.blockHeight,
+                    this.setState({superblockApproved: response.data.approved, 
                       superblockLastBlockHash: response.data.lastSyscoinBlockHash, superblockLastBlockTime: response.data.lastSyscoinBlockTime,
                       superblockMerkleRoot: response.data.merkleRoot, superblockParentId: response.data.parentId,
-                      superblockPreviousBlockBits: response.data.previousSyscoinBlockBits,superblockPreviousBlockTime: response.data.previousSyscoinBlockTime,
+                      superblockLastBlockBits: response.data.lastSyscoinBlockBits,
                       superblockHeight: response.data.superblockHeight, superblockId:  response.data.superblockId
                     });
                   }
@@ -126,10 +124,10 @@ class Step1 extends Component {
                 });
               }
               else{
-                this.setState({superblockApproved: response.data.approved, superblockBlockHeight: response.data.blockHeight,
+                this.setState({superblockApproved: response.data.approved, 
                   superblockLastBlockHash: response.data.lastSyscoinBlockHash, superblockLastBlockTime: response.data.lastSyscoinBlockTime,
                   superblockMerkleRoot: response.data.merkleRoot, superblockParentId: response.data.parentId,
-                  superblockPreviousBlockBits: response.data.previousSyscoinBlockBits,superblockPreviousBlockTime: response.data.previousSyscoinBlockTime,
+                  superblockLastBlockBits: response.data.lastSyscoinBlockBits,
                   superblockHeight: response.data.superblockHeight, superblockId:  response.data.superblockId
                 });
               }
@@ -139,10 +137,10 @@ class Step1 extends Component {
             });
         }
         else{
-          this.setState({superblockApproved: response.data.approved, superblockBlockHeight: response.data.blockHeight,
+          this.setState({superblockApproved: response.data.approved, 
             superblockLastBlockHash: response.data.lastSyscoinBlockHash, superblockLastBlockTime: response.data.lastSyscoinBlockTime,
             superblockMerkleRoot: response.data.merkleRoot, superblockParentId: response.data.parentId,
-            superblockPreviousBlockBits: response.data.previousSyscoinBlockBits,superblockPreviousBlockTime: response.data.previousSyscoinBlockTime,
+            superblockLastBlockBits: response.data.lastSyscoinBlockBits,
             superblockHeight: response.data.superblockHeight, superblockId:  response.data.superblockId
           });
         }
@@ -164,10 +162,10 @@ class Step1 extends Component {
           this.setState({searchError: response.error});
         }
         else{
-          this.setState({superblockApproved: response.data.approved, superblockBlockHeight: response.data.blockHeight,
+          this.setState({superblockApproved: response.data.approved,
             superblockLastBlockHash: response.data.lastSyscoinBlockHash, superblockLastBlockTime: response.data.lastSyscoinBlockTime,
             superblockMerkleRoot: response.data.merkleRoot, superblockParentId: response.data.parentId,
-            superblockPreviousBlockBits: response.data.previousSyscoinBlockBits,superblockPreviousBlockTime: response.data.previousSyscoinBlockTime,
+            superblockLastBlockBits: response.data.lastSyscoinBlockBits,
             superblockHeight: response.data.superblockHeight, superblockId:  response.data.superblockId
           });
         }
@@ -217,7 +215,6 @@ class Step1 extends Component {
                   <div className="col-md-6">
                     <code>
                         {this.props.t("step1SuperblockId")}: {this.state.superblockId}<br />
-                        {this.props.t("step1SuperblockBlockHeight")}: {this.state.superblockBlockHeight}<br />
                         {this.props.t("step1SuperblockHeight")}: {this.state.superblockHeight}<br />
                         {this.props.t("step1LastBlockTime")}: {this.state.superblockLastBlockTime}<br />
                         {this.props.t("step1SuperblockApproved")}: {this.state.superblockApproved.toString()}<br />
@@ -228,8 +225,7 @@ class Step1 extends Component {
                     <code>
                         {this.props.t("step1LastBlockHash")}: {this.state.superblockLastBlockHash}<br />
                         {this.props.t("step1MerkleRoot")}: {this.state.superblockMerkleRoot}<br />
-                        {this.props.t("step1PreviousBlockTime")}: {this.state.superblockPreviousBlockTime}<br />
-                        {this.props.t("step1PreviousBlockBits")}: {this.state.superblockPreviousBlockBits}<br />
+                        {this.props.t("step1LastBlockBits")}: {this.state.superblockLastBlockBits}<br />
                         {this.props.t("step1SuperblockParentId")}: {this.state.superblockParentId}<br />
                     </code>
                   </div>
