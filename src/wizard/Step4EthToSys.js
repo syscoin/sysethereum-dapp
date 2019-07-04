@@ -10,10 +10,10 @@ class Step4ES extends Component {
   }
 
   componentDidMount() {
-    if(!this.props.getStore().mintblockhash || !this.props.getStore().minttxid){
+   /* if(!this.props.getStore().mintblockhash || !this.props.getStore().minttxid){
       this.props.jumpToStep(3);
       return;
-    }
+    }*/
     let baseURL = "";
     
     baseURL = "http://explorer.blockchainfoundry.co/tx/" + this.props.getStore().minttxid;

@@ -40,9 +40,9 @@ class Step4 extends Component {
   }
 
   componentDidMount() {
-    if(!this.props.getStore().blockhash || !this.props.getStore().txid){
+    /*if(!this.props.getStore().blockhash || !this.props.getStore().txid){
       this.props.jumpToStep(2);
-    }
+    }*/
   }
 
   componentWillUnmount() {}
