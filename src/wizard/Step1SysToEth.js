@@ -186,13 +186,13 @@ class Step1 extends Component {
         <div className="row">
           <form id="Form" className="form-horizontal">
             <div className="form-group">
-              <label className="col-md-12 control-label">
+              <label className="col-md-12">
                 <h1>{this.props.t("step1Head")}</h1>
-                <h3>{this.props.t("step1Description")} <a href="https://github.com/syscoin/sysethereum-contracts" target="_blank" rel="noopener noreferrer">{this.props.t("repoUrl")}</a></h3>
+                <h3><div dangerouslySetInnerHTML={{__html: this.props.t("step1Description")}}></div> <a href="https://github.com/syscoin/sysethereum-contracts" className="vivid" target="_blank" rel="noopener noreferrer">{this.props.t("repoUrl")}</a></h3>
               </label>
   
 
-              <div className="row">
+              <div className="row mb30">
                 <div className="col-md-8 col-md-offset-2">
                   <div className="navbar-form" role="search">
                     <div className="input-group add-on">
@@ -203,7 +203,7 @@ class Step1 extends Component {
                           placeholder={this.props.t("step1SearchBox")}
                           className="form-control"/>
                       <div className="input-group-btn">
-                        <button className="btn btn-default" type="button" onClick={this.searchSuperblock}><i className="glyphicon glyphicon-search"></i></button>
+                        <button className="btn btn-default formbtnmini" type="button" onClick={this.searchSuperblock}><i className="glyphicon glyphicon-search"></i></button>
                       </div>
                     </div>
                     <div className="superblocksearcherror">{this.state.searchError}</div>
@@ -213,27 +213,27 @@ class Step1 extends Component {
               <div className="row">
                 <div className="col-md-12">
                   <div className="col-md-6">
-                    <code>
-                        {this.props.t("step1SuperblockId")}: {this.state.superblockId}<br />
-                        {this.props.t("step1SuperblockHeight")}: {this.state.superblockHeight}<br />
-                        {this.props.t("step1LastBlockTime")}: {this.state.superblockLastBlockTime}<br />
-                        {this.props.t("step1SuperblockApproved")}: {this.state.superblockApproved.toString()}<br />
-                        {this.props.t("step1SuperblockAddress")}: <a href={this.sbURL} target="_blank" rel="noopener noreferrer">{this.sbContract}</a><br />
+                    <code className="block">
+                        {this.props.t("step1SuperblockId")}: <span className="result">{this.state.superblockId}</span><br />
+                        {this.props.t("step1SuperblockHeight")}: <span className="result">{this.state.superblockHeight}</span><br />
+                        {this.props.t("step1LastBlockTime")}: <span className="result">{this.state.superblockLastBlockTime}</span><br />
+                        {this.props.t("step1SuperblockApproved")}: <span className="result">{this.state.superblockApproved.toString()}</span><br />
+                        {this.props.t("step1SuperblockAddress")}:<span className="result"><a href={this.sbURL} target="_blank" rel="noopener noreferrer">{this.sbContract}</a></span><br />
                     </code>
                   </div>
                   <div className="col-md-6">
-                    <code>
-                        {this.props.t("step1LastBlockHash")}: {this.state.superblockLastBlockHash}<br />
-                        {this.props.t("step1MerkleRoot")}: {this.state.superblockMerkleRoot}<br />
-                        {this.props.t("step1LastBlockBits")}: {this.state.superblockLastBlockBits}<br />
-                        {this.props.t("step1SuperblockParentId")}: {this.state.superblockParentId}<br />
+                    <code className="block">
+                        {this.props.t("step1LastBlockHash")}: <span className="result">{this.state.superblockLastBlockHash}</span><br />
+                        {this.props.t("step1MerkleRoot")}: <span className="result">{this.state.superblockMerkleRoot}</span><br />
+                        {this.props.t("step1LastBlockBits")}: <span className="result">{this.state.superblockLastBlockBit}</span><br />
+                        {this.props.t("step1SuperblockParentId")}: <span className="result">{this.state.superblockParentId}</span><br />
                     </code>
                   </div>
                 </div>
                 
-                <div className="col-8 col-md-offset-5 col-sm-offset-5 col-lg-offset-5">
+                <div className="col-md-4 col-sm-12 col-centered text-center">
                   <div className="superblockpagecontainer">
-                    <div className="superblockpageicon" onClick={this.handlePrevClick}><MaterialIcon icon="arrow_left" size='large' /></div><div className="superblockpage">{this.state.superblockHeight}</div><div className="superblockpageicon" onClick={this.handleNextClick}><MaterialIcon icon="arrow_right" size='large' /></div>
+                    <div className="superblockpageicon" onClick={this.handlePrevClick}><MaterialIcon icon="arrow_left" color="#ffffff" size='large' /></div><div className="superblockpage">{this.state.superblockHeight}</div><div className="superblockpageicon" onClick={this.handleNextClick}><MaterialIcon icon="arrow_right" color="#ffffff" size='large' /></div>
                 </div>
                </div>
               </div>

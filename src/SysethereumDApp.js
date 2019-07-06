@@ -36,40 +36,81 @@ class SysethereumDApp extends Component {
       <div>
       <div  className={(this.state.introDisplay  ? "visible" : "hidden")}>
       <div className="step">
-      <div className="mycol">
+      <div className="mycol intro">
+      
           <div className="mycontainer">
-            <a href="javascript:void(0)" onClick={this.onSysToEth}>
+
+            <h1>Official Syscoin Ethereum Bridge</h1>
+            
+            <a className="systoeth" href="javascript:void(0)" onClick={this.onSysToEth}>
               <div className="mybtn mybtn-two">
-              <span>SYS=>ETH</span>
+              <span>SYS ➜ ETH</span>
               </div>
             </a>
 
-        &nbsp;&nbsp;&nbsp;
-
-            <a href="javascript:void(0)" onClick={this.onEthToSys}>
+            <a className="ethtosys" href="javascript:void(0)" onClick={this.onEthToSys}>
             <div className="mybtn mybtn-two">
-              <span>ETH=>SYS</span>
+              <span>ETH ➜ SYS</span>
             </div>
             </a>
+
           </div>
+
+          <div className="introText">
+            <p>
+              In Syscoin 4.0 we introduce a brand-new addition to Syscoin Platform: a unique blockchain bridging technology called Syscoin Bridge, which establishes a two-way transaction channel between Syscoin and other blockchains. Making a bridge work like this has been a point of focus for the blockchain industry since Satoshi spoke about SPV (Simplified Payment Verification) in the original Bitcoin whitepaper.
+            </p>
+
+            <p>This type of bridge has never been seen before and is unique in that it allows for Syscoin tokens to transfer to and exist on other blockchains; the sum of which combined with Syscoin tokens on the Syscoin blockchain represent the total circulating supply of SYS.</p>
+          </div>
+
+
         </div> 
     </div>
     </div>
     <div className={(this.state.ethToSysDisplay  ? "visible" : "hidden")}>
-    <button type="button" className="close closeButton" aria-label="Close" onClick={this.onHome}>
-      <span aria-hidden="true">&times;</span>
-    </button>
+    
+      <div className="wizardTitleCont">
+        <div className="wizardTitle">
+          <span className="ethl">ETH</span>
+          <span className="direction">➜</span>
+          <span className="sysr">SYS</span>
+          
+        </div> 
+      </div>
+     
+
+    
       <I18nextProvider i18n={i18n}>
         <EthToSysWizardi18n />
       </I18nextProvider>
+
+      <button type="button" className="close closeButton wizardCancel" aria-label="Close" onClick={this.onHome}>
+      <span className="glyphicon glyphicon-remove" aria-hidden="true"></span> Close
+      </button>
+
+
     </div>
     <div  className={(this.state.sysToEthDisplay  ? "visible" : "hidden")}>
-      <button type="button" className="close closeButton" aria-label="Close" onClick={this.onHome}>
-        <span aria-hidden="true">&times;</span>
-      </button>
+      
+
+      <div className="wizardTitleCont">
+        <div className="wizardTitle">
+          <span className="sysl">SYS</span>
+          <span className="direction">➜</span>
+          <span className="ethr">ETH</span>
+        </div> 
+      </div>
+
       <I18nextProvider i18n={i18n}>
         <SysToEthWizardi18n />
       </I18nextProvider>
+
+      <button type="button" className="close closeButton wizardCancel" aria-label="Close" onClick={this.onHome}>
+      <span className="glyphicon glyphicon-remove" aria-hidden="true">&nbsp;</span> Close
+      </button>
+
+
     </div>
     </div>
     );

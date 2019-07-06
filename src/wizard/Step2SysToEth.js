@@ -179,46 +179,46 @@ class Step2 extends Component {
     let notValidClasses = {};
 
     if (typeof this.state.assetVal == 'undefined' || this.state.assetVal) {
-      notValidClasses.assetCls = 'no-error col-md-8';
+      notValidClasses.assetCls = 'no-error';
     }
     else {
-       notValidClasses.assetCls = 'has-error col-md-8';
+       notValidClasses.assetCls = 'has-error';
        notValidClasses.assetValGrpCls = 'val-err-tooltip';
     }
     if (typeof this.state.fundingaddressVal == 'undefined' || this.state.fundingaddressVal) {
-      notValidClasses.fundingaddressCls = 'no-error col-md-8';
+      notValidClasses.fundingaddressCls = 'no-error';
     }
     else {
-      notValidClasses.fundingaddressCls = 'has-error col-md-8';
+      notValidClasses.fundingaddressCls = 'has-error';
       notValidClasses.fundingaddressValGrpCls = 'val-err-tooltip';
     }
 
     if (typeof this.state.amountVal == 'undefined' || this.state.amountVal) {
-        notValidClasses.amountCls = 'no-error col-md-8';
+        notValidClasses.amountCls = 'no-error';
     }
     else {
-       notValidClasses.amountCls = 'has-error col-md-8';
+       notValidClasses.amountCls = 'has-error';
        notValidClasses.amountValGrpCls = 'val-err-tooltip';
     }
     if (typeof this.state.ethaddressVal == 'undefined' || this.state.ethaddressVal) {
-      notValidClasses.ethaddressCls = 'no-error col-md-8';
+      notValidClasses.ethaddressCls = 'no-error';
     }
     else {
-      notValidClasses.ethaddressCls = 'has-error col-md-8';
+      notValidClasses.ethaddressCls = 'has-error';
       notValidClasses.ethaddressValGrpCls = 'val-err-tooltip';
     }
     if (typeof this.state.sysrawtxunsignedVal == 'undefined' || this.state.sysrawtxunsignedVal) {
-      notValidClasses.sysrawtxunsignedCls = 'no-error col-md-8';
+      notValidClasses.sysrawtxunsignedCls = 'no-error';
     }
     else {
-      notValidClasses.sysrawtxunsignedCls = 'has-error col-md-8';
+      notValidClasses.sysrawtxunsignedCls = 'has-error';
       notValidClasses.sysrawtxunsignedValGrpCls = 'val-err-tooltip';
     }
     if (typeof this.state.buttonVal == 'undefined' || this.state.buttonVal) {
-      notValidClasses.buttonCls = 'no-error col-md-8';
+      notValidClasses.buttonCls = 'no-error';
     }
     else {
-      notValidClasses.buttonCls = 'has-error col-md-8';
+      notValidClasses.buttonCls = 'has-error';
       notValidClasses.buttonValGrpCls = 'val-err-tooltip';
     }
     return (
@@ -226,9 +226,9 @@ class Step2 extends Component {
         <div className="row">
           <form id="Form" className="form-horizontal">
             <div className="form-group">
-            <label className="col-md-12 control-label">
-                <h1>{this.props.t("step2Head")}</h1>
-                <h3>{this.props.t("step2Description")}</h3>
+            <label className="col-md-12">
+                <h1 dangerouslySetInnerHTML={{__html: this.props.t("step2Head")}}></h1>
+                <h3 dangerouslySetInnerHTML={{__html: this.props.t("step2Description")}}></h3>
               </label>
               <div className="row">
               <div className="col-md-12">
@@ -306,10 +306,8 @@ class Step2 extends Component {
               </div>
               <div className="row">
               <div className="col-md-12">
-                <label className="control-label col-md-4">
-                </label>  
                 <div className={notValidClasses.buttonCls}>
-                    <button type="button" disabled={this.state.working} className="form-control btn btn-default" aria-label={this.props.t("step2Button")} onClick={this.getBurnTx}>
+                    <button type="button" disabled={this.state.working} className="form-control btn btn-default formbtn" aria-label={this.props.t("step2Button")} onClick={this.getBurnTx}>
                     <span className="glyphicon glyphicon-send" aria-hidden="true">&nbsp;</span>
                     {this.props.t("step2Button")}
                     </button>

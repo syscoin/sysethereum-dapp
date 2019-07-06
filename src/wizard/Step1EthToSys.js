@@ -313,11 +313,11 @@ class Step1ES extends Component {
     let notValidClasses = {};    
     if (typeof this.state.buttonVal == 'undefined' || this.state.buttonVal) {
       notValidClasses.buttonCls = 'has-success';
-      notValidClasses.buttonValGrpCls = 'val-success-tooltip';
+      notValidClasses.buttonValGrpCls = 'val-success-tooltip mb30'; // use 'active' class if you want to actually use this (green) tooltip
     }
     else {
        notValidClasses.buttonCls = 'has-error';
-       notValidClasses.buttonValGrpCls = 'val-err-tooltip';
+       notValidClasses.buttonValGrpCls = 'val-err-tooltip mb30';
     }   
     if (typeof this.state.toSysAssetGUIDVal == 'undefined' || this.state.toSysAssetGUIDVal) {
       notValidClasses.toSysAssetGUIDCls = 'has-success';
@@ -365,9 +365,9 @@ class Step1ES extends Component {
         <div className="row">
           <form id="Form" className="form-horizontal">
             <div className="form-group">
-              <label className="col-md-12 control-label">
+              <label className="col-md-12">
                 <h1>{this.props.t("step1ESHead")}</h1>
-                <h3>{this.props.t("step1ESDescription")}</h3>
+                <h3 dangerouslySetInnerHTML={{__html: this.props.t("step1ESDescription")}}></h3>
               </label>
               <div className="row">
               <div className="col-md-12">
@@ -462,11 +462,10 @@ class Step1ES extends Component {
               </div>
               </div>
               <div className="row">
-              <div className="col-md-12">
-                <label className="control-label col-md-4">
-                </label>  
+              <div className="col-md-4 col-sm-12 col-centered">
+                
                 <div className={notValidClasses.buttonCls}>
-                    <button disabled={this.state.working} type="button" className="form-control btn btn-default" aria-label={this.props.t("step1ESButton")} onClick={this.submitProofs}>
+                    <button disabled={this.state.working} type="button" className="form-control btn btn-default formbtn" aria-label={this.props.t("step1ESButton")} onClick={this.submitProofs}>
                     <span className="glyphicon glyphicon-send" aria-hidden="true">&nbsp;</span>
                     {this.props.t("step1ESButton")}
                     </button>
@@ -475,33 +474,57 @@ class Step1ES extends Component {
               </div>
               </div>
               <div className="row">
-                <div className="col-md-12">
+            
                   <div className="col-md-6">
-                    <code>
-                        {this.props.t("step5ReceiptStatus")}: {this.state.receiptStatus}<br />
-                        {this.props.t("step5ReceiptTxHash")}: {this.state.receiptTxHash}<br />
-                        {this.props.t("step5ReceiptTxIndex")}: {this.state.receiptTxIndex}<br />
-                        {this.props.t("step5ReceiptFrom")}: {this.state.receiptFrom}<br />
-                        {this.props.t("step5ReceiptTo")}: {this.state.receiptTo}<br />
+                    <code className="block">
+                        {this.props.t("step5ReceiptStatus")}: <span className="result">{this.state.receiptStatus}</span>
+                   
+                    <br />
+            
+                        {this.props.t("step5ReceiptTxHash")}: <span className="result">{this.state.receiptTxHash}</span>
+             
+                    <br />
+             
+                        {this.props.t("step5ReceiptTxIndex")}: <span className="result">{this.state.receiptTxIndex}</span>
+               
+                    <br />
+                
+                        {this.props.t("step5ReceiptFrom")}: <span className="result">{this.state.receiptFrom}</span>
+                  
+                    <br />
+                
+                        {this.props.t("step5ReceiptTo")}: <span className="result">{this.state.receiptTo}</span>
                     </code>
                   </div>
                   <div className="col-md-6">
-                    <code>
-                        {this.props.t("step5ReceiptBlockhash")}: {this.state.receiptBlockhash}<br />
-                        {this.props.t("step5ReceiptBlocknumber")}: {this.state.receiptBlocknumber}<br />
-                        {this.props.t("step5ReceiptTotalGas")}: {this.state.receiptTotalGas}<br />
-                        {this.props.t("step5ReceiptGas")}: {this.state.receiptGas}<br />
-                        {this.props.t("step5ReceiptConfirmations")}: {this.state.receiptConf}<br />
+                    <code className="block">
+                        {this.props.t("step5ReceiptBlockhash")}: <span className="result">{this.state.receiptBlockhash}</span>
+              
+                    <br />
+                 
+                        {this.props.t("step5ReceiptBlocknumber")}: <span className="result">{this.state.receiptBlocknumber}</span>
+                   
+                    <br />
+                  
+                        {this.props.t("step5ReceiptTotalGas")}: <span className="result">{this.state.receiptTotalGas}</span>
+                 
+                    <br />
+                 
+                        {this.props.t("step5ReceiptGas")}: <span className="result">{this.state.receiptGas}</span>
+                 
+                    <br />
+           
+                        {this.props.t("step5ReceiptConfirmations")}: <span className="result">{this.state.receiptConf}</span>
                     </code>
-                  </div>
+
+                  
+                 
                 </div>
                 </div>
                 <div className="row">
-                <div className="col-md-12">
-                <label className="control-label col-md-4">
-                </label>  
+                <div className="col-md-4 col-sm-12 col-centered">
                   <div>
-                    <button type="button" disabled={!this.state.receiptObj || this.state.working} className="form-control btn btn-default" aria-label={this.props.t("step5Download")} onClick={this.downloadReceipt}>
+                    <button type="button" disabled={!this.state.receiptObj || this.state.working} className="form-control btn btn-default formbtn" aria-label={this.props.t("step5Download")} onClick={this.downloadReceipt}>
                     <span className="glyphicon glyphicon-download" aria-hidden="true">&nbsp;</span>
                     {this.props.t("step5Download")}
                     </button>

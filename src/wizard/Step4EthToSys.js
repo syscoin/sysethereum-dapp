@@ -31,9 +31,11 @@ class Step4ES extends Component {
         <div className="row">
           <form id="Form" className="form-horizontal">
             <div className="form-group">
-              <label className="col-md-12 control-label">
-                <h1>{this.props.t("step4ESHead")}</h1>
-                <h3>{this.props.t("step4ESDescription")}<a href={this.state.explorerLink} target="_blank" rel="noopener noreferrer">{this.state.explorerLink}</a></h3>
+              <label className="col-md-12">
+                
+                <h1 dangerouslySetInnerHTML={{__html: this.props.t("step4ESHead")}}></h1>
+                <h3><div dangerouslySetInnerHTML={{__html: this.props.t("step4ESDescription")}}></div><a className="vivid" href={this.state.explorerLink} target="_blank" rel="noopener noreferrer">{this.state.explorerLink}</a></h3>
+                
               </label>
             </div>
           </form>

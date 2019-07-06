@@ -36,8 +36,8 @@ class Step6 extends Component {
           <form id="Form" className="form-horizontal">
             <div className="form-group">
               <label className="col-md-12 control-label">
-                <h1>{this.props.t("step6Head")}</h1>
-                <h3>{this.props.t("step6Description")}<a href={this.state.explorerLink} target="_blank" rel="noopener noreferrer">{this.state.explorerLink}</a></h3>
+                <h1 dangerouslySetInnerHTML={{__html: this.props.t("step6Head")}}></h1>
+                <h3><div  dangerouslySetInnerHTML={{__html: this.props.t("step6Description")}}></div><a class="vivid" href={this.state.explorerLink} target="_blank" rel="noopener noreferrer">{this.state.explorerLink}</a></h3>
               </label>
             </div>
           </form>

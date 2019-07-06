@@ -1,0 +1,166 @@
+@import "_mixins.scss";
+@import 'https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap&subset=latin-ext';
+
+body 
+{
+    margin: 0;
+    padding: 0;
+    font-family: "Lato", sans-serif;
+    height:100%;
+
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    background: -moz-linear-gradient(202deg, rgba(30,56,99,1) 0%, rgba(31,28,94,1) 53%, rgba(25,25,90,1) 100%);
+    background: -webkit-linear-gradient(202deg, rgba(30,56,99,1) 0%, rgba(31,28,94,1) 53%, rgba(25,25,90,1) 100%);
+    background: linear-gradient(202deg, rgba(30,56,99,1) 0%, rgba(31,28,94,1) 53%, rgba(25,25,90,1) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#1e3863",endColorstr="#19195a",GradientType=1); 
+    
+
+    #root 
+    { 
+        margin-top:40px;
+    }
+
+    .background
+    {
+        background: rgb(30,56,99);
+        background: url(./imgs/main-backround-bottom-quaternary.png) no-repeat top center, -moz-linear-gradient(202deg, rgba(30,56,99,1) 0%, rgba(31,28,94,1) 53%, rgba(25,25,90,1) 100%);
+        background: url(./imgs/main-backround-bottom-quaternary.png) no-repeat top center, -webkit-linear-gradient(202deg, rgba(30,56,99,1) 0%, rgba(31,28,94,1) 53%, rgba(25,25,90,1) 100%);
+        background: url(./imgs/main-backround-bottom-quaternary.png) no-repeat top center, linear-gradient(202deg, rgba(30,56,99,1) 0%, rgba(31,28,94,1) 53%, rgba(25,25,90,1) 100%);
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#1e3863",endColorstr="#19195a",GradientType=1); 
+        background-size: cover;
+        overflow: hidden;
+        min-height:100%;
+    }
+}
+
+code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+
+.mycol 
+{
+    height: 100%;
+}
+
+div[class*=mycontainer] 
+{
+    text-align: center;
+    max-width: 1000px;
+    margin:0 auto;
+    min-height: 450px;
+    justify-content: center;
+    font-family: 'Lato', sans-serif;
+    background: url(./imgs/bridge1.png) no-repeat bottom center;
+    min-height:700px;
+    position: relative;
+}
+  
+.intro 
+{
+    .mycontainer
+    { 
+        h1 
+        {
+            text-align: center;
+            color:white;
+            font-weight: 300;
+            margin-bottom:50px;
+        }
+
+        a
+        {
+            text-decoration: none !important; 
+            font-size: 16px;
+            font-weight: 300;
+            width:100px;
+            display: block;
+            margin:35px auto;
+            height: 48px;
+            line-height: 48px;
+            border-radius: 24px;
+            min-width: 184px;
+            padding: 0 24px;
+            color: #fff;
+            font-size: 18px;
+            text-align: center;
+            cursor: pointer;
+            text-decoration: none;
+
+            -webkit-transition: background .3s,color .3s,border-color .3s;
+            -o-transition: background .3s,color .3s,border-color .3s;
+            transition: background .3s,color .3s,border-color .3s;
+
+            border: 2px solid #359ef6;
+            line-height: 44px;
+            -webkit-box-shadow: 0 16px 32px rgba(0,0,0,.12);
+            box-shadow: 0 16px 32px rgba(0,0,0,.12);
+
+            animation-name: buttonGlow;
+            animation-duration: 1s;
+            animation-iteration-count: infinite;
+            animation-timing-function: linear;
+            animation-direction: alternate;
+
+            &:hover
+            {
+                color:white;
+                background: #359ef6;
+            }
+        }   
+    }
+
+    .introText
+    {
+        width:50%;
+        color:white;
+        font-size: 16px;
+        margin:40px auto 0;
+    }
+}
+
+@keyframes buttonGlow 
+{
+    from {
+        @include box-shadow(0,0,25px, 0px, rgba(#fff,0.4));
+    }
+    to {
+        @include box-shadow(0,0,5px, 0px, rgba(#fff,0.2));
+    }
+}
+  
+
+@media (max-width: 1000px) {
+    div[class*=mycontainer]
+    {
+        max-width: 100%;
+    }
+
+    .intro .introText 
+    {
+        width:80%;
+    }
+}
+
+@media (max-width: 680px) {
+    div[class*=mycontainer]
+    {
+        background-size: contain;
+    }
+}
+
+@media (max-width: 650px) {
+    #exList .title 
+    {
+        margin-top: 58px !important;
+    }
+
+    #exList {
+        background-position: 10px 20px !important;
+    }
+
+
+
+}
