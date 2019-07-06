@@ -38,6 +38,7 @@ div[class*=mycontainer] {
 .mybtn {
   position: relative;
   color: white;
+  /*color: white;*/
   width: 256px;
   height: 64px;
   line-height: 64px;
