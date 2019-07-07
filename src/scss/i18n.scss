@@ -1,0 +1,21 @@
+@import "_mixins.scss";
+
+/* only example specific CSS goes here - pls do not write any CSS that overwrite the ../css/main.css example css */
+.languageButtons {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+  .languageButtons button {
+    margin: 4px;
+    border: 1px solid #39435f;
+    font-size: 16px;
+    color: #fff;
+    border-radius: 25px;
+    background: #37435f;
+    line-height: 17px;
+    display: block;
+    float: left;
+    padding-bottom: 5px;
+
+  }

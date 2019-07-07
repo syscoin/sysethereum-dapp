@@ -212,17 +212,15 @@ class Step4 extends Component {
         <div className="row">
           <form id="Form" className="form-horizontal">
             <div className="form-group">
-              <label className="col-md-12 control-label">
-                <h1>{this.props.t("step4Head")}</h1>
-                <h3>{this.props.t("step4Description")}</h3>
+              <label className="col-md-12">
+                <h1 dangerouslySetInnerHTML={{__html: this.props.t("step4Head")}}></h1>
+                <h3 dangerouslySetInnerHTML={{__html: this.props.t("step4Description")}}></h3>
               </label>
             
             <div className="row">
               <div className="col-md-12">
-                <label className="control-label col-md-4">
-                </label>  
                 <div className={notValidClasses.buttonCls}>
-                    <button type="button" disabled={this.state.working} className="form-control btn btn-default" aria-label={this.props.t("step4Button")} onClick={this.getProofs}>
+                    <button type="button" disabled={this.state.working} className="form-control btn btn-default formbtn" aria-label={this.props.t("step4Button")} onClick={this.getProofs}>
                     <span className="glyphicon glyphicon-search" aria-hidden="true">&nbsp;</span>
                     {this.props.t("step4Button")}
                     </button>

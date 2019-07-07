@@ -194,89 +194,95 @@ class Step2ES extends Component {
     let notValidClasses = {};
 
     if (typeof this.state.ethburntxidVal == 'undefined' || this.state.ethburntxidVal) {
-      notValidClasses.ethburntxidCls = 'no-error col-md-8';
+      notValidClasses.ethburntxidCls = 'no-error';
     }
     else {
-      notValidClasses.ethburntxidCls = 'has-error col-md-8';
+      notValidClasses.ethburntxidCls = 'has-error';
       notValidClasses.ethburntxidValGrpCls = 'val-err-tooltip';
     }
     if (typeof this.state.mintsysrawtxunsignedVal == 'undefined' || this.state.mintsysrawtxunsignedVal) {
-      notValidClasses.mintsysrawtxunsignedCls = 'no-error col-md-8';
+      notValidClasses.mintsysrawtxunsignedCls = 'no-error ';
     }
     else {
-      notValidClasses.mintsysrawtxunsignedCls = 'has-error col-md-8';
+      notValidClasses.mintsysrawtxunsignedCls = 'has-error';
       notValidClasses.mintsysrawtxunsignedValGrpCls = 'val-err-tooltip';
     }
     if (typeof this.state.buttonVal == 'undefined' || this.state.buttonVal) {
-      notValidClasses.buttonCls = 'no-error col-md-8';
+      notValidClasses.buttonCls = 'no-error ';
     }
     else {
-      notValidClasses.buttonCls = 'has-error col-md-8';
+      notValidClasses.buttonCls = 'has-error ';
       notValidClasses.buttonValGrpCls = 'val-err-tooltip';
     }
     return (
       <div className="step step2es">
         <div className="row">
-          <form id="Form" className="form-horizontal">
+          <form id="Form" >
             <div className="form-group">
-            <label className="col-md-12 control-label">
-                <h1>{this.props.t("step2ESHead")}</h1>
-                <h3>{this.props.t("step2ESDescription")}</h3>
+
+              <label className="col-md-12">
+                  <h1 dangerouslySetInnerHTML={{__html: this.props.t("step2ESHead")}}></h1>
+                  <h3 dangerouslySetInnerHTML={{__html: this.props.t("step2ESDescription")}}></h3>
               </label>
              
-              <div className="row">
-              <div className="col-md-12">
-                <label className="control-label col-md-4">
-                  {this.props.t("step3TxidLabel")}
-                </label>
-                <div className={notValidClasses.ethburntxidCls}>
-                  <input
-                    ref="ethburntxid"
-                    autoComplete="off"
-                    type="text"
-                    placeholder={this.props.t("step2ESEnterTxid")}
-                    className="form-control"
-                    required
-                    defaultValue={this.state.ethburntxid}
-                     />
-                  <div className={notValidClasses.ethburntxidValGrpCls}>{this.state.ethburntxidValMsg}</div>
-                </div>
-              </div>
-              </div>          
-              <div className="row">
-              <div className="col-md-12">
-                <label className="control-label col-md-4">
-                </label>  
-                <div className={notValidClasses.buttonCls}>
-                    <button type="button" disabled={this.state.working} className="form-control btn btn-default" aria-label={this.props.t("step2Button")} onClick={this.getMintTx}>
-                    <span className="glyphicon glyphicon-send" aria-hidden="true">&nbsp;</span>
-                    {this.props.t("step2Button")}
-                    </button>
-                  <div className={notValidClasses.buttonValGrpCls}>{this.state.buttonValMsg}</div>
-                </div>
-              </div>
-              </div>
+                <div className="row">
+                <div className="col-md-12">
+                    <label className="control-label col-md-4">
+                      {this.props.t("step3TxidLabel")}
+                    </label>
+                    <div className={notValidClasses.ethburntxidCls}>
+                      <input
+                        ref="ethburntxid"
+                        autoComplete="off"
+                        type="text"
+                        placeholder={this.props.t("step2ESEnterTxid")}
+                        className="form-control"
+                        required
+                        defaultValue={this.state.ethburntxid}
+                        />
+                      <div className={notValidClasses.ethburntxidValGrpCls}>{this.state.ethburntxidValMsg}</div>
+                    </div>
+                  </div>
+                </div> 
 
-              <div className="row">
-              <div className="col-md-12">
-                <label className="control-label col-md-4">
-                  {this.props.t("step2RawTxLabel")}
-                </label>  
-                <div className={notValidClasses.mintsysrawtxunsignedCls}>
-                  <textarea
-                    rows="3"
-                    ref="mintsysrawtxunsigned"
-                    autoComplete="off"
-                    type="text"
-                    placeholder={this.props.t("step2EnterRawTx")}
-                    className="form-control"
-                    required
-                    defaultValue={this.state.mintsysrawtxunsigned}
-                     />
-                  <div className={notValidClasses.mintsysrawtxunsignedValGrpCls}>{this.state.mintsysrawtxunsignedValMsg}</div>
+
+                <div className="row">
+                <div className="col-md-4 col-sm-12 col-centered">
+  
+                  <div className={notValidClasses.buttonCls}>
+                      <button type="button" disabled={this.state.working} className="form-control btn btn-default formbtn" aria-label={this.props.t("step2Button")} onClick={this.getMintTx}>
+                      <span className="glyphicon glyphicon-send" aria-hidden="true">&nbsp;</span>
+                      {this.props.t("step2Button")}
+                      </button>
+                    <div className={notValidClasses.buttonValGrpCls}>{this.state.buttonValMsg}</div>
+                  </div>
                 </div>
-              </div>
-              </div>
+                </div>
+
+                <div className="row">
+                <div className="col-md-12">
+                  <label className="control-label col-md-4">
+                    {this.props.t("step2RawTxLabel")}
+                  </label>  
+                  <div className={notValidClasses.mintsysrawtxunsignedCls}>
+                    <textarea
+                      rows="3"
+                      ref="mintsysrawtxunsigned"
+                      autoComplete="off"
+                      type="text"
+                      placeholder={this.props.t("step2EnterRawTx")}
+                      className="form-control"
+                      required
+                      defaultValue={this.state.mintsysrawtxunsigned}
+                      />
+                    <div className={notValidClasses.mintsysrawtxunsignedValGrpCls}>{this.state.mintsysrawtxunsignedValMsg}</div>
+                  </div>
+                </div>
+                </div>
+              
+
+              
+
             </div>
           </form>
         </div>

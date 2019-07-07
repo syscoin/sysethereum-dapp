@@ -129,43 +129,43 @@ class Step3ES extends Component {
     let notValidClasses = {};
 
     if (typeof this.state.txidVal == 'undefined' || this.state.txidVal) {
-      notValidClasses.txidCls = 'no-error col-md-8';
+      notValidClasses.txidCls = 'no-error';
     }
     else {
-      notValidClasses.txidCls = 'has-error col-md-8';
+      notValidClasses.txidCls = 'has-error ';
       notValidClasses.txidValGrpCls = 'val-err-tooltip';
     }
 
     if (typeof this.state.mintblockhashVal == 'undefined' || this.state.mintblockhashVal) {
-        notValidClasses.blockhashCls = 'no-error col-md-8';
+        notValidClasses.blockhashCls = 'no-error';
     }
     else {
-       notValidClasses.blockhashCls = 'has-error col-md-8';
+       notValidClasses.blockhashCls = 'has-error';
        notValidClasses.blockhashValGrpCls = 'val-err-tooltip';
     }
     if (typeof this.state.buttonVal == 'undefined' || this.state.buttonVal) {
-      notValidClasses.buttonCls = 'no-error col-md-8';
+      notValidClasses.buttonCls = 'no-error';
     }
     else {
-      notValidClasses.buttonCls = 'has-error col-md-8';
+      notValidClasses.buttonCls = 'has-error';
       notValidClasses.buttonValGrpCls = 'val-err-tooltip';
     }
     return (
       <div className="step step3es">
         <div className="row">
-          <form id="Form" className="form-horizontal">
+          <form id="Form">
             <div className="form-group">
-              <label className="col-md-12 control-label">
-                <h1>{this.props.t("step3Head")}</h1>
-                <h3>{this.props.t("step3ESDescription")}</h3>
+              <label className="col-md-12">
+                <h1 dangerouslySetInnerHTML={{__html: this.props.t("step3Head")}}></h1>
+                <h3 dangerouslySetInnerHTML={{__html: this.props.t("step3ESDescription")}}></h3>
               </label>
            
             <div className="row">
-            <div className="col-md-12 ">
+            <div className="col-md-12 no-error">
                 <label className="control-label col-md-4">
                   {this.props.t("step2RawTxLabel")}
                 </label>  
-                <div className="col-md-8">
+                
                     <textarea
                       rows="3"
                       autoComplete="off"
@@ -173,7 +173,7 @@ class Step3ES extends Component {
                       className="form-control"
                       defaultValue={this.state.mintsysrawtxunsigned}
                       />
-                </div>
+                
               </div>
             </div>
             <div className="row">
@@ -196,11 +196,10 @@ class Step3ES extends Component {
               </div>
               </div>
               <div className="row">
-              <div className="col-md-12">
-                <label className="control-label col-md-4">
-                </label>  
+              <div className="col-md-4 col-sm-12 col-centered">
+       
                 <div className={notValidClasses.buttonCls}>
-                    <button type="button" disabled={this.state.working} className="form-control btn btn-default" aria-label={this.props.t("step3Button")} onClick={this.getBlockhash}>
+                    <button type="button" disabled={this.state.working} className="form-control btn btn-default formbtn" aria-label={this.props.t("step3Button")} onClick={this.getBlockhash}>
                     <span className="glyphicon glyphicon-search" aria-hidden="true">&nbsp;</span>
                     {this.props.t("step3Button")}
                     </button>
