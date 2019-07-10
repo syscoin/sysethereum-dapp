@@ -225,7 +225,7 @@ class Step1 extends Component {
                     <code className="block">
                         {this.props.t("step1LastBlockHash")}: <span className="result">{this.state.superblockLastBlockHash}</span><br />
                         {this.props.t("step1MerkleRoot")}: <span className="result">{this.state.superblockMerkleRoot}</span><br />
-                        {this.props.t("step1LastBlockBits")}: <span className="result">{this.state.superblockLastBlockBit}</span><br />
+                        {this.props.t("step1LastBlockBits")}: <span className="result">{this.state.superblockLastBlockBits}</span><br />
                         {this.props.t("step1SuperblockParentId")}: <span className="result">{this.state.superblockParentId}</span><br />
                     </code>
                   </div>
