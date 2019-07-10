@@ -58,10 +58,10 @@ class SysethereumDApp extends Component {
 
           <div className="introText">
             <p>
-              In Syscoin 4.0 we introduce a brand-new addition to Syscoin Platform: a unique blockchain bridging technology called Syscoin Bridge, which establishes a two-way transaction channel between Syscoin and other blockchains. Making a bridge work like this has been a point of focus for the blockchain industry since Satoshi spoke about SPV (Simplified Payment Verification) in the original Bitcoin whitepaper.
+              In Syscoin 4.0 we introduce a brand-new addition to Syscoin Platform: a unique blockchain bridging technology called Syscoin Interoptibility Bridge, which establishes a trustless and permissionless two-way transaction channel between Syscoin and other blockchains. Making a bridge work like this has been a point of focus for the blockchain industry since Satoshi spoke about SPV (Simplified Payment Verification) in the original Bitcoin whitepaper.
             </p>
 
-            <p>This type of bridge has never been seen before and is unique in that it allows for Syscoin tokens to transfer to and exist on other blockchains; the sum of which combined with Syscoin tokens on the Syscoin blockchain represent the total circulating supply of SYS.</p>
+            <p>This type of bridge has never been seen before and is unique in that it allows for Syscoin tokens to transfer to and exist on other blockchains; It is zero-sum meaning the total circulating supply of the asset moving over the bridge remains unchanged.</p>
           </div>
 
 
