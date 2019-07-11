@@ -134,6 +134,16 @@
         .result
         {
             color:#1d5f96;
+            display: inline-block;
+            float: left;
+        }
+
+        .dataname
+        {
+          width: 280px;
+          display: inline-block;
+          float: left;
+          clear: both;
         }
     }
 
@@ -142,6 +152,8 @@
         display:block;
         padding:6px;
         line-height: 1.2em;
+        overflow: hidden;
+        word-break: break-all;
     }
 
     code.blue 
@@ -187,6 +199,23 @@
     }
 }
 
+
+.react-tabs__tab-list
+{
+  margin-bottom: 0;
+  margin-left: 10px;
+  border: 0;
+
+  .react-tabs__tab
+  {
+    border:0;
+  }
+  .react-tabs__tab--selected
+  {
+    background:#d3dfff
+  }
+}
+
 .col-centered{
     float: none !important;
     margin: 0 auto;
@@ -230,6 +259,26 @@ ol.progtrckr {
     ol.progtrckr
     {
         padding-top:40px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    code
+    {
+        .result
+        {
+            color:#1d5f96;
+            display: inline-block;
+            float: left;
+            clear: both;
+        }
+
+        .dataname
+        {
+          display: inline-block;
+          float: left;
+          clear: both;
+        }
     }
   }
 
@@ -299,7 +348,7 @@ ol.progtrckr {
   }
   .superblockpagecontainer {
     display: inline-flex;
-    margin-top:50px;
+    margin-top:20px;
   }
   .superblockpageicon {
     cursor: pointer;

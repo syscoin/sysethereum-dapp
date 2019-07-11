@@ -5,6 +5,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "bitcoin-proof": "^2.0.0",
+    "eth-proof": "git+https://github.com/syscoin/eth-proof.git",
     "i18next": "^12.0.0",
     "i18next-browser-languagedetector": "^2.2.3",
     "joi": "^10.2.2",
@@ -17,10 +18,10 @@
     "react-scripts": "2.1.8",
     "react-search-field": "^1.0.0",
     "react-stepzilla": "^6.0.0",
+    "react-tabs": "^3.0.0",
     "react-validation-mixin": "^5.4.0",
-    "web3": "^1.0.0-beta.55",
     "rlp": "^2.2.3",
-    "eth-proof": "git+https://github.com/syscoin/eth-proof.git"
+    "web3": "^1.0.0-beta.55"
   },
   "scripts": {
     "start": "react-scripts start",

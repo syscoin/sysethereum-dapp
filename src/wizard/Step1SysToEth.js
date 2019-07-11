@@ -1,6 +1,8 @@
 
 import React, { Component } from 'react';
 import MaterialIcon from 'material-icons-react';
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import "react-tabs/style/react-tabs.css";
 import web3 from '../web3';
 import sbconfig from '../SyscoinSuperblocks';
 import CONFIGURATION from '../config';
@@ -212,23 +214,31 @@ class Step1 extends Component {
               </div>
               <div className="row">
                 <div className="col-md-12">
-                  <div className="col-md-6">
-                    <code className="block">
-                        {this.props.t("step1SuperblockId")}: <span className="result">{this.state.superblockId}</span><br />
-                        {this.props.t("step1SuperblockHeight")}: <span className="result">{this.state.superblockHeight}</span><br />
-                        {this.props.t("step1LastBlockTime")}: <span className="result">{this.state.superblockLastBlockTime}</span><br />
-                        {this.props.t("step1SuperblockApproved")}: <span className="result">{this.state.superblockApproved.toString()}</span><br />
-                        {this.props.t("step1SuperblockAddress")}:<span className="result"><a href={this.sbURL} target="_blank" rel="noopener noreferrer">{this.sbContract}</a></span><br />
-                    </code>
-                  </div>
-                  <div className="col-md-6">
-                    <code className="block">
-                        {this.props.t("step1LastBlockHash")}: <span className="result">{this.state.superblockLastBlockHash}</span><br />
-                        {this.props.t("step1MerkleRoot")}: <span className="result">{this.state.superblockMerkleRoot}</span><br />
-                        {this.props.t("step1LastBlockBits")}: <span className="result">{this.state.superblockLastBlockBits}</span><br />
-                        {this.props.t("step1SuperblockParentId")}: <span className="result">{this.state.superblockParentId}</span><br />
-                    </code>
-                  </div>
+
+                  <Tabs>
+                    <TabList>
+                      <Tab>{this.props.t("tabGeneral")}</Tab>
+                      <Tab>{this.props.t("tabAdvanced")}</Tab>
+                    </TabList>
+                    <TabPanel>
+                      <code className="block">
+                          <span class="dataname">{this.props.t("step1SuperblockId")}:</span> <span className="result">{this.state.superblockId}</span><br />
+                          <span class="dataname">{this.props.t("step1SuperblockHeight")}:</span> <span className="result">{this.state.superblockHeight}</span><br />
+                          <span class="dataname">{this.props.t("step1LastBlockTime")}:</span> <span className="result">{this.state.superblockLastBlockTime}</span><br />
+                          <span class="dataname">{this.props.t("step1SuperblockApproved")}:</span> <span className="result">{this.state.superblockApproved.toString()}</span><br />
+                          <span class="dataname">{this.props.t("step1SuperblockAddress")}:</span><span className="result"><a href={this.sbURL} target="_blank" rel="noopener noreferrer">{this.sbContract}</a></span><br />
+                      </code>
+                    </TabPanel>
+                    <TabPanel>
+                      <code className="block">
+                      <span class="dataname">{this.props.t("step1LastBlockHash")}:</span> <span className="result">{this.state.superblockLastBlockHash}</span><br />
+                      <span class="dataname">{this.props.t("step1MerkleRoot")}:</span> <span className="result">{this.state.superblockMerkleRoot}</span><br />
+                      <span class="dataname">{this.props.t("step1LastBlockBits")}:</span> <span className="result">{this.state.superblockLastBlockBits}</span><br />
+                      <span class="dataname">{this.props.t("step1SuperblockParentId")}:</span> <span className="result">{this.state.superblockParentId}</span><br />
+                      </code>
+                    </TabPanel>
+                  </Tabs>
+
                 </div>
                 
                 <div className="col-md-4 col-sm-12 col-centered text-center">

@@ -6,6 +6,8 @@ i18n.use(LanguageDetector).init({
   resources: {
     en: {
       translations: {
+        'tabGeneral':'General',
+        'tabAdvanced':'Advanced',
         'ethToSysButton': 'Ethereum To Syscoin',
         'sysToEthButton': 'Syscoin To Ethereum',
         'introHead': 'Welcome to the official Syscoin to Ethereum Bridge wizard!',
@@ -114,6 +116,8 @@ i18n.use(LanguageDetector).init({
     },
     es: {
       translations: {
+        'tabGeneral':'General',
+        'tabAdvanced':'Advanced',
         'ethToSysButton': 'Desde Ethereum hacia Syscoin',
         'sysToEthButton': 'Desde Syscoin hacia Ethereum',
         'introHead': 'Bienvenido al asistente oficial de la pasarela desde Syscoin hacia Ethereum!',
@@ -225,6 +229,8 @@ i18n.use(LanguageDetector).init({
     },
     fr: {
       translations: {
+        'tabGeneral':'General',
+        'tabAdvanced':'Advanced',
         'ethToSysButton': "Ethereum à Syscoin",
         'sysToEthButton': "Syscoin à Ethereum",
         'introHead': "Bienvenue à l'assistant officiel d'installation du pont entre Syscoin et Ethereum",

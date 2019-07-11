@@ -1,5 +1,7 @@
 
 import React, { Component } from 'react';
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import "react-tabs/style/react-tabs.css";
 import sbconfig from '../SyscoinSuperblocks';
 import { getProof } from 'bitcoin-proof'
 import Web3 from 'web3';
@@ -227,24 +229,32 @@ class Step5 extends Component {
               </div>
               <div className="row">
                 <div className="col-md-12">
-                  <div className="col-md-6">
-                    <code className="block">
-                        {this.props.t("step5ReceiptStatus")}: <span className="result">{this.state.receiptStatus}</span><br />
-                        {this.props.t("step5ReceiptTxHash")}:<span className="result">{this.state.receiptTxHash}</span><br />
-                        {this.props.t("step5ReceiptTxIndex")}: <span className="result">{this.state.receiptTxIndex}</span><br />
-                        {this.props.t("step5ReceiptFrom")}: <span className="result">{this.state.receiptFrom}</span><br />
-                        {this.props.t("step5ReceiptTo")}: <span className="result">{this.state.receiptTo}</span><br />
-                    </code>
-                  </div>
-                  <div className="col-md-6">
-                    <code className="block">
-                        {this.props.t("step5ReceiptBlockhash")}: <span className="result">{this.state.receiptBlockhash}</span><br />
-                        {this.props.t("step5ReceiptBlocknumber")}:<span className="result"> {this.state.receiptBlocknumber}</span><br />
-                        {this.props.t("step5ReceiptTotalGas")}: <span className="result">{this.state.receiptTotalGas}</span><br />
-                        {this.props.t("step5ReceiptGas")}: <span className="result">{this.state.receiptGas}</span><br />
-                        {this.props.t("step5ReceiptConfirmations")}: <span className="result">{this.state.receiptConf}</span><br />
-                    </code>
-                  </div>
+
+                <Tabs>
+                    <TabList>
+                      <Tab>{this.props.t("tabGeneral")}</Tab>
+                      <Tab>{this.props.t("tabAdvanced")}</Tab>
+                    </TabList>
+                    <TabPanel>
+                      <code className="block">
+                          <span class="dataname">{this.props.t("step5ReceiptStatus")}:</span> <span className="result">{this.state.receiptStatus}</span><br />
+                          <span class="dataname">{this.props.t("step5ReceiptTxHash")}:</span> <span className="result">{this.state.receiptTxHash}</span><br />
+                          <span class="dataname">{this.props.t("step5ReceiptTxIndex")}:</span> <span className="result">{this.state.receiptTxIndex}</span><br />
+                          <span class="dataname">{this.props.t("step5ReceiptFrom")}:</span> <span className="result">{this.state.receiptFrom}</span><br />
+                          <span class="dataname">{this.props.t("step5ReceiptTo")}:</span><span className="result">{this.state.receiptTo}</span><br />
+                      </code>
+                    </TabPanel>
+                    <TabPanel>
+                      <code className="block">
+                      <span class="dataname">{this.props.t("step5ReceiptBlockhash")}:</span> <span className="result">{this.state.receiptBlockhash}</span><br />
+                      <span class="dataname">{this.props.t("step5ReceiptBlocknumber")}:</span> <span className="result">{this.state.receiptBlocknumber}</span><br />
+                      <span class="dataname">{this.props.t("step5ReceiptTotalGas")}:</span> <span className="result">{this.state.receiptTotalGas}</span><br />
+                      <span class="dataname">{this.props.t("step5ReceiptGas")}:</span> <span className="result">{this.state.receiptGas}</span><br />
+                      <span class="dataname">{this.props.t("step5ReceiptConfirmations")}:</span> <span className="result">{this.state.receiptConf}</span><br />
+                      </code>
+                    </TabPanel>
+                  </Tabs>
+
                 </div>
                 </div>
                 <div className="row">
