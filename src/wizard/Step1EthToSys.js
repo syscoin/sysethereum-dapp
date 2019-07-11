@@ -213,10 +213,6 @@ class Step1ES extends Component {
     validateNewInput.syscoinWitnessAddressVal = true;
     validateNewInput.sysxFromAccountVal = true;
     let valid = true;
-    if(!userInput.sysxContract || userInput.sysxContract === ""){
-      validateNewInput.sysxContractVal = false;
-      valid = false;
-    }
     if(!userInput.toSysAssetGUID || userInput.toSysAssetGUID === ""){
       validateNewInput.toSysAssetGUIDVal = false;
       valid = false;
