@@ -10,14 +10,14 @@ class Step4ES extends Component {
   }
 
   componentDidMount() {
-   /* if(!this.props.getStore().mintblockhash || !this.props.getStore().minttxid){
+    if(!this.props.getStore().mintblockhash || !this.props.getStore().minttxid){
       this.props.jumpToStep(3);
       return;
-    }*/
+    }
     let baseURL = "";
     
-    baseURL = "http://explorer.blockchainfoundry.co/tx/" + this.props.getStore().minttxid;
-    
+    //baseURL = "http://explorer.blockchainfoundry.co/tx/" + this.props.getStore().minttxid;
+    baseURL = "http://52.203.169.241:9000/tx/" + this.props.getStore().minttxid;
     this.setState({explorerLink: baseURL});
   }
 

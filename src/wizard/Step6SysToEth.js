@@ -11,10 +11,10 @@ class Step6 extends Component {
   }
 
   componentDidMount() {
-    /*if(!this.props.getStore().receiptObj){
+    if(!this.props.getStore().receiptObj){
       this.props.jumpToStep(4);
       return;
-    }*/
+    }
     let baseURL = "";
     if(CONFIGURATION.testnet){
       baseURL = "https://rinkeby.etherscan.io/tx/";

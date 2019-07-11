@@ -20,9 +20,9 @@ class Step3ES extends Component {
   }
 
   componentDidMount() {
-    /*if(!this.props.getStore().mintsysrawtxunsigned){
+    if(!this.props.getStore().mintsysrawtxunsigned){
       this.props.jumpToStep(1);
-    }*/
+    }
   }
 
   componentWillUnmount() {}

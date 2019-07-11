@@ -19,11 +19,11 @@ class Step2ES extends Component {
   }
 
   componentDidMount() {
-   /* if((!this.props.getStore().toSysAssetGUID && !this.props.getStore().toSysAssetGUID == 0) ||
+    if((!this.props.getStore().toSysAssetGUID && !this.props.getStore().toSysAssetGUID == 0) ||
     !this.props.getStore().toSysAmount ||
     !this.props.getStore().syscoinWitnessAddress){
       this.props.jumpToStep(0);
-    }*/
+    }
   }
 
 
