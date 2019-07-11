@@ -46,7 +46,7 @@ class Step1ES extends Component {
     // if full validation passes then save to store and pass as valid
     if (Object.keys(validateNewInput).every((k) => { return validateNewInput[k] === true })) {
         if(this.props.getStore().receiptTxHash !== userInput.receiptTxHash || this.props.getStore().toSysAssetGUID !== userInput.toSysAssetGUID || this.props.getStore().toSysAmount !== userInput.toSysAmount ||
-        this.props.getStore().sysxContract !== userInput.sysxContract || this.props.getStore().sysxFromAccount !== userInput.sysxFromAccount || this.props.getStore().syscoinWitnessAddress !== userInput.syscoinWitnessAddress) { // only update store of something changed
+        this.props.getStore().sysxFromAccount !== userInput.sysxFromAccount || this.props.getStore().syscoinWitnessAddress !== userInput.syscoinWitnessAddress) { // only update store of something changed
           this.props.updateStore({
             ...userInput,
             savedToCloud: false // use this to notify step4 that some changes took place and prompt the user to save again
@@ -103,7 +103,6 @@ class Step1ES extends Component {
 
   _validationErrors(val) {
     const errMsgs = {
-      sysxContractValMsg: val.sysxContractVal ? '' : this.props.t("step1SEContract"),
       sysxFromAccountValMsg: val.sysxFromAccountVal ? '' : this.props.t("step2EthAddress"),
       toSysAssetGUIDValMsg: val.toSysAssetGUIDVal ? '' : this.props.t("step2Asset"),
       toSysAmountValMsg: val.toSysAmountVal ? '' : this.props.t("step2Amount"),
@@ -124,7 +123,7 @@ class Step1ES extends Component {
 
   _grabUserInput() {
     return {
-      sysxContract: this.refs.sysxContract.value,
+      sysxContract: '',
       toSysAssetGUID: this.refs.toSysAssetGUID.value,
       sysxFromAccount: this.refs.sysxFromAccount.value,
       toSysAmount: this.refs.toSysAmount.value,
@@ -174,6 +173,27 @@ class Step1ES extends Component {
         else if(results){
           let version = this.byteToHex(results.witness_version);
           return "0x" + version + results.witness_program;
+        }
+      }catch(e) {
+        validateNewInput.buttonVal = false;
+        validateNewInput.buttonValMsg = e.message;
+        return "";
+      }
+    }
+    return "";
+  }
+  async getAssetContract(guid, validateNewInput){
+    if(guid.length > 0){
+      try {
+        let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=assetinfo&asset_guid=' + guid);
+        results = results.data;
+        if(results.error){
+          validateNewInput.buttonVal = false;
+          validateNewInput.buttonValMsg = results.error;
+          return "";
+        }
+        else if(results){
+          return results.contract;
         }
       }catch(e) {
         validateNewInput.buttonVal = false;
@@ -254,6 +274,12 @@ class Step1ES extends Component {
       this.setState({working: false});
       return;
     }
+    userInput.sysxContract = await this.getAssetContract(userInput.toSysAssetGUID, validateNewInput);
+    if(userInput.sysxContract === ""){
+      this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+      this.setState({working: false});
+      return;
+    }
     validateNewInput.buttonVal = true;
     validateNewInput.buttonValMsg = this.props.t("step5AuthMetamask");
     this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
@@ -327,14 +353,6 @@ class Step1ES extends Component {
        notValidClasses.toSysAssetGUIDCls = 'has-error';
        notValidClasses.toSysAssetGUIDValGrpCls = 'val-err-tooltip';
     }   
-    if (typeof this.state.sysxContractVal == 'undefined' || this.state.sysxContractVal) {
-      notValidClasses.sysxContractCls = 'has-success';
-      notValidClasses.sysxContractValGrpCls = 'val-success-tooltip';
-    }
-    else {
-       notValidClasses.sysxContractCls = 'has-error';
-       notValidClasses.sysxContractValGrpCls = 'val-err-tooltip';
-    }  
     if (typeof this.state.toSysAmountVal == 'undefined' || this.state.toSysAmountVal) {
       notValidClasses.toSysAmountCls = 'has-success';
       notValidClasses.toSysAmountValGrpCls = 'val-success-tooltip';
@@ -384,24 +402,6 @@ class Step1ES extends Component {
                     defaultValue={this.state.toSysAssetGUID}
                      />
                   <div className={notValidClasses.toSysAssetGUIDValGrpCls}>{this.state.toSysAssetGUIDValMsg}</div>
-                </div>
-              </div>
-              </div>
-              <div className="row">
-              <div className="col-md-12">
-                <label className="control-label col-md-4">
-                  {this.props.t("step1ESContractLabel")}
-                </label>
-                <div className={notValidClasses.sysxContractCls}>
-                  <input
-                    ref="sysxContract"
-                    autoComplete="off"
-                    type="text"
-                    placeholder={this.props.t("step1ESEnterContract")}
-                    className="form-control"
-                    defaultValue={this.state.sysxContract}
-                     />
-                  <div className={notValidClasses.sysxContractValGrpCls}>{this.state.sysxContractValMsg}</div>
                 </div>
               </div>
               </div>

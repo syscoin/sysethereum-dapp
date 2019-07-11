@@ -58,8 +58,6 @@ class SysToEthWizard extends Component {
           <div className='languageButtons'>
             <button onClick={() =>  i18n.changeLanguage("en")}>🇬🇧</button>
             <button onClick={() =>  i18n.changeLanguage("de")}>🇩🇪</button>
-            <button onClick={() =>  i18n.changeLanguage("es")}>🇩🇪</button>
-            <button onClick={() =>  i18n.changeLanguage("fr")}>🇩🇪</button>
           </div>
           <StepZilla
             steps={steps}
