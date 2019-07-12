@@ -55,10 +55,18 @@ class SysToEthWizard extends Component {
     return (
       <div className='SysToEthWizard'>
         <div className='step-progress'>
+
           <div className='languageButtons'>
-            <button onClick={() =>  i18n.changeLanguage("en")}>🇬🇧</button>
-            <button onClick={() =>  i18n.changeLanguage("de")}>🇩🇪</button>
+            <div class="dropdown">
+              <button class="dropbtn"><i class="glyphicon glyphicon-globe"></i><span class="selectedLang">{ i18n.language }</span></button>
+              <div class="dropdown-content">
+              <button onClick={() =>  i18n.changeLanguage("en")}>EN</button>
+              <button onClick={() =>  i18n.changeLanguage("es")}>ES</button>
+              <button onClick={() =>  i18n.changeLanguage("fr")}>FR</button>
+              </div>
+            </div>
           </div>
+
           <StepZilla
             steps={steps}
             preventEnterSubmission={true}
