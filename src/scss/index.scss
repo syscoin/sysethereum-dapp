@@ -50,12 +50,20 @@ div[class*=mycontainer]
     text-align: center;
     max-width: 1000px;
     margin:0 auto;
-    min-height: 450px;
     justify-content: center;
     font-family: 'Lato', sans-serif;
-    background: url(./imgs/bridge1.png) no-repeat bottom center;
-    min-height:700px;
+    min-height:760px;
     position: relative;
+
+    .animation
+    {
+        position: absolute;
+        bottom: 0;
+        width: 70%;
+        /* left: 50%; */
+        transform: translateX(-50%);
+        z-index: 2;
+    }
 }
   
 .intro 
@@ -88,6 +96,8 @@ div[class*=mycontainer]
             text-align: center;
             cursor: pointer;
             text-decoration: none;
+            z-index: 3;
+            position: relative;
 
             -webkit-transition: background .3s,color .3s,border-color .3s;
             -o-transition: background .3s,color .3s,border-color .3s;
@@ -147,7 +157,14 @@ div[class*=mycontainer]
 @media (max-width: 680px) {
     div[class*=mycontainer]
     {
-        background-size: contain;
+        min-height: 630px;
+    }
+}
+
+@media (max-width: 500px) {
+    div[class*=mycontainer]
+    {
+        min-height: 530px;
     }
 }
 
