@@ -222,24 +222,26 @@ class Step1 extends Component {
                     </TabList>
                     <TabPanel>
                       <code className="block">
-                          <span class="dataname">{this.props.t("step1SuperblockId")}:</span> <span className="result">{this.state.superblockId}</span><br />
-                          <span class="dataname">{this.props.t("step1SuperblockHeight")}:</span> <span className="result">{this.state.superblockHeight}</span><br />
-                          <span class="dataname">{this.props.t("step1LastBlockTime")}:</span> <span className="result">{this.state.superblockLastBlockTime}</span><br />
-                          <span class="dataname">{this.props.t("step1SuperblockApproved")}:</span> <span className="result">{this.state.superblockApproved.toString()}</span><br />
-                          <span class="dataname">{this.props.t("step1SuperblockAddress")}:</span><span className="result"><a href={this.sbURL} target="_blank" rel="noopener noreferrer">{this.sbContract}</a></span><br />
+                          <span className="dataname">{this.props.t("step1SuperblockId")}:</span> <span className="result">{this.state.superblockId}</span><br />
+                          <span className="dataname">{this.props.t("step1SuperblockHeight")}:</span> <span className="result">{this.state.superblockHeight}</span><br />
+                          <span className="dataname">{this.props.t("step1LastBlockTime")}:</span> <span className="result">{this.state.superblockLastBlockTime}</span><br />
+                          <span className="dataname">{this.props.t("step1SuperblockApproved")}:</span> <span className="result">{this.state.superblockApproved.toString()}</span><br />
+                          <span className="dataname">{this.props.t("step1SuperblockAddress")}:</span><span className="result"><a href={this.sbURL} target="_blank" rel="noopener noreferrer">{this.sbContract}</a></span><br />
                       </code>
                     </TabPanel>
                     <TabPanel>
                       <code className="block">
-                      <span class="dataname">{this.props.t("step1LastBlockHash")}:</span> <span className="result">{this.state.superblockLastBlockHash}</span><br />
-                      <span class="dataname">{this.props.t("step1MerkleRoot")}:</span> <span className="result">{this.state.superblockMerkleRoot}</span><br />
-                      <span class="dataname">{this.props.t("step1LastBlockBits")}:</span> <span className="result">{this.state.superblockLastBlockBits}</span><br />
-                      <span class="dataname">{this.props.t("step1SuperblockParentId")}:</span> <span className="result">{this.state.superblockParentId}</span><br />
+                      <span className="dataname">{this.props.t("step1LastBlockHash")}:</span> <span className="result">{this.state.superblockLastBlockHash}</span><br />
+                      <span className="dataname">{this.props.t("step1MerkleRoot")}:</span> <span className="result">{this.state.superblockMerkleRoot}</span><br />
+                      <span className="dataname">{this.props.t("step1LastBlockBits")}:</span> <span className="result">{this.state.superblockLastBlockBits}</span><br />
+                      <span className="dataname">{this.props.t("step1SuperblockParentId")}:</span> <span className="result">{this.state.superblockParentId}</span><br />
                       </code>
                     </TabPanel>
                   </Tabs>
 
                 </div>
+              </div>
+              <div className="row">
                 
                 <div className="col-md-4 col-sm-12 col-centered text-center">
                   <div className="superblockpagecontainer">

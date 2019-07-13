@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './SysethereumDApp.css';
+import bridgeAnim from './imgs/bridge_diagram.svg';
 import SysToEthWizardi18n from './wizard/SysToEthWizard';
 import EthToSysWizardi18n from './wizard/EthToSysWizard';
 import { I18nextProvider } from "react-i18next";
@@ -54,6 +55,8 @@ class SysethereumDApp extends Component {
             </div>
             </a>
 
+            <object className="animation" type="image/svg+xml" data={bridgeAnim}></object>
+
           </div>
 
           <div className="introText">
@@ -62,6 +65,7 @@ class SysethereumDApp extends Component {
             </p>
 
             <p>This type of bridge has never been seen before and is unique in that it allows for Syscoin tokens to transfer to and exist on other blockchains; It is zero-sum meaning the total circulating supply of the asset moving over the bridge remains unchanged.</p>
+
           </div>
 
 
