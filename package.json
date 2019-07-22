@@ -19,6 +19,7 @@
     "react-search-field": "^1.0.0",
     "react-stepzilla": "^6.0.0",
     "react-tabs": "^3.0.0",
+    "react-textarea-autosize": "^7.1.0",
     "react-validation-mixin": "^5.4.0",
     "rlp": "^2.2.3",
     "web3": "^1.0.0-beta.55"

@@ -240,35 +240,29 @@ html h4 {
     background-color: #f2f9ff;
   }
 
-  #exList {
-    background-color: rgba(#333,0.5);
-    background-image: url(imgs/syscoin-logo.svg);
-    background-position: 10px center;
-    background-repeat: no-repeat;
-    background-size: 205px;
-    padding: 16px;
-    text-align: center;
-    color: #fff;
+#menu 
+{
+  background-color:#1b1a3557;
+  background-image: url(imgs/syscoin-logo.svg);
+  background-position: 10px center;
+  background-repeat: no-repeat;
+  background-size: 205px;
+  text-align: center;
+  color: #fff;
+  position: fixed;
+  width:100%;
+  top:0;
+  z-index:10;
+  padding:16px;
+  
+  .title 
+  {
+      margin-bottom: 5px;
+      font-weight: 300;
+      font-size: 2rem;
+      margin-top: 5px;
   }
 
- #exList .title {
-    margin-bottom: 5px;
-    font-weight: 300;
-    font-size: 2rem;
-    margin-top: 5px;
-  }
-
-  #exList .eg {
-    display: inline-block;
-    padding: 5px;
-    border: solid 1px;
-    border-radius: 3px;
-    margin-right: 5px;
-    cursor: pointer;
-  }
-
-  #exList .eg.sel {
-    background-color: #000;
-  }
+}
 
 
