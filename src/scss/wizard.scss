@@ -388,3 +388,10 @@ ol.progtrckr {
     font-size: 14px;
     color: #fff;
   }
+
+  @media (max-width: 835px) {
+    .wizardTitleCont
+    {
+      margin-top:105px;
+    }
+  }

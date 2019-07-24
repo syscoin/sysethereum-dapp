@@ -242,7 +242,7 @@ html h4 {
 
 #menu 
 {
-  background-color:#1b1a3557;
+  background-color:#191950e6;
   background-image: url(imgs/syscoin-logo.svg);
   background-position: 10px center;
   background-repeat: no-repeat;
@@ -254,6 +254,14 @@ html h4 {
   top:0;
   z-index:10;
   padding:16px;
+
+  .goHome
+  {
+    position: absolute;
+    width:205px;
+    height:40px;
+    cursor: pointer;
+  }
   
   .title 
   {
@@ -265,4 +273,26 @@ html h4 {
 
 }
 
+@media (max-width: 835px) {
+  #menu 
+  {
+    background-position: center 10px;
+    background-size:160px;
+
+    .goHome
+    {
+      top:15px;
+      left: 50%;
+      height:50px;
+      @include transform(translate(-50%, 0));
+    }
+
+    .title
+    {
+      margin-top:40px;
+    }
+
+    
+  }
+}
 
