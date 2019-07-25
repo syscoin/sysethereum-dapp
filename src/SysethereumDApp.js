@@ -177,7 +177,7 @@ class SysethereumDApp extends Component {
               <ol>
                 <li>
                   <strong>Burn SPT</strong><br />
-                  Provably burn SPT on the Syscoin blockchain.
+                  Provably burn SPT on the Syscoin blockchain. <a href="javascript:void(0)" onClick={this.onSysToEth}>SYS ➜ ETH</a>
                 </li>
                 <li>
                   <strong>Mint ERC20</strong><br />
@@ -199,7 +199,7 @@ class SysethereumDApp extends Component {
               <ol>
                 <li>
                   <strong>Burn SPT ERC20</strong><br />
-                  Provably burn ERC20 on the Ethereum blockchain.
+                  Provably burn ERC20 on the Ethereum blockchain. <a href="javascript:void(0)" onClick={this.onEthToSys}>ETH ➜ SYS</a>
                 </li>
                 <li>
                   <strong>Mint SPT</strong><br />
