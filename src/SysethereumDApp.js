@@ -14,11 +14,18 @@ class SysethereumDApp extends Component {
       introDisplay: true,
       ethToSysDisplay: false,
       sysToEthDisplay: false,  
+      emailName: '',
+      emailSender: '',
+      emailMessage: '',
+      emailSent: false
     };
       
     this.onSysToEth = this.onSysToEth.bind(this);
     this.onEthToSys = this.onEthToSys.bind(this);
     this.onHome = this.onHome.bind(this);
+    this.handleEmailChange = this.handleEmailChange.bind(this);
+    this.handleEmailSubmit = this.handleEmailSubmit.bind(this);
+
   }
 
 
@@ -32,6 +39,19 @@ class SysethereumDApp extends Component {
   }
   onHome() {
     this.setState({ introDisplay: true, ethToSysDisplay: false,  sysToEthDisplay: false});
+  }
+
+  handleEmailChange(evt) {
+    this.setState({ [evt.target.name]: evt.target.value });
+  }
+
+  handleEmailSubmit(evt) {
+    evt.preventDefault();
+    console.log(this.state.emailName,this.state.emailSender,this.state.emailMessage);
+
+    // todo: send email
+
+    this.setState({ emailSent: true });
   }
 
   render() { 
@@ -173,44 +193,44 @@ class SysethereumDApp extends Component {
             <h2>Bridge any SPT to an ERC20</h2>
             <p>Move from Syscoin Platform Token to ERC20 in 3 simple steps:</p>
 
-            <p>
-              <ol>
-                <li>
-                  <strong>Burn SPT</strong><br />
-                  Provably burn SPT on the Syscoin blockchain. <a href="javascript:void(0)" onClick={this.onSysToEth}>SYS ➜ ETH</a>
-                </li>
-                <li>
-                  <strong>Mint ERC20</strong><br />
-                  Use proof-of-burn from the Syscoin blockchain to mint ERC20 tokens on the Ethereum blockchain 1:1 with burned SPTs from Syscoin.
-                </li>
-                <li>
-                  <strong>Leverage Ethereum Ecosystem</strong><br />
-                  Use SPT ERC20 with Ethereum smart contracts and the plethora of existing wallets and services that support ERC20 tokens.
-                </li>
-              </ol>
-            </p>
+      
+            <ol>
+              <li>
+                <strong>Burn SPT</strong><br />
+                Provably burn SPT on the Syscoin blockchain. <a href="javascript:void(0)" onClick={this.onSysToEth}>SYS ➜ ETH</a>
+              </li>
+              <li>
+                <strong>Mint ERC20</strong><br />
+                Use proof-of-burn from the Syscoin blockchain to mint ERC20 tokens on the Ethereum blockchain 1:1 with burned SPTs from Syscoin.
+              </li>
+              <li>
+                <strong>Leverage Ethereum Ecosystem</strong><br />
+                Use SPT ERC20 with Ethereum smart contracts and the plethora of existing wallets and services that support ERC20 tokens.
+              </li>
+            </ol>
+     
 
             <div className="ornament intext"></div>
 
             <h2>Bridge any ERC20 to an SPT</h2>
             <p>Convert any ERC20 to a Syscoin Platform Token in 3 easy steps:</p>
 
-            <p>
-              <ol>
-                <li>
-                  <strong>Burn SPT ERC20</strong><br />
-                  Provably burn ERC20 on the Ethereum blockchain. <a href="javascript:void(0)" onClick={this.onEthToSys}>ETH ➜ SYS</a>
-                </li>
-                <li>
-                  <strong>Mint SPT</strong><br />
-                  Use proof-of-burn from the Ethereum blockchain to mint SPT tokens on the Syscoin blockchain 1:1 with burned SPT ERC20s from Ethereum.
-                </li>
-                <li>
-                  <strong>Leverage Syscoin Ecosystem</strong><br />
-                  Use SPT on Syscoin for fast, scalable transactions and low transaction costs.
-                </li>
-              </ol>
-            </p>
+           
+            <ol>
+              <li>
+                <strong>Burn SPT ERC20</strong><br />
+                Provably burn ERC20 on the Ethereum blockchain. <a href="javascript:void(0)" onClick={this.onEthToSys}>ETH ➜ SYS</a>
+              </li>
+              <li>
+                <strong>Mint SPT</strong><br />
+                Use proof-of-burn from the Ethereum blockchain to mint SPT tokens on the Syscoin blockchain 1:1 with burned SPT ERC20s from Ethereum.
+              </li>
+              <li>
+                <strong>Leverage Syscoin Ecosystem</strong><br />
+                Use SPT on Syscoin for fast, scalable transactions and low transaction costs.
+              </li>
+            </ol>
+           
 
             <div className="ornament intext"></div>
 
@@ -319,23 +339,27 @@ class SysethereumDApp extends Component {
             <div className="ornament"></div>
             <h1>Contact</h1>
 
-            <form action="#" name="contact" method="post">
+            <form onSubmit={this.handleEmailSubmit}>
               <div className="form-group">
                 <label htmlFor="emailaddr">Email address</label>
-                <input type="email" className="form-control" id="emailaddr" name="email" required />
+                <input type="email" className="form-control" id="emailaddr" required onChange={this.handleEmailChange} name="emailSender" />
               </div>
 
               <div className="form-group">
                 <label htmlFor="yourname">Your name</label>
-                <input type="text" className="form-control" id="yourname" name="name" required />
+                <input type="text" className="form-control" id="yourname" required onChange={this.handleEmailChange} name="emailName" />
               </div>
 
               <div className="form-group">
                 <label htmlFor="message">Message</label>
-                <Textarea className="form-control" id="message" name="msg" minRows={1} required />
+                <Textarea className="form-control" id="message" minRows={1} required onChange={this.handleEmailChange} name="emailMessage" />
               </div>
             
-              <button type="submit" className="btn btn-default">Send</button>
+              <button type="submit" className="btn btn-default" disabled={this.state.emailSent}>Send</button>
+
+              <div className={(this.state.emailSent  ? "visible" : "hidden")}>
+                <p className="bg-success">Email sent!</p>
+              </div>
   
             </form>
           </div>
@@ -390,7 +414,7 @@ class SysethereumDApp extends Component {
     <div className={(this.state.ethToSysDisplay  ? "visible" : "hidden")}>
 
       <div id="menu"> 
-        <div class="goHome" onClick={this.onHome}></div>
+        <div className="goHome" onClick={this.onHome}></div>
         <div className="title">Walk over the Syscoin Bridge</div>
       </div>
     
@@ -418,7 +442,7 @@ class SysethereumDApp extends Component {
     <div  className={(this.state.sysToEthDisplay  ? "visible" : "hidden")}>
 
       <div id="menu"> 
-        <div class="goHome" onClick={this.onHome}></div>
+        <div className="goHome" onClick={this.onHome}></div>
         <div className="title">Walk over the Syscoin Bridge</div>
       </div>
       
