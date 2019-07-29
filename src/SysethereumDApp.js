@@ -6,6 +6,7 @@ import EthToSysWizardi18n from './wizard/EthToSysWizard';
 import { I18nextProvider } from "react-i18next";
 import i18n from "./wizard/i18n";
 import Textarea from 'react-textarea-autosize';
+import axios from 'axios';
 
 class SysethereumDApp extends Component {
   constructor(props) {
@@ -47,11 +48,15 @@ class SysethereumDApp extends Component {
 
   handleEmailSubmit(evt) {
     evt.preventDefault();
-    console.log(this.state.emailName,this.state.emailSender,this.state.emailMessage);
+    var self = this;
 
-    // todo: send email
+    axios.post('https://syscoin.org/email_sender.php', {name:this.state.emailName, email:this.state.emailSender, msg: this.state.emailMessage})
+    .then(function (response) {
+      if(response.data.status == 1)
+        self.setState({ emailSent: true });
+    });
 
-    this.setState({ emailSent: true });
+    
   }
 
   render() { 
@@ -154,16 +159,8 @@ class SysethereumDApp extends Component {
                   <i className="demo-icon icon-sys"></i>
                 </a>
               </div>
-                
-
-             
-          
 
             </div>
-
-            
-
-
 
         </div> 
         <div className="section">
