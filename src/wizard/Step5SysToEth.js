@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import "react-tabs/style/react-tabs.css";
-import sbconfig from '../SyscoinSuperblocks';
+import sbconfig from '../SyscoinSuperblocksI';
 import { getProof } from 'bitcoin-proof'
 import Web3 from 'web3';
 import CONFIGURATION from '../config';
@@ -164,7 +164,7 @@ class Step5 extends Component {
     thisObj.state.receiptObj = null;
 
      SyscoinSuperblocks.methods.relayTx(_txBytes, this.props.getStore().txindex, merkleProof.sibling, _syscoinBlockHeader, 
-      this.props.getStore().syscoinblockindex, _syscoinBlockSiblings, _superblockHash, this.props.getStore().untrustedtargetcontract).send({from: accounts[0], gas: 500000})
+      this.props.getStore().syscoinblockindex, _syscoinBlockSiblings, _superblockHash).send({from: accounts[0], gas: 500000})
       .on('transactionHash', function(hash){
         thisObj.setState({receiptTxHash: hash, buttonVal: true, buttonValMsg: thisObj.props.t("step5PleaseWait")});
       })

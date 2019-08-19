@@ -12,8 +12,7 @@ class Step4 extends Component {
       syscoinblockindex: props.getStore().syscoinblockindex,
       superblockhash: props.getStore().superblockhash,
       syscoinblocksiblings: props.getStore().syscoinblocksiblings,
-      txbytes: props.getStore().txbytes,
-      untrustedtargetcontract: props.getStore().untrustedtargetcontract
+      txbytes: props.getStore().txbytes
     };
           // INPUTS:
       // enter syscoin burn txid
@@ -32,7 +31,6 @@ class Step4 extends Component {
     // step 5: 
       // INPUTS:
       // _txBytes - transaction bytes (autofilled with getrawtransaction)
-      // _untrustedTargetContract - the contract that is going to process the transaction (input from assetinfo or genesis param)
     this._validateOnDemand = true; // this flag enables onBlur validation as user fills forms
     this.getProofs = this.getProofs.bind(this);
     this.validationCheck = this.validationCheck.bind(this);
@@ -60,7 +58,6 @@ class Step4 extends Component {
         this.props.getStore().syscoinblockindex !== userInput.syscoinblockindex ||
         this.props.getStore().syscoinblocksiblings !== userInput.syscoinblocksiblings ||
         this.props.getStore().txbytes !== userInput.txbytes ||
-        this.props.getStore().untrustedtargetcontract !== userInput.untrustedtargetcontract ||
         this.props.getStore().superblockhash !== userInput.superblockhash 
         ) { // only update store of something changed
           this.props.updateStore({
@@ -101,8 +98,6 @@ class Step4 extends Component {
         console.log("txsiblingsVal " + validateNewInput.txsiblings);
         validateNewInput.txindex = results.index;
         console.log("txindexVal " + validateNewInput.txindex);
-        validateNewInput.untrustedtargetcontract = results.contract;
-        console.log("untrustedtargetcontractVal " + validateNewInput.untrustedtargetcontract);
       }
     }catch(e) {
       validateNewInput.buttonVal = false;
@@ -165,8 +160,7 @@ class Step4 extends Component {
       syscoinblockindexVal: true,
       syscoinblocksiblingsVal: true,
       superblockhashVal: true,
-      txbytesVal: true,
-      untrustedtargetcontractVal: true
+      txbytesVal: true
     }
   }
 
@@ -178,8 +172,7 @@ class Step4 extends Component {
       syscoinblockindexValMsg: '',
       syscoinblocksiblingsValMsg: '',
       superblockhashValMsg: '',
-      txbytesValMsg: '',
-      untrustedtargetcontractValMsg: ''
+      txbytesValMsg: ''
     }
     return errMsgs;
   }
@@ -192,8 +185,7 @@ class Step4 extends Component {
       syscoinblockindex: this.state.syscoinblockindex,
       syscoinblocksiblings: this.state.syscoinblocksiblings,
       superblockhash: this.state.superblockhash,
-      txbytes: this.state.txbytes,
-      untrustedtargetcontract: this.state.untrustedtargetcontract
+      txbytes: this.state.txbytes
     };
   }
   render() {

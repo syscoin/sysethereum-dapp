@@ -3,8 +3,8 @@ import React, { Component } from 'react';
 import Web3 from 'web3';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import "react-tabs/style/react-tabs.css";
-import tpabi from '../SyscoinTransactionProcessor';
-import hsabi from '../HumanStandardToken';  
+import assetabi from '../SyscoinERC20AssetI';
+import tpabi from '../SyscoinTransactionProcessor';  
 import CONFIGURATION from '../config';
 const axios = require('axios');
 const web3 = new Web3(Web3.givenProvider);
@@ -205,6 +205,43 @@ class Step1ES extends Component {
     }
     return "";
   }
+  freezeBurnERC20(syscoinTransactionProcessor, validateNewInput, thisObj, amount, assetGUID, syscoinWitnessProgram, userInput, fromAccount) {
+    thisObj.state.receiptObj = null;
+    syscoinTransactionProcessor.methods.freezeBurnERC20(amount, assetGUID, syscoinWitnessProgram, userInput.sysxContract).send({from: fromAccount, gas: 500000})
+      .on('transactionHash', function(hash){
+        validateNewInput.buttonVal = true;
+        validateNewInput.receiptTxHash = hash;
+        validateNewInput.buttonValMsg = thisObj.props.t("step5AuthMetamask");
+        thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
+        thisObj.setState({working: true});
+      })
+      .on('confirmation', function(confirmationNumber, receipt){ 
+        if(thisObj.state.receiptObj === null){
+          thisObj.setStateFromReceipt(receipt, null, confirmationNumber, validateNewInput);
+          thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
+          thisObj.setState({working: false});
+        } else {
+          validateNewInput.receiptConf = confirmationNumber;
+          thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
+        }
+      })
+      .on('error', (error, receipt) => {
+        thisObj.setState({working: false});
+        if(error.message.length <= 512 && error.message.indexOf("{") !== -1){
+          error = JSON.parse(error.message.substring(error.message.indexOf("{")));
+        }
+        let message = error.message.toString();
+        if(receipt){
+          thisObj.setStateFromReceipt(receipt, message, 0, validateNewInput);
+          thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
+        }
+        else{
+          validateNewInput.buttonVal = false;
+          validateNewInput.buttonValMsg = message;
+          thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
+        }
+      })
+  }
   async submitProofs() {
     let userInput = this._grabUserInput(); // grab user entered vals
     let validateNewInput = this._validateData(userInput); // run the new input against the validator
@@ -281,35 +318,36 @@ class Step1ES extends Component {
     validateNewInput.buttonVal = true;
     validateNewInput.buttonValMsg = this.props.t("step5AuthMetamask");
     this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-    let contract = await web3.eth.Contract(tpabi, userInput.sysxContract);
-    
-    let contractBase = await web3.eth.Contract(hsabi, userInput.sysxContract);
-    
-    let decimals = await contractBase.methods.decimals().call();
-    
-    let assetGUID = userInput.toSysAssetGUID;
-    let amount = userInput.toSysAmount*Math.pow(10, decimals);
+    let syscoinTransactionProcessor = await web3.eth.Contract(tpabi,  CONFIGURATION.ERC20Manager);
+    let contractBase = await web3.eth.Contract(assetabi, userInput.sysxContract);
     let fromAccount = userInput.sysxFromAccount;
+    let allowance = await contractBase.methods.allowance(fromAccount, CONFIGURATION.ERC20Manager).call();
+    let balance = await contractBase.methods.balanceOf(fromAccount).call();
+    let amount = userInput.toSysAmount*Math.pow(10, decimals);
+    let decimals = await contractBase.methods.decimals().call();
+    let assetGUID = userInput.toSysAssetGUID;
+    
 
     let thisObj = this;
-    thisObj.state.receiptObj = null;
-    contract.methods.burn(amount, assetGUID, syscoinWitnessProgram).send({from: fromAccount, gas: 500000})
+    if(amount > balance){
+      // insufficient balance
+      validateNewInput.buttonVal = false;
+      validateNewInput.buttonValMsg = this.props.t("step5InsufficientTokenBalance");
+      this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+      this.setState({working: false});
+      return;
+    }
+    // we may need to get allowance of funds
+    if(allowance < amount){
+      console.log("Allowance of " + amount-allowance + " needed.");
+      contractBase.methods.approve(CONFIGURATION.ERC20Manager, amount).send({from: fromAccount, gas: 500000})
       .on('transactionHash', function(hash){
         validateNewInput.buttonVal = true;
-        validateNewInput.receiptTxHash = hash;
-        validateNewInput.buttonValMsg = thisObj.props.t("step5AuthMetamask");
+        validateNewInput.buttonValMsg = thisObj.props.t("step5AuthAllowanceMetamask");
         thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
-        thisObj.setState({working: true});
       })
       .on('confirmation', function(confirmationNumber, receipt){ 
-        if(thisObj.state.receiptObj === null){
-          thisObj.setStateFromReceipt(receipt, null, confirmationNumber, validateNewInput);
-          thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
-          thisObj.setState({working: false});
-        } else {
-          validateNewInput.receiptConf = confirmationNumber;
-          thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
-        }
+        thisObj.freezeBurnERC20(syscoinTransactionProcessor, validateNewInput, thisObj, amount, assetGUID, syscoinWitnessProgram, userInput, fromAccount);
       })
       .on('error', (error, receipt) => {
         thisObj.setState({working: false});
@@ -327,6 +365,10 @@ class Step1ES extends Component {
           thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
         }
       })
+    }
+    else{
+      thisObj.freezeBurnERC20(syscoinTransactionProcessor, validateNewInput, thisObj, amount, assetGUID, syscoinWitnessProgram, userInput, fromAccount);
+    }
   }
 
  

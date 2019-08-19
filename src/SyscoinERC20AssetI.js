@@ -1,34 +1,20 @@
-const hsabi = [
-  {
-    "constant": true,
-    "inputs": [],
-    "name": "name",
-    "outputs": [
-      {
-        "name": "",
-        "type": "string"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
+const assetabi = [
   {
     "constant": false,
     "inputs": [
       {
-        "name": "_spender",
+        "name": "spender",
         "type": "address"
       },
       {
-        "name": "_value",
+        "name": "amount",
         "type": "uint256"
       }
     ],
     "name": "approve",
     "outputs": [
       {
-        "name": "success",
+        "name": "",
         "type": "bool"
       }
     ],
@@ -54,28 +40,137 @@ const hsabi = [
     "constant": false,
     "inputs": [
       {
-        "name": "_from",
+        "name": "sender",
         "type": "address"
       },
       {
-        "name": "_to",
+        "name": "recipient",
         "type": "address"
       },
       {
-        "name": "_value",
+        "name": "amount",
         "type": "uint256"
       }
     ],
     "name": "transferFrom",
     "outputs": [
       {
-        "name": "success",
+        "name": "",
         "type": "bool"
       }
     ],
     "payable": false,
     "stateMutability": "nonpayable",
     "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "balanceOf",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "recipient",
+        "type": "address"
+      },
+      {
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "transfer",
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "name": "spender",
+        "type": "address"
+      }
+    ],
+    "name": "allowance",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "name": "from",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "name": "value",
+        "type": "uint256"
+      }
+    ],
+    "name": "Transfer",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "name": "spender",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "name": "value",
+        "type": "uint256"
+      }
+    ],
+    "name": "Approval",
+    "type": "event"
   },
   {
     "constant": true,
@@ -92,68 +187,39 @@ const hsabi = [
     "type": "function"
   },
   {
-    "constant": true,
-    "inputs": [],
-    "name": "version",
-    "outputs": [
-      {
-        "name": "",
-        "type": "string"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": true,
+    "constant": false,
     "inputs": [
       {
-        "name": "_owner",
+        "name": "account",
         "type": "address"
-      }
-    ],
-    "name": "balanceOf",
-    "outputs": [
+      },
       {
-        "name": "balance",
+        "name": "amount",
         "type": "uint256"
       }
     ],
+    "name": "burnFrom",
+    "outputs": [],
     "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [],
-    "name": "symbol",
-    "outputs": [
-      {
-        "name": "",
-        "type": "string"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "constant": false,
     "inputs": [
       {
-        "name": "_to",
+        "name": "account",
         "type": "address"
       },
       {
-        "name": "_value",
+        "name": "amount",
         "type": "uint256"
       }
     ],
-    "name": "transfer",
+    "name": "mint",
     "outputs": [
       {
-        "name": "success",
+        "name": "",
         "type": "bool"
       }
     ],
@@ -165,118 +231,20 @@ const hsabi = [
     "constant": true,
     "inputs": [
       {
-        "name": "_owner",
-        "type": "address"
-      },
-      {
-        "name": "_spender",
+        "name": "account",
         "type": "address"
       }
     ],
-    "name": "allowance",
+    "name": "isMinter",
     "outputs": [
       {
-        "name": "remaining",
-        "type": "uint256"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "name": "_initialAmount",
-        "type": "uint256"
-      },
-      {
-        "name": "_tokenName",
-        "type": "string"
-      },
-      {
-        "name": "_decimalUnits",
-        "type": "uint8"
-      },
-      {
-        "name": "_tokenSymbol",
-        "type": "string"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "name": "_from",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "name": "_to",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "name": "_value",
-        "type": "uint256"
-      }
-    ],
-    "name": "Transfer",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "name": "_owner",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "name": "_spender",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "name": "_value",
-        "type": "uint256"
-      }
-    ],
-    "name": "Approval",
-    "type": "event"
-  },
-  {
-    "constant": false,
-    "inputs": [
-      {
-        "name": "_spender",
-        "type": "address"
-      },
-      {
-        "name": "_value",
-        "type": "uint256"
-      },
-      {
-        "name": "_extraData",
-        "type": "bytes"
-      }
-    ],
-    "name": "approveAndCall",
-    "outputs": [
-      {
-        "name": "success",
+        "name": "",
         "type": "bool"
       }
     ],
     "payable": false,
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   }
 ]
-  export default hsabi;
+  export default assetabi;

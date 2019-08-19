@@ -4,7 +4,7 @@ import MaterialIcon from 'material-icons-react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import "react-tabs/style/react-tabs.css";
 import web3 from '../web3';
-import sbconfig from '../SyscoinSuperblocks';
+import sbconfig from '../SyscoinSuperblocksI';
 import CONFIGURATION from '../config';
 const axios = require('axios');
 class Step1 extends Component {
