@@ -50,12 +50,12 @@ const tpabi = [
         "type": "uint32"
       },
       {
-        "name": "syscoinAddress",
-        "type": "bytes"
-      },
-      {
         "name": "erc20ContractAddress",
         "type": "address"
+      },
+      {
+        "name": "syscoinAddress",
+        "type": "bytes"
       }
     ],
     "name": "freezeBurnERC20",

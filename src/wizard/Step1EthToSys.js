@@ -207,7 +207,7 @@ class Step1ES extends Component {
   }
   freezeBurnERC20(syscoinTransactionProcessor, validateNewInput, thisObj, amount, assetGUID, syscoinWitnessProgram, userInput, fromAccount) {
     thisObj.state.receiptObj = null;
-    syscoinTransactionProcessor.methods.freezeBurnERC20(amount, assetGUID, syscoinWitnessProgram, userInput.sysxContract).send({from: fromAccount, gas: 500000})
+    syscoinTransactionProcessor.methods.freezeBurnERC20(amount, assetGUID, userInput.sysxContract, syscoinWitnessProgram).send({from: fromAccount, gas: 500000})
       .on('transactionHash', function(hash){
         validateNewInput.buttonVal = true;
         validateNewInput.receiptTxHash = hash;
@@ -323,8 +323,8 @@ class Step1ES extends Component {
     let fromAccount = userInput.sysxFromAccount;
     let allowance = await contractBase.methods.allowance(fromAccount, CONFIGURATION.ERC20Manager).call();
     let balance = await contractBase.methods.balanceOf(fromAccount).call();
-    let amount = userInput.toSysAmount*Math.pow(10, decimals);
     let decimals = await contractBase.methods.decimals().call();
+    let amount = parseInt(userInput.toSysAmount)*Math.pow(10, decimals);
     let assetGUID = userInput.toSysAssetGUID;
     
 
