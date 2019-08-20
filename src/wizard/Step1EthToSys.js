@@ -337,6 +337,7 @@ class Step1ES extends Component {
       this.setState({working: false});
       return;
     }
+    let bFirstConfirmation = true;
     // we may need to get allowance of funds
     if(allowance < amount){
       console.log("Allowance of " + amount-allowance + " needed.");
@@ -346,8 +347,11 @@ class Step1ES extends Component {
         validateNewInput.buttonValMsg = thisObj.props.t("step5AuthAllowanceMetamask");
         thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
       })
-      .on('confirmation', function(confirmationNumber, receipt){ 
-        thisObj.freezeBurnERC20(syscoinTransactionProcessor, validateNewInput, thisObj, amount, assetGUID, syscoinWitnessProgram, userInput, fromAccount);
+      .on('confirmation', function(confirmationNumber, receipt){
+        if(bFirstConfirmation){
+          bFirstConfirmation = false; 
+          thisObj.freezeBurnERC20(syscoinTransactionProcessor, validateNewInput, thisObj, amount, assetGUID, syscoinWitnessProgram, userInput, fromAccount);
+        }
       })
       .on('error', (error, receipt) => {
         thisObj.setState({working: false});
