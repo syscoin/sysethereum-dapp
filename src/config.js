@@ -4,8 +4,8 @@
       this.agentURL = "localhost";
       this.agentPort = 8000;
       this.infuraURL = "https://rinkeby.infura.io/v3/xxx";
-      this.superblockContract = "0x12974fFc30231FBF254588f6aa647A26EdA547af";
-      this.ERC20Manager = "0x890345340A36C7C4e24a5a6ea0a7AE87E223DD38";
+      this.superblockContract = "0xc0aa919ba4E86A04f17a47fb3532d8980A397496";
+      this.ERC20Manager = "0xB30f785A2e9c74Ed9bfe09e09E4ad598883D2717";
     }
   }
   export default new CONFIGURATION();
