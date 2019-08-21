@@ -50,7 +50,7 @@ i18n.use(LanguageDetector).init({
         'step1ESEnterWitnessAddress': 'Enter receiving Syscoin address...',
         'step1ESButton': 'Burn Ethereum Token',
         'step2ESHead': '<em class="step">Step 2:</em> Build a raw unsigned Syscoin Mint transaction',
-        'step2ESDescription': 'Please enter the Transaction ID from your Ethereum burn transaction below if it is not already auto-filled.<br/> Click Generate to create the raw unsigned transaction before proceeding to the next step. Note to ensure that the burn transaction on Ethereum was adequately settled, you will have to wait atleast 360 confirmations on Ethereum before you are able to create the mint transaction on Syscoin.',
+        'step2ESDescription': 'Please enter the Transaction ID from your Ethereum burn transaction below if it is not already auto-filled.<br/> Click Generate to create the raw unsigned transaction before proceeding to the next step. Note to ensure that the burn transaction on Ethereum was adequately settled, you will have to wait atleast about 1 hour before you are able to proceed with this step and create the mint transaction on Syscoin.',
         'step2ESEnterTxid': 'Enter Ethereum Transaction Hash (Txid)...',
         'step2ESTxid': 'A valid Ethereum TXID is required',
         'step2ESInvalidProof': 'Invalid Transaction Proof - Error: ',
