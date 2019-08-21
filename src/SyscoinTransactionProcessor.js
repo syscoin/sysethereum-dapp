@@ -25,15 +25,14 @@ const tpabi = [
       {
         "name": "assetGUID",
         "type": "uint32"
+      },
+      {
+        "name": "precision",
+        "type": "uint8"
       }
     ],
     "name": "processTransaction",
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [],
     "payable": false,
     "stateMutability": "nonpayable",
     "type": "function"
@@ -52,6 +51,10 @@ const tpabi = [
       {
         "name": "erc20ContractAddress",
         "type": "address"
+      },
+      {
+        "name": "precision",
+        "type": "uint8"
       },
       {
         "name": "syscoinAddress",

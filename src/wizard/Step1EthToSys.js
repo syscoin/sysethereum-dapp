@@ -205,9 +205,9 @@ class Step1ES extends Component {
     }
     return "";
   }
-  freezeBurnERC20(syscoinTransactionProcessor, validateNewInput, thisObj, amount, assetGUID, syscoinWitnessProgram, userInput, fromAccount) {
+  freezeBurnERC20(syscoinTransactionProcessor, validateNewInput, thisObj, amount, assetGUID, decimals, syscoinWitnessProgram, userInput, fromAccount) {
     thisObj.state.receiptObj = null;
-    syscoinTransactionProcessor.methods.freezeBurnERC20(amount, assetGUID, userInput.sysxContract, syscoinWitnessProgram).send({from: fromAccount, gas: 500000})
+    syscoinTransactionProcessor.methods.freezeBurnERC20(amount, assetGUID, userInput.sysxContract, decimals, syscoinWitnessProgram).send({from: fromAccount, gas: 500000})
       .on('transactionHash', function(hash){
         validateNewInput.buttonVal = true;
         validateNewInput.receiptTxHash = hash;
@@ -323,8 +323,9 @@ class Step1ES extends Component {
     let fromAccount = userInput.sysxFromAccount;
     let allowance = await contractBase.methods.allowance(fromAccount, CONFIGURATION.ERC20Manager).call();
     let balance = await contractBase.methods.balanceOf(fromAccount).call();
+    balance = web3.utils.toBN(balance.toString());
     let decimals = await contractBase.methods.decimals().call();
-    let amount = parseInt(userInput.toSysAmount)*Math.pow(10, decimals);
+    let amount = web3.utils.toBN(web3.utils.toWei(userInput.toSysAmount));
     let assetGUID = userInput.toSysAssetGUID;
     
 
@@ -341,7 +342,7 @@ class Step1ES extends Component {
     // we may need to get allowance of funds
     if(allowance < amount){
       console.log("Allowance of " + amount-allowance + " needed.");
-      contractBase.methods.approve(CONFIGURATION.ERC20Manager, amount).send({from: fromAccount, gas: 500000})
+      contractBase.methods.approve(CONFIGURATION.ERC20Manager, amount.toString()).send({from: fromAccount, gas: 500000})
       .on('transactionHash', function(hash){
         validateNewInput.buttonVal = true;
         validateNewInput.buttonValMsg = thisObj.props.t("step5AuthAllowanceMetamask");
@@ -350,7 +351,7 @@ class Step1ES extends Component {
       .on('confirmation', function(confirmationNumber, receipt){
         if(bFirstConfirmation){
           bFirstConfirmation = false; 
-          thisObj.freezeBurnERC20(syscoinTransactionProcessor, validateNewInput, thisObj, amount, assetGUID, syscoinWitnessProgram, userInput, fromAccount);
+          thisObj.freezeBurnERC20(syscoinTransactionProcessor, validateNewInput, thisObj, amount.toString(), assetGUID, decimals, syscoinWitnessProgram, userInput, fromAccount);
         }
       })
       .on('error', (error, receipt) => {
@@ -371,7 +372,7 @@ class Step1ES extends Component {
       })
     }
     else{
-      thisObj.freezeBurnERC20(syscoinTransactionProcessor, validateNewInput, thisObj, amount, assetGUID, syscoinWitnessProgram, userInput, fromAccount);
+      thisObj.freezeBurnERC20(syscoinTransactionProcessor, validateNewInput, thisObj, amount.toString(), assetGUID, decimals, syscoinWitnessProgram, userInput, fromAccount);
     }
   }
 
