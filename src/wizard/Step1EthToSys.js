@@ -322,6 +322,7 @@ class Step1ES extends Component {
     let contractBase = await web3.eth.Contract(assetabi, userInput.sysxContract);
     let fromAccount = userInput.sysxFromAccount;
     let allowance = await contractBase.methods.allowance(fromAccount, CONFIGURATION.ERC20Manager).call();
+    allowance = web3.utils.toBN(allowance.toString());
     let balance = await contractBase.methods.balanceOf(fromAccount).call();
     balance = web3.utils.toBN(balance.toString());
     let decimals = await contractBase.methods.decimals().call();
@@ -330,7 +331,7 @@ class Step1ES extends Component {
     
 
     let thisObj = this;
-    if(amount > balance){
+    if(amount.gt(balance)){
       // insufficient balance
       validateNewInput.buttonVal = false;
       validateNewInput.buttonValMsg = this.props.t("step5InsufficientTokenBalance");
@@ -340,7 +341,7 @@ class Step1ES extends Component {
     }
     let bFirstConfirmation = true;
     // we may need to get allowance of funds
-    if(allowance < amount){
+    if(allowance.gt(amount)){
       console.log("Allowance needed.");
       contractBase.methods.approve(CONFIGURATION.ERC20Manager, amount.toString()).send({from: fromAccount, gas: 500000})
       .on('transactionHash', function(hash){
