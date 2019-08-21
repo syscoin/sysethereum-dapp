@@ -341,7 +341,7 @@ class Step1ES extends Component {
     }
     let bFirstConfirmation = true;
     // we may need to get allowance of funds
-    if(allowance.gt(amount)){
+    if(allowance.lt(amount)){
       console.log("Allowance needed.");
       contractBase.methods.approve(CONFIGURATION.ERC20Manager, amount.toString()).send({from: fromAccount, gas: 500000})
       .on('transactionHash', function(hash){
