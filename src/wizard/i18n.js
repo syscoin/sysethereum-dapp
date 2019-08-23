@@ -43,7 +43,7 @@ i18n.use(LanguageDetector).init({
         'step1SuperblockParentId': 'Previous Superblock ID',
         'step1SearchBox': 'Enter a hash or height to locate a Superblock...',
         'step1ESHead': 'Welcome to the official Ethereum to Syscoin Bridge wizard!',
-        'step1ESDescription': '<p><em>This is a wizard for a bridge for users of Ethereum who has previously walked over from Syscoin to move back trustlessly.</em></p> <p>An SPV proof of the Ethereum burn transaction is required to move back to Syscoin.</p><p> <strong>Please enter details about which asset to move back to Syscoin:</strong></p> Enter <code>505115838</code> for <code class="blue">Asset GUID</code> if moving Syscoin (SYSX) over otherwise enter the GUID of the Asset token you are moving back to Syscoin.',
+        'step1ESDescription': '<p><em>This is a wizard for a bridge for users of Ethereum who has previously walked over from Syscoin to move back trustlessly.</em></p> <p>An SPV proof of the Ethereum burn transaction is required to move back to Syscoin.</p><p> <strong>Please enter details about which asset to move back to Syscoin:</strong></p> Enter <code>1032484279</code> for <code class="blue">Asset GUID</code> if moving Syscoin (SYSX) over otherwise enter the GUID of the Asset token you are moving back to Syscoin.',
         'step1ESFromAccountLabel': 'Ethereum account',
         'step1ESEnterFromAccount': 'Enter your ethereum token address...',
         'step1ESWitnessAddressLabel': 'Syscoin Address',
@@ -55,7 +55,7 @@ i18n.use(LanguageDetector).init({
         'step2ESTxid': 'A valid Ethereum TXID is required',
         'step2ESInvalidProof': 'Invalid Transaction Proof - Error: ',
         'step2Head': '<em class="step">Step 2:</em> Build a raw unsigned Syscoin Burn transaction',
-        'step2Description': 'You may skip this step if you already have an unsigned burn transaction by putting it into the Raw Transaction input box below. Please fill out asset (if applicable), amount, address and then click Generate to create the raw unsigned transaction before proceeding to the next step. Enter <code>505115838</code> for <code class="blue">Asset GUID</code> if moving Syscoin (SYSX) over otherwise enter the GUID you are moving to Ethereum. If you already have a Transaction ID then you may skip ahead to Step 3.',
+        'step2Description': 'You may skip this step if you already have an unsigned burn transaction by putting it into the Raw Transaction input box below. Please fill out asset (if applicable), amount, address and then click Generate to create the raw unsigned transaction before proceeding to the next step. Enter <code>1032484279</code> for <code class="blue">Asset GUID</code> if moving Syscoin (SYSX) over otherwise enter the GUID you are moving to Ethereum. If you already have a Transaction ID then you may skip ahead to Step 3.',
         'step2Asset': 'A valid Syscoin Asset GUID is required',
         'step2AssetLabel': 'Asset GUID',
         'step2RawTx': 'A valid Syscoin raw transaction is required',
@@ -156,7 +156,7 @@ i18n.use(LanguageDetector).init({
         'step1SearchBox': 'Introduce un hash o numero de bloque para localizar un Super Bloque...',
         'step1ESHead': 'Bienvenido al asistente la pasarela oficial desde Ethereum hacia Syscoin!',
         
-        'step1ESDescription': 'Esto es un asistente para los usuarios de la pasarela de Ethereum que previamente la hayan usado desde Syscoin y quieran volver atrás sin preocupación. Una prueba SPV de la ejecución (quemado) de la transacción de Ethereum es necesaria para volver a Syscoin. Para usar el activo SYSX the Ethereum introduzca introduzca "719610612" para GUID, si por el contrario esta moviendo a Syscoin otro activo introduzca su GUID del activo que quiera mover.',
+        'step1ESDescription': 'Esto es un asistente para los usuarios de la pasarela de Ethereum que previamente la hayan usado desde Syscoin y quieran volver atrás sin preocupación. Una prueba SPV de la ejecución (quemado) de la transacción de Ethereum es necesaria para volver a Syscoin. Para usar el activo SYSX the Ethereum introduzca introduzca "1032484279" para GUID, si por el contrario esta moviendo a Syscoin otro activo introduzca su GUID del activo que quiera mover.',
 
         'step1ESFromAccountLabel': 'La cuenta Ethereum',
         'step1ESEnterFromAccount': 'Introduzca la direccion de su activo de Ethereum..',
