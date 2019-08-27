@@ -31,6 +31,7 @@ i18n.use(LanguageDetector).init({
         'stepSuperblock': 'Could not connect to Superblock contract, try again in a few minutes or contact the administrator if issue persists',
         'step1Head': 'Welcome to the official Syscoin to Ethereum Bridge wizard!',
         'step1Description': '<em>This is a wizard for a bridge for users of Syscoin to walk trustlessly over to Ethereum without any counterparties.</em><br/><br/> A notion of Superblocks is used to aggregate blocks every hour and post the merkle root hash of the aggregate block to an Ethereum contract. An SPV proof of the superblock as well as the Syscoin transaction when walking over the bridge helps to unlock tokens on an ERC20 token that is connected to Syscoin and participating Syscoin Assets. <br/><br/>Please click on the Next button below to proceed. <br/><br/> The smart contracts can be found here:',
+        'step1Faucet': 'You need Syscoin in funding addresses when using the Syscoin blockchain to pay for fees. Use the faucet to get some small amount of Syscoin using Proof-Of-Work here:',
         'step1CurrentSuperblock': 'Superblock Information',
         'step1SuperblockId': 'Superblock ID',
         'step1SuperblockHeight': 'Superblock Height',

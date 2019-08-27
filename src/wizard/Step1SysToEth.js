@@ -191,6 +191,7 @@ class Step1 extends Component {
               <label className="col-md-12">
                 <h1>{this.props.t("step1Head")}</h1>
                 <h3><div dangerouslySetInnerHTML={{__html: this.props.t("step1Description")}}></div> <a href="https://github.com/syscoin/sysethereum-contracts" className="vivid" target="_blank" rel="noopener noreferrer">{this.props.t("repoUrl")}</a></h3>
+                <h3><div dangerouslySetInnerHTML={{__html: this.props.t("step1Faucet")}}></div> <a href="http://faucet.syscoin.org" className="vivid" target="_blank" rel="noopener noreferrer">http://faucet.syscoin.org</a></h3>
               </label>
   
 

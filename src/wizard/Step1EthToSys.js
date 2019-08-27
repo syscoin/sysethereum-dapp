@@ -432,6 +432,7 @@ class Step1ES extends Component {
               <label className="col-md-12">
                 <h1>{this.props.t("step1ESHead")}</h1>
                 <h3 dangerouslySetInnerHTML={{__html: this.props.t("step1ESDescription")}}></h3>
+                <h3><div dangerouslySetInnerHTML={{__html: this.props.t("step1Faucet")}}></div> <a href="http://faucet.syscoin.org" className="vivid" target="_blank" rel="noopener noreferrer">http://faucet.syscoin.org</a></h3>
               </label>
               <div className="row">
               <div className="col-md-12">
