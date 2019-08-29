@@ -327,6 +327,7 @@ class Step1ES extends Component {
     balance = web3.utils.toBN(balance.toString());
     let decimals = await contractBase.methods.decimals().call();
     let amount = web3.utils.toBN(userInput.toSysAmount);
+    amount = amount.mul(web3.utils.toBN(10).pow(web3.utils.toBN(decimals)));
     let assetGUID = userInput.toSysAssetGUID;
     
 
