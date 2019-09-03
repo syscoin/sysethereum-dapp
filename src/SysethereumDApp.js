@@ -355,7 +355,7 @@ class SysethereumDApp extends Component {
               <button type="submit" className="btn btn-default" disabled={this.state.emailSent}>Send</button>
 
               <div className={(this.state.emailSent  ? "visible" : "hidden")}>
-                <p className="bg-success">Email sent!</p>
+                <p className="bg-success">Thank you for reaching out to us, we will get back to you as soon as possible.</p>
               </div>
   
             </form>
