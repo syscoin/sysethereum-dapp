@@ -14,6 +14,12 @@ class Step1 extends Component {
     this.handlePrevClick = this.handlePrevClick.bind(this);
     this.handleNextClick = this.handleNextClick.bind(this);
     this.sbContract = sbconfig.contract;
+    this.faucetURL = "https://faucet";
+    if(CONFIGURATION.testnet){
+      this.faucetURL += "-testnet";
+    }
+    this.faucetURL += ".syscoin.org";
+    
     this.sbURL = "https://";
     if(CONFIGURATION.testnet){
       this.sbURL += "rinkeby.";
@@ -191,7 +197,7 @@ class Step1 extends Component {
               <label className="col-md-12">
                 <h1>{this.props.t("step1Head")}</h1>
                 <h3><div dangerouslySetInnerHTML={{__html: this.props.t("step1Description")}}></div> <a href="https://github.com/syscoin/sysethereum-contracts" className="vivid" target="_blank" rel="noopener noreferrer">{this.props.t("repoUrl")}</a></h3>
-                <h3><div dangerouslySetInnerHTML={{__html: this.props.t("step1Faucet")}}></div> <a href="https://faucet.syscoin.org" className="vivid" target="_blank" rel="noopener noreferrer">https://faucet.syscoin.org</a></h3>
+                <h3><div dangerouslySetInnerHTML={{__html: this.props.t("step1Faucet")}}></div> <a href={this.faucetURL} className="vivid" target="_blank" rel="noopener noreferrer">{this.faucetURL}</a></h3>
               </label>
   
 
