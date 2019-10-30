@@ -369,6 +369,16 @@ code
         }
     }
 
+    .faq a
+    {
+        color:#65b8ff;
+
+        &:hover 
+        {
+            color:white;
+        }
+    }
+
     .anchor
     {
         padding-top:100px;
