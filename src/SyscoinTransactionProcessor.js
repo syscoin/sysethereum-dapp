@@ -15,21 +15,24 @@ const tpabi = [
         "type": "address"
       },
       {
-        "name": "_assetGUID",
+        "name": "superblockSubmitterAddress",
+        "type": "address"
+      },
+      {
+        "name": "erc20ContractAddress",
+        "type": "address"
+      },
+      {
+        "name": "assetGUID",
         "type": "uint32"
       },
       {
-        "name": "superblockSubmitterAddress",
-        "type": "address"
+        "name": "precision",
+        "type": "uint8"
       }
     ],
     "name": "processTransaction",
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [],
     "payable": false,
     "stateMutability": "nonpayable",
     "type": "function"
@@ -38,27 +41,35 @@ const tpabi = [
     "constant": false,
     "inputs": [
       {
-        "name": "_value",
+        "name": "value",
         "type": "uint256"
       },
       {
-        "name": "_assetGUID",
+        "name": "assetGUID",
         "type": "uint32"
       },
       {
-        "name": "syscoinWitnessProgram",
+        "name": "erc20ContractAddress",
+        "type": "address"
+      },
+      {
+        "name": "precision",
+        "type": "uint8"
+      },
+      {
+        "name": "syscoinAddress",
         "type": "bytes"
       }
     ],
-    "name": "burn",
+    "name": "freezeBurnERC20",
     "outputs": [
       {
-        "name": "success",
+        "name": "",
         "type": "bool"
       }
     ],
-    "payable": true,
-    "stateMutability": "payable",
+    "payable": false,
+    "stateMutability": "nonpayable",
     "type": "function"
   }
 ]
