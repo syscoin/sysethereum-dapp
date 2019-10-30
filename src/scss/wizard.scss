@@ -1,5 +1,9 @@
 @import "_mixins.scss";
 
+.wizardTitleCont
+{
+  margin-top:70px;
+}
 .EthToSysWizard,
 .SysToEthWizard
 {
@@ -197,6 +201,7 @@
     {
         margin-bottom:30px;
     }
+
 }
 
 
@@ -383,4 +388,11 @@ ol.progtrckr {
     padding: 3px 5px 3px 10px;
     font-size: 14px;
     color: #fff;
+  }
+
+  @media (max-width: 835px) {
+    .wizardTitleCont
+    {
+      margin-top:105px;
+    }
   }

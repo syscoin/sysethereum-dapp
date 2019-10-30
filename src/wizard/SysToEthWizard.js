@@ -12,6 +12,8 @@ import { withNamespaces } from 'react-i18next';
 import './css/wizard.css';
 import './css/i18n.css';
 
+import { Beforeunload } from 'react-beforeunload';
+
 class SysToEthWizard extends Component {
   constructor(props) {
     super(props);
@@ -54,6 +56,7 @@ class SysToEthWizard extends Component {
 
     return (
       <div className='SysToEthWizard'>
+        <Beforeunload onBeforeunload={() => "Do you want to leave this page? You'll lose your data!"} />
         <div className='step-progress'>
 
           <div className='languageButtons'>
