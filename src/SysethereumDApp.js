@@ -400,7 +400,7 @@ class SysethereumDApp extends Component {
           Why have an SPT on Syscoin if I can have an ERC20 token?
           </p>
           <p>
-          SPTs are ZDAG enabled. They benefit from high-speed and high-throughput token transfers with low fees. ZDAG’s probabilistic security also enables you to determine the security/speed trade-off most ideal for your particular use case  All of this is especially attractive for point of sale applications.
+          SPTs are ZDAG enabled. They benefit from high-speed and high-throughput token transfers with low fees. ZDAG’s probabilistic security also enables you to determine the security/speed trade-off most ideal for your particular use case. All of this is especially attractive for point of sale applications.
           </p>
 
           <p className="question">
