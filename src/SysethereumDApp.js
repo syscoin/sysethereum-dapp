@@ -310,20 +310,20 @@ class SysethereumDApp extends Component {
             What is SYSX?
             </p>
             <p>
-            SYSX is both an SPT and Ethereum ERC20 token, backed by SYS at 1:1 ratio. You can burn your SYS and mint SYSX on the Syscoin chain, allowing you to utilize high throughput ZDAG transactions. You can then burn your SYSX and mint a SYSX (ERC20) token, allowing you to utilize all the functionalities of the Ethereum Chain, such as Smart Contracts. This mint/burn process can also be done in reverse order; it works in both directions.
+            SYSX is both an SPT and Ethereum ERC20 token, backed by SYS at 1:1 ratio. You can burn your SYS and mint SYSX on the Syscoin chain, allowing you to utilize high throughput ZDAG transactions. You can then burn your SYSX (SPT) and mint a SYSX (ERC20) token, allowing you to utilize all the functionalities of the Ethereum Chain, such as Smart Contracts. This mint/burn process can also be done in reverse order; it works in both directions. 
           </p>
 
           <p className="question">
           How does the SYSX bridge work?
             </p>
           <p>
-          The basic structure of how SYS bridge works is SYS &lt;-&gt; SYSX &lt;-&gt; SYSETH (ERC20).
+          The basic structure of how SYS bridge works is SYS &lt;-&gt; SYSX (SPT) &lt;-&gt; SYSX (ERC20).
           </p>
           <p>
-          You will need to burn your Syscoin for the SYSX SPT. You can then move your SYSX SPT across the bridge, which will then be minted as a SYSX (ERC20).
+          You will need to burn your SYS for SYSX (SPT). You can then move your SYSX (SPT) across the bridge, which will then be minted as a SYSX (ERC20).
           </p>
           <p>
-          The total supply of SYS + SYSX + SYSX (ERC20) = Total Circulating Supply.
+          The total supply of SYS + SYSX (SPT) + SYSX (ERC20) = Total Circulating Supply.
           </p>
 
           <p className="question">
@@ -334,31 +334,31 @@ class SysethereumDApp extends Component {
           </p>
 
           <p className="question">
-          Will SPTs be transferable to ETH?
+          Will SPTs be transferable to Ethereum?
             </p>
           <p>
-          SPTs can be transferred to Ethereum as ERC20 tokens and back to Syscoin SPTs as needed.
+          Any Syscoin SPT can be transferred to Ethereum as an ERC20, and back, as needed, given the necessary Bridge smart contracts are in place on both the Syscoin and Ethereum blockchains pertaining to that particular SPT/ERC20.  These contracts are already in place for SYSX, and they can serve as a template for bridging other SPTs. You can reference them here: <a target="_blank" rel="noopener noreferrer" href="https://github.com/syscoin/sysethereum-contracts">https://github.com/syscoin/sysethereum-contracts</a>
           </p>
 
           <p className="question">
           Will this mean I can use Ledger, Myetherwallet, Metamask etc?
           </p>
           <p>
-          Your SPT will be compatible with all the major service providers of Ethereum once moved across the bridge to become an ERC20 token.
+          Your SPT will become compatible with all the major service providers of Ethereum once moved across the bridge to become an ERC20 token.
           </p>
 
           <p className="question">
           Syscoin supply will remain the same?
           </p>
           <p>
-          Yes. The total supply of SYS + SYSX + SYSETH (ERC20) = Total Circulating Supply. This supply is maintained via mint/burn as tokens move across the bridge in either direction.
+          Yes. SYS + SYSX (SPT) + SYSX (ERC20) = Total Circulating Supply.  This supply is maintained via mint/burn as tokens move across the bridge in either direction.
           </p>
 
           <p className="question">
-          What counterparty or custodian related risks and/or limitations do I incur when using Sysethereum Bridge?
+          What counterparty or custodian related risks and/or limitations do I incur when using Syscoin Bridge?
           </p>
           <p>
-          None. You maintain full possession and control of your funds at all times. Furthermore, market demand (such as with atomic swap) is not required to take advantage of Sysethereum Bridge. These benefits are made possible by first-class integration with Ethereum, utilizing dual smart contracts and SPV on both sides.
+          None. You maintain full possession and control of your funds at all times. Furthermore, market demand (such as with atomic swap) is not required to take advantage of Syscoin Bridge. These benefits are made possible by first-class integration with Ethereum, utilizing dual smart contracts and SPV proofs on both sides.
           </p>
 
           <p className="question">
@@ -372,7 +372,7 @@ class SysethereumDApp extends Component {
           Can I have SYSX in my QT/Spark wallet?
           </p>
           <p>
-          SYSX is an SPT and an ERC20 token so it will depend on what chain you are on. If you are on the ETH chain, you will need to use the Ethereum supported wallets. If you are on the Syscoin chain you will need to use Spark. QT can also be used, although you will need to have competence with command line interface.
+          SYSX is an SPT and an ERC20 token, thus it will depend on which chain your tokens are on. If they are on Ethereum, you will need to use the Ethereum supported wallets. If they are on Syscoin, you can use Spark. Syscoin QT can also be used if you are competent with command line interface.
           </p>
 
           <p className="question">
@@ -383,45 +383,45 @@ class SysethereumDApp extends Component {
           </p>
 
           <p className="question">
-          Do I need Sys to execute ZDAG transactions, and if so how much?
+          Do I need SYS to execute SPT transactions, and if so how much?
           </p>
           <p>
-          SYS is required to execute any transaction within the Syscoin network, including SPT transfers. Exact transaction costs depend on network conditions. Syscoin transaction fees are relatively inexpensive, especially in the case of SPTs. Typically, thousands of SPT transfers can be funded with a single SYS, due to the unique fee market of the ZDAG network within which users usually do not require having PoW confirmation within an immediate block.
+          SYS is required to execute any transaction within the Syscoin network, including SPT transfers.  Exact transaction costs depend on network conditions. Syscoin transaction fees are relatively inexpensive, especially in the case of SPTs which utilize Syscoin’s ZDAG protocol. Typically, thousands of SPT transfers can be funded with a single SYS, due to the unique fee market of the ZDAG network within which users usually do not require having PoW confirmation within an immediate block.
           </p>
 
           <p className="question">
           Are there any specific use cases for smart contracts with Syscoin?
           </p>
           <p>
-          As discussed in the blogpost on the evolution of Syscoin, there are multiple ways Syscoin can leverage smart contracts. Being a two-way bridge, smart contracts on Ethereum will be able to leverage advantages unique to Syscoin such as ZDAG speed, throughput and low fees. Users on Syscoin also benefit from the security of merged-mining with the Bitcoin network, and Syscoin’s compliance with Bitcoin Core. A network resilient against 51% attacks, and a proven core, are of utmost importance when choosing a base layer blockchain to store your assets.
+          As discussed in the blogpost on the evolution of Syscoin, there are multiple ways Syscoin can leverage smart contracts. Being a two-way bridge, smart contracts on Ethereum will be able to leverage advantages unique to Syscoin such as ZDAG speed, throughput, security, and low fees. Users on Syscoin also benefit from the security of merged-mining with the Bitcoin network, and Syscoin’s compliance with Bitcoin Core. A network resilient against 51% attacks, and a proven core, are of utmost importance when choosing a base layer blockchain to store your assets.
           </p>
 
           <p className="question">
-          Will ZDAG be as fast on SYSETH, or will it be bounded to ETH speed?
+          Will SYSX be as fast on Ethereum, or will it be bound to Ethereum’s speed?
           </p>
           <p>
-          Since SYSX ERC20 tokens reside within the EVM, transfers of SYSX ERC20 internal to Ethereum do not utilize ZDAG. On the other hand, SYSX and other SPTs on the Syscoin chain do utilize ZDAG. 
+          Since SYSX ERC20 tokens reside within the EVM, transactions will bear the performance characteristics of the Ethereum network. On the other hand, SYSX (SPT), and other SPTs on the Syscoin chain, do utilize and benefit from ZDAG speed, throughput, security and low fees. 
           </p>
 
           <p className="question">
           Why have an SPT on Syscoin if I can have an ERC20 token?
           </p>
           <p>
-          SPTs are ZDAG enabled. They benefit from high-speed and high-throughput token transfers with low fees. ZDAG’s probabilistic security also enables you to determine the security/speed trade-off most ideal for your particular use case. All of this is especially attractive for point of sale applications.
+          Because this delivers multiple advantages. SPTs are ZDAG enabled, which means they benefit from high-speed and high-throughput token transfers with low fees. ZDAG’s probabilistic security (offering global consensus in ten seconds or less) enables you to determine the security/speed trade-off most ideal for your particular use case. Further, each SPT transaction settles onchain with Bitcoin compliant proof of work. All of this is especially attractive for point of sale applications. You can learn more about Syscoin ZDAG here: <a href="https://syscoin.org/z-dag" target="_blank" rel="noopener noreferrer">https://syscoin.org/z-dag</a>
           </p>
 
           <p className="question">
           Can other ERC20 tokens be migrated to the Syscoin chain for fast transfers and Point-of-Sale applications?
           </p>
           <p>
-          Yes ERC20 tokens will be able to leverage ZDAG’s advantages by burning and minting via the bridge, resulting in an SPT.
+          Yes ERC20 tokens will be able to leverage ZDAG’s advantages by burning and minting via the bridge, resulting in an SPT.  This is currently active for SYSX.  A reference implementation of the smart contracts necessary to enable your particular ERC20 with Syscoin Bridge is available here: <a href="https://github.com/syscoin/sysethereum-contracts" target="_blank" rel="noopener noreferrer">https://github.com/syscoin/sysethereum-contracts</a>
           </p>
 
           <p className="question">
           How is this initiative different from others?
           </p>
           <p>
-          Sysethereum is the first two-way interoperability solution without counterparties, a permissionless and trustless solution that leverages the security of each respective blockchain. This allows us to consider the SPT supply mechanism as a fractional supply across multiple blockchains. Users on Syscoin by extension will be able to leverage the vast toolset and network effect of Ethereum whilst Ethereum users can leverage Syscoin’s cost effective and efficient asset specific transactionality. You can read more about the technicals here: <a href="https://github.com/syscoin/sysethereum-docs" target="_blank" rel="noopener noreferrer">https://github.com/syscoin/sysethereum-docs</a>
+          Syscoin Bridge is the first two-way interoperability solution without counterparties, a permissionless and trustless solution that leverages the security of each respective blockchain. This allows us to consider the SPT supply mechanism as a fractional supply across multiple blockchains. Users on Syscoin by extension will be able to leverage the vast toolset and network effect of Ethereum whilst Ethereum users can leverage Syscoin’s cost effective and efficient asset specific transactionality. You can read more about the technicals here: <a href="https://github.com/syscoin/sysethereum-docs" target="_blank" rel="noopener noreferrer">https://github.com/syscoin/sysethereum-docs</a>
           </p>
 
 
