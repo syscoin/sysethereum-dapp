@@ -1,5 +1,6 @@
 
 import React, { Component } from 'react';
+import CONFIGURATION from './config';
 class Step4ES extends Component {
   constructor(props) {
     super(props);
@@ -14,10 +15,12 @@ class Step4ES extends Component {
       this.props.jumpToStep(3);
       return;
     }
-    let baseURL = "";
-    
-    //baseURL = "http://explorer.blockchainfoundry.co/tx/" + this.props.getStore().minttxid;
-    baseURL = "http://52.203.169.241:9000/tx/" + this.props.getStore().minttxid;
+
+    let baseURL = "https://explorer";
+    if(CONFIGURATION.testnet){
+      baseURL += "-testnet"
+    }
+    baseURL += "blockchainfoundry.co/tx/" + this.props.getStore().minttxid;
     this.setState({explorerLink: baseURL});
   }
 

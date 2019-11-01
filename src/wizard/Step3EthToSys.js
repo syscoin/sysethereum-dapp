@@ -67,7 +67,7 @@ class Step3ES extends Component {
       this.setState({working: true});
       let minttxid = userInput.minttxid.toString();
       try {
-        let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=getblockhashbytxid&txid=' + minttxid);
+        let results = await axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=getblockhashbytxid&txid=' + minttxid);
         results = results.data;
         if(results.error){
           validateNewInput.buttonVal = false;

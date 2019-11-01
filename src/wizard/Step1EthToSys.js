@@ -171,7 +171,7 @@ class Step1ES extends Component {
   async getWitnessProgram(address, validateNewInput){
     if(address.length > 0){
       try {
-        let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=getaddressinfo&address=' + address);
+        let results = await axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=getaddressinfo&address=' + address);
         results = results.data;
         if(results.error){
           validateNewInput.buttonVal = false;
@@ -193,7 +193,7 @@ class Step1ES extends Component {
   async getAssetContract(guid, validateNewInput){
     if(guid.length > 0){
       try {
-        let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=assetinfo&asset_guid=' + guid);
+        let results = await axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=assetinfo&asset_guid=' + guid);
         results = results.data;
         if(results.error){
           validateNewInput.buttonVal = false;
