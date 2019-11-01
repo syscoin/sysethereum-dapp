@@ -3,8 +3,8 @@ import React, { Component } from 'react';
 import Web3 from 'web3';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import "react-tabs/style/react-tabs.css";
-import assetabi from '../SyscoinERC20AssetI';
-import tpabi from '../SyscoinTransactionProcessor';  
+import assetabi from '../SyscoinERC20I';
+import erc20managerabi from '../ERC20ManagerI';  
 import CONFIGURATION from '../config';
 const axios = require('axios');
 const web3 = new Web3(Web3.givenProvider);
@@ -211,9 +211,9 @@ class Step1ES extends Component {
     }
     return "";
   }
-  freezeBurnERC20(syscoinTransactionProcessor, validateNewInput, thisObj, amount, assetGUID, decimals, syscoinWitnessProgram, userInput, fromAccount) {
+  freezeBurnERC20(ERC20Man, validateNewInput, thisObj, amount, assetGUID, decimals, syscoinWitnessProgram, userInput, fromAccount) {
     thisObj.state.receiptObj = null;
-    syscoinTransactionProcessor.methods.freezeBurnERC20(amount, assetGUID, userInput.sysxContract, decimals, syscoinWitnessProgram).send({from: fromAccount, gas: 500000})
+    ERC20Man.methods.freezeBurnERC20(amount, assetGUID, userInput.sysxContract, decimals, syscoinWitnessProgram).send({from: fromAccount, gas: 500000})
       .on('transactionHash', function(hash){
         validateNewInput.buttonVal = true;
         validateNewInput.receiptTxHash = hash;
@@ -324,7 +324,7 @@ class Step1ES extends Component {
     validateNewInput.buttonVal = true;
     validateNewInput.buttonValMsg = this.props.t("step5AuthMetamask");
     this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-    let syscoinTransactionProcessor = await web3.eth.Contract(tpabi,  CONFIGURATION.ERC20Manager);
+    let erc20Manager = await web3.eth.Contract(erc20managerabi,  CONFIGURATION.ERC20Manager);
     let contractBase = await web3.eth.Contract(assetabi, userInput.sysxContract);
     let fromAccount = userInput.sysxFromAccount;
     let allowance = await contractBase.methods.allowance(fromAccount, CONFIGURATION.ERC20Manager).call();
@@ -359,7 +359,7 @@ class Step1ES extends Component {
       .on('confirmation', function(confirmationNumber, receipt){
         if(bFirstConfirmation){
           bFirstConfirmation = false; 
-          thisObj.freezeBurnERC20(syscoinTransactionProcessor, validateNewInput, thisObj, amount.toString(), assetGUID, decimals, syscoinWitnessProgram, userInput, fromAccount);
+          thisObj.freezeBurnERC20(erc20Manager, validateNewInput, thisObj, amount.toString(), assetGUID, decimals, syscoinWitnessProgram, userInput, fromAccount);
         }
       })
       .on('error', (error, receipt) => {
@@ -380,7 +380,7 @@ class Step1ES extends Component {
       })
     }
     else{
-      thisObj.freezeBurnERC20(syscoinTransactionProcessor, validateNewInput, thisObj, amount.toString(), assetGUID, decimals, syscoinWitnessProgram, userInput, fromAccount);
+      thisObj.freezeBurnERC20(erc20Manager, validateNewInput, thisObj, amount.toString(), assetGUID, decimals, syscoinWitnessProgram, userInput, fromAccount);
     }
   }
 

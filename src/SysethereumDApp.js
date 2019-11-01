@@ -7,7 +7,8 @@ import { I18nextProvider } from "react-i18next";
 import i18n from "./wizard/i18n";
 import Textarea from 'react-textarea-autosize';
 import axios from 'axios';
-
+import sbconfig from './SyscoinSuperblocksI';
+import CONFIGURATION from './config';
 class SysethereumDApp extends Component {
   constructor(props) {
     super(props);
@@ -26,7 +27,13 @@ class SysethereumDApp extends Component {
     this.onHome = this.onHome.bind(this);
     this.handleEmailChange = this.handleEmailChange.bind(this);
     this.handleEmailSubmit = this.handleEmailSubmit.bind(this);
-
+    this.superblockURL = "";
+    if(CONFIGURATION.testnet){
+      this.superblockURL += "https://rinkeby.etherscan.io/address/"+sbconfig.contract+"#code";
+    }
+    else{
+      this.superblockURL += "https://etherscan.io/address/"+sbconfig.contract+"#code";
+    }
   }
 
 
@@ -246,7 +253,7 @@ class SysethereumDApp extends Component {
             </p>
 
             <p>
-              <a href="https://rinkeby.etherscan.io/address/0x7d5602305f4d2c7dc9c85b40a47d88b63086eb2b#code" target="_blank" rel="noopener noreferrer">Check out the Superblock contract on Rinkeby testnet</a>
+              <a href={this.superblockURL} target="_blank" rel="noopener noreferrer">Check out the Superblock contract on Rinkeby testnet</a>
             </p>
 
             <div className="ornament intext"></div>
