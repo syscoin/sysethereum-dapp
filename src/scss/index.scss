@@ -597,9 +597,15 @@ code
         {
             width:50%;
 
+            h1 
+            {
+                margin: 2vh 0 0 30px;
+            }
+
             .bottom .equals
             {
                 font-size: 1.6em;
+                margin: 0 0 0vh 30px;
             }
            
         }
@@ -607,7 +613,7 @@ code
     } 
 }
 
-@media (max-width: 1170px) {
+@media (max-width: 1170px), (max-height:650px) and (orientation: landscape) {
     
     .intro 
     {
@@ -1103,14 +1109,21 @@ code
     }
 }
 
-@media (max-width: 900px) and (orientation: landscape) {
+@media (max-width: 950px) and (orientation: landscape){
     .intro .left
     {
-        min-height:200vh;
+        min-height:230vh;
     }
 
     .intro .right .links
     {
-        top:-200vh;
+        top:-230vh;
+    }
+}
+
+@media (max-height:650px) and (orientation: landscape)
+{
+    .intro .left .bottom .equals {
+        margin: 0 0 0vh 0px;
     }
 }
