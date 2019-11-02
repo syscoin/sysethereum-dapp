@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-import CONFIGURATION from './config';
+import CONFIGURATION from '../config';
 class Step4ES extends Component {
   constructor(props) {
     super(props);
