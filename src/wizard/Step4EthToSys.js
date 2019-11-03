@@ -20,7 +20,7 @@ class Step4ES extends Component {
     if(CONFIGURATION.testnet){
       baseURL += "-testnet"
     }
-    baseURL += "blockchainfoundry.co/tx/" + this.props.getStore().minttxid;
+    baseURL += ".blockchainfoundry.co/tx/" + this.props.getStore().minttxid;
     this.setState({explorerLink: baseURL});
   }
 
