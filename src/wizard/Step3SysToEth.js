@@ -34,7 +34,7 @@ class Step3 extends Component {
   saveToLocalStorage() {
     if (typeof(Storage) !== "undefined") {
       // Code for localStorage/sessionStorage.
-      localStorage.setItem("txid", this.props.getStore().txid);
+      localStorage.setItem("txid", this.refs.txid.value);
     } else {
       // Sorry! No Web Storage support..
     }
