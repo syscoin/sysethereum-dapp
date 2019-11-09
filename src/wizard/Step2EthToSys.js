@@ -7,9 +7,10 @@ const axios = require('axios');
 class Step2ES extends Component {
   constructor(props) {
     super(props);
+    let storageExists = typeof(Storage) !== "undefined";
     this.state = {
-      mintsysrawtxunsigned: props.getStore().mintsysrawtxunsigned,
-      ethburntxid: (typeof(Storage) !== "undefined" && localStorage.getItem("receiptTxHash")) || this.props.getStore().receiptTxHash,
+      mintsysrawtxunsigned: (storageExists && localStorage.getItem("mintsysrawtxunsigned")) || props.getStore().mintsysrawtxunsigned,
+      ethburntxid: (storageExists && localStorage.getItem("receiptTxHash")) || this.props.getStore().receiptTxHash,
       working: false
     };
     this._validateOnDemand = true; // this flag enables onBlur validation as user fills forms
@@ -21,6 +22,7 @@ class Step2ES extends Component {
     if (typeof(Storage) !== "undefined") {
       // Code for localStorage/sessionStorage.
       localStorage.setItem("receiptTxHash", this.refs.ethburntxid.value);
+      localStorage.setItem("mintsysrawtxunsigned", this.refs.mintsysrawtxunsigned.value);
     } else {
       // Sorry! No Web Storage support..
     }

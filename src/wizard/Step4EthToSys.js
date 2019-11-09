@@ -17,6 +17,7 @@ class Step4ES extends Component {
       localStorage.removeItem("toSysAmount");
       localStorage.removeItem("syscoinWitnessAddress");
       localStorage.removeItem("receiptTxHash");
+      localStorage.removeItem("mintsysrawtxunsigned");
     } else {
       // Sorry! No Web Storage support..
     }

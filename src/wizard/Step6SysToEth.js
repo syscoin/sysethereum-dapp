@@ -17,6 +17,7 @@ class Step6 extends Component {
       localStorage.removeItem("ethaddress");
       localStorage.removeItem("sysrawtxunsigned");
       localStorage.removeItem("txid");
+      localStorage.removeItem("blockhash");
     } else {
       // Sorry! No Web Storage support..
     }

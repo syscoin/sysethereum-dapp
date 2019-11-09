@@ -9,7 +9,7 @@ class Step3 extends Component {
     this.state = {
       sysrawtxunsigned: (storageExists && localStorage.getItem("sysrawtxunsigned")) || props.getStore().sysrawtxunsigned,
       txid: (storageExists && localStorage.getItem("txid")) || props.getStore().txid,
-      blockhash: props.getStore().blockhash,
+      blockhash: (storageExists && localStorage.getItem("blockhash")) || props.getStore().blockhash,
       working: false
     };
     
@@ -28,6 +28,7 @@ class Step3 extends Component {
     if (typeof(Storage) !== "undefined") {
       // Code for localStorage/sessionStorage.
       localStorage.setItem("txid", this.refs.txid.value);
+      localStorage.setItem("blockhash", this.refs.blockhash.value);
     } else {
       // Sorry! No Web Storage support..
     }
