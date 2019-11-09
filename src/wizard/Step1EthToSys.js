@@ -11,14 +11,15 @@ const web3 = new Web3(Web3.givenProvider);
 class Step1ES extends Component {
   constructor(props) {
     super(props);
+    let storageExists = typeof(Storage) !== "undefined";
     this.state = {
-      sysxContract: props.getStore().sysxContract,
-      sysxFromAccount: props.getStore().sysxFromAccount,
-      toSysAssetGUID: props.getStore().toSysAssetGUID,
-      toSysAmount: props.getStore().toSysAmount,
-      syscoinWitnessAddress: props.getStore().syscoinWitnessAddress,
+      sysxContract: (storageExists && localStorage.getItem("sysxContract")) || props.getStore().sysxContract,
+      sysxFromAccount: (storageExists && localStorage.getItem("sysxFromAccount")) || props.getStore().sysxFromAccount,
+      toSysAssetGUID: (storageExists && localStorage.getItem("toSysAssetGUID")) || props.getStore().toSysAssetGUID,
+      toSysAmount: (storageExists && localStorage.getItem("toSysAmount")) || props.getStore().toSysAmount,
+      syscoinWitnessAddress: (storageExists && localStorage.getItem("syscoinWitnessAddress")) || props.getStore().syscoinWitnessAddress,
       receiptStatus: props.getStore().receiptStatus,
-      receiptTxHash: props.getStore().receiptTxHash,
+      receiptTxHash: (storageExists && localStorage.getItem("receiptTxHash")) || props.getStore().receiptTxHash,
       receiptTxIndex: props.getStore().receiptTxIndex,
       receiptFrom: props.getStore().receiptFrom,
       receiptTo: props.getStore().receiptTo,
@@ -40,20 +41,6 @@ class Step1ES extends Component {
       this.faucetURL += "-testnet";
     }
     this.faucetURL += ".syscoin.org";
-    this.setFromLocalStorage();
-    
-  }
-  setFromLocalStorage() {
-    if (typeof(Storage) !== "undefined") {
-      this.state.sysxContract = localStorage.getItem("sysxContract");
-      this.state.sysxFromAccount = localStorage.getItem("sysxFromAccount");
-      this.state.toSysAssetGUID = localStorage.getItem("toSysAssetGUID");
-      this.state.toSysAmount = localStorage.getItem("toSysAmount");
-      this.state.syscoinWitnessAddress = localStorage.getItem("syscoinWitnessAddress");
-      this.state.receiptTxHash = localStorage.getItem("receiptTxHash");
-    } else {
-      // Sorry! No Web Storage support..
-    }
   }
   componentDidMount() {
     

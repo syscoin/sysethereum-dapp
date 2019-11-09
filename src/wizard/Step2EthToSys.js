@@ -9,7 +9,7 @@ class Step2ES extends Component {
     super(props);
     this.state = {
       mintsysrawtxunsigned: props.getStore().mintsysrawtxunsigned,
-      ethburntxid: this.props.getStore().receiptTxHash,
+      ethburntxid: (typeof(Storage) !== "undefined" && localStorage.getItem("receiptTxHash")) || this.props.getStore().receiptTxHash,
       working: false
     };
     this._validateOnDemand = true; // this flag enables onBlur validation as user fills forms
@@ -17,7 +17,14 @@ class Step2ES extends Component {
     this.validationCheck = this.validationCheck.bind(this);
     this.isValidated = this.isValidated.bind(this);
   }
-
+  saveToLocalStorage() {
+    if (typeof(Storage) !== "undefined") {
+      // Code for localStorage/sessionStorage.
+      localStorage.setItem("receiptTxHash", this.refs.ethburntxid.value);
+    } else {
+      // Sorry! No Web Storage support..
+    }
+  }
   componentDidMount() {
     if((!this.props.getStore().toSysAssetGUID && !this.props.getStore().toSysAssetGUID === 0) ||
     !this.props.getStore().toSysAmount ||
@@ -111,6 +118,7 @@ class Step2ES extends Component {
             userInput.mintsysrawtxunsigned = results.hex;
             self.setState({working: false});
             self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+            this.saveToLocalStorage();
           }
         }catch(e) {
           validateNewInput.buttonVal = false;

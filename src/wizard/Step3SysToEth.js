@@ -5,9 +5,10 @@ const axios = require('axios');
 class Step3 extends Component {
   constructor(props) {
     super(props);
+    let storageExists = typeof(Storage) !== "undefined";
     this.state = {
-      sysrawtxunsigned: props.getStore().sysrawtxunsigned,
-      txid: props.getStore().txid,
+      sysrawtxunsigned: (storageExists && localStorage.getItem("sysrawtxunsigned")) || props.getStore().sysrawtxunsigned,
+      txid: (storageExists && localStorage.getItem("txid")) || props.getStore().txid,
       blockhash: props.getStore().blockhash,
       working: false
     };
@@ -16,7 +17,6 @@ class Step3 extends Component {
     this.getBlockhash = this.getBlockhash.bind(this);
     this.validationCheck = this.validationCheck.bind(this);
     this.isValidated = this.isValidated.bind(this);
-    this.setFromLocalStorage();
   }
 
   componentDidMount() {
@@ -24,14 +24,6 @@ class Step3 extends Component {
   }
 
   componentWillUnmount() {}
-  setFromLocalStorage() {
-    if (typeof(Storage) !== "undefined") {
-      this.state.txid = localStorage.getItem("txid");
-      this.state.sysrawtxunsigned = localStorage.getItem("sysrawtxunsigned");
-    } else {
-      // Sorry! No Web Storage support..
-    }
-  }
   saveToLocalStorage() {
     if (typeof(Storage) !== "undefined") {
       // Code for localStorage/sessionStorage.

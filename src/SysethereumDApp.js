@@ -59,7 +59,7 @@ class SysethereumDApp extends Component {
 
     axios.post('https://syscoin.org/email_sender.php', {name:this.state.emailName, email:this.state.emailSender, msg: this.state.emailMessage})
     .then(function (response) {
-      if(response.data.status == 1)
+      if(response.data.status === 1)
         self.setState({ emailSent: true });
     });
 
