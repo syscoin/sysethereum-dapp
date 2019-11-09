@@ -12,6 +12,7 @@ class Step6 extends Component {
   clearLocalStorage() {
     if (typeof(Storage) !== "undefined") {
       localStorage.removeItem("asset");
+      localStorage.removeItem("amount");
       localStorage.removeItem("fundingaddress");
       localStorage.removeItem("ethaddress");
       localStorage.removeItem("sysrawtxunsigned");

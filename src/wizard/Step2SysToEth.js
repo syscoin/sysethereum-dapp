@@ -27,6 +27,7 @@ class Step2 extends Component {
   setFromLocalStorage() {
     if (typeof(Storage) !== "undefined") {
       this.state.asset = localStorage.getItem("asset");
+      this.state.amount = localStorage.getItem("amount");
       this.state.fundingaddress = localStorage.getItem("fundingaddress");
       this.state.ethaddress = localStorage.getItem("ethaddress");
       this.state.sysrawtxunsigned = localStorage.getItem("sysrawtxunsigned");
@@ -37,10 +38,11 @@ class Step2 extends Component {
   saveToLocalStorage() {
     if (typeof(Storage) !== "undefined") {
       // Code for localStorage/sessionStorage.
-      localStorage.setItem("asset", this.props.getStore().asset);
-      localStorage.setItem("fundingaddress", this.props.getStore().fundingaddress);
-      localStorage.setItem("ethaddress", this.props.getStore().ethaddress);
-      localStorage.setItem("sysrawtxunsigned", this.props.getStore().sysrawtxunsigned);
+      localStorage.setItem("asset", this.refs.asset.value);
+      localStorage.setItem("amount", this.refs.amount.value);
+      localStorage.setItem("fundingaddress", this.refs.fundingaddress.value);
+      localStorage.setItem("ethaddress", this.refs.ethaddress.value);
+      localStorage.setItem("sysrawtxunsigned", this.refs.sysrawtxunsigned.value);
     } else {
       // Sorry! No Web Storage support..
     }

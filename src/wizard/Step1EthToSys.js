@@ -94,12 +94,12 @@ class Step1ES extends Component {
   saveToLocalStorage() {
     if (typeof(Storage) !== "undefined") {
       // Code for localStorage/sessionStorage.
-      localStorage.setItem("sysxContract", this.props.getStore().sysxContract);
-      localStorage.setItem("sysxFromAccount", this.props.getStore().sysxFromAccount);
-      localStorage.setItem("toSysAssetGUID", this.props.getStore().toSysAssetGUID);
-      localStorage.setItem("toSysAmount", this.props.getStore().toSysAmount);
-      localStorage.setItem("syscoinWitnessAddress", this.props.getStore().syscoinWitnessAddress);
-      localStorage.setItem("receiptTxHash", this.props.getStore().receiptTxHash);
+      localStorage.setItem("sysxContract", this.refs.sysxContract.value);
+      localStorage.setItem("sysxFromAccount", this.refs.sysxFromAccount.value);
+      localStorage.setItem("toSysAssetGUID", this.refs.toSysAssetGUID.value);
+      localStorage.setItem("toSysAmount", this.refs.toSysAmount.value);
+      localStorage.setItem("syscoinWitnessAddress", this.refs.syscoinWitnessAddress.value);
+      localStorage.setItem("receiptTxHash", this.state.receiptTxHash);
     } else {
       // Sorry! No Web Storage support..
     }
