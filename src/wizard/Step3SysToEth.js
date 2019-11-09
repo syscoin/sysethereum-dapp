@@ -27,6 +27,7 @@ class Step3 extends Component {
   setFromLocalStorage() {
     if (typeof(Storage) !== "undefined") {
       this.state.txid = localStorage.getItem("txid");
+      this.state.sysrawtxunsigned = localStorage.getItem("sysrawtxunsigned");
     } else {
       // Sorry! No Web Storage support..
     }
