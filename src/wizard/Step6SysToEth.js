@@ -9,7 +9,18 @@ class Step6 extends Component {
     };
 
   }
-
+  clearLocalStorage() {
+    if (typeof(Storage) !== "undefined") {
+      localStorage.removeItem("asset");
+      localStorage.removeItem("fundingaddress");
+      localStorage.removeItem("ethaddress");
+      localStorage.removeItem("sysrawtxunsigned");
+      localStorage.removeItem("txid");
+    } else {
+      // Sorry! No Web Storage support..
+    }
+    
+  }
   componentDidMount() {
     if(!this.props.getStore().receiptObj){
       this.props.jumpToStep(4);
@@ -23,6 +34,7 @@ class Step6 extends Component {
       baseURL = "https://etherscan.io/tx/";
     }
     this.setState({explorerLink: baseURL + this.props.getStore().receiptObj.transactionHash});
+    this.clearLocalStorage();
   }
 
   componentWillUnmount() {}

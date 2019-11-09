@@ -9,7 +9,19 @@ class Step4ES extends Component {
     };
 
   }
-
+  clearLocalStorage() {
+    if (typeof(Storage) !== "undefined") {
+      localStorage.removeItem("sysxContract");
+      localStorage.removeItem("sysxFromAccount");
+      localStorage.removeItem("toSysAssetGUID");
+      localStorage.removeItem("toSysAmount");
+      localStorage.removeItem("syscoinWitnessAddress");
+      localStorage.removeItem("receiptTxHash");
+    } else {
+      // Sorry! No Web Storage support..
+    }
+    
+  }
   componentDidMount() {
     if(!this.props.getStore().mintblockhash || !this.props.getStore().minttxid){
       this.props.jumpToStep(3);
@@ -22,6 +34,7 @@ class Step4ES extends Component {
     }
     baseURL += ".blockchainfoundry.co/tx/" + this.props.getStore().minttxid;
     this.setState({explorerLink: baseURL});
+    this.clearLocalStorage();
   }
 
   componentWillUnmount() {}

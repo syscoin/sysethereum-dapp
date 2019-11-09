@@ -40,11 +40,23 @@ class Step1ES extends Component {
       this.faucetURL += "-testnet";
     }
     this.faucetURL += ".syscoin.org";
+    this.setFromLocalStorage();
     
   }
-
+  setFromLocalStorage() {
+    if (typeof(Storage) !== "undefined") {
+      this.state.sysxContract = localStorage.getItem("sysxContract");
+      this.state.sysxFromAccount = localStorage.getItem("sysxFromAccount");
+      this.state.toSysAssetGUID = localStorage.getItem("toSysAssetGUID");
+      this.state.toSysAmount = localStorage.getItem("toSysAmount");
+      this.state.syscoinWitnessAddress = localStorage.getItem("syscoinWitnessAddress");
+      this.state.receiptTxHash = localStorage.getItem("receiptTxHash");
+    } else {
+      // Sorry! No Web Storage support..
+    }
+  }
   componentDidMount() {
-   
+    
   }
   isValidated() {
     const userInput = this._grabUserInput(); // grab user entered vals
@@ -78,6 +90,19 @@ class Step1ES extends Component {
     element.download = "receipt.txt";
     document.body.appendChild(element); // Required for this to work in FireFox
     element.click();
+  }
+  saveToLocalStorage() {
+    if (typeof(Storage) !== "undefined") {
+      // Code for localStorage/sessionStorage.
+      localStorage.setItem("sysxContract", this.props.getStore().sysxContract);
+      localStorage.setItem("sysxFromAccount", this.props.getStore().sysxFromAccount);
+      localStorage.setItem("toSysAssetGUID", this.props.getStore().toSysAssetGUID);
+      localStorage.setItem("toSysAmount", this.props.getStore().toSysAmount);
+      localStorage.setItem("syscoinWitnessAddress", this.props.getStore().syscoinWitnessAddress);
+      localStorage.setItem("receiptTxHash", this.props.getStore().receiptTxHash);
+    } else {
+      // Sorry! No Web Storage support..
+    }
   }
   validationCheck() {
     if (!this._validateOnDemand)
@@ -226,6 +251,7 @@ class Step1ES extends Component {
           thisObj.setStateFromReceipt(receipt, null, confirmationNumber, validateNewInput);
           thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
           thisObj.setState({working: false});
+          thisObj.saveToLocalStorage();
         } else {
           validateNewInput.receiptConf = confirmationNumber;
           thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));

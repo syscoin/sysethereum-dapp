@@ -16,7 +16,7 @@ class Step3 extends Component {
     this.getBlockhash = this.getBlockhash.bind(this);
     this.validationCheck = this.validationCheck.bind(this);
     this.isValidated = this.isValidated.bind(this);
-   
+    this.setFromLocalStorage();
   }
 
   componentDidMount() {
@@ -24,7 +24,21 @@ class Step3 extends Component {
   }
 
   componentWillUnmount() {}
-
+  setFromLocalStorage() {
+    if (typeof(Storage) !== "undefined") {
+      this.state.txid = localStorage.getItem("txid");
+    } else {
+      // Sorry! No Web Storage support..
+    }
+  }
+  saveToLocalStorage() {
+    if (typeof(Storage) !== "undefined") {
+      // Code for localStorage/sessionStorage.
+      localStorage.setItem("txid", this.props.getStore().txid);
+    } else {
+      // Sorry! No Web Storage support..
+    }
+  }
   isValidated() {
     const userInput = this._grabUserInput(); // grab user entered vals
     const validateNewInput = this._validateData(userInput); // run the new input against the validator
@@ -71,21 +85,24 @@ class Step3 extends Component {
           validateNewInput.buttonVal = false;
           validateNewInput.buttonValMsg = results.error;
           this.setState({working: false});
+          this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
           console.log("error " + results.error);
         }
         else if(results && results.hex){
           validateNewInput.blockhashVal = true;
           this.refs.blockhash.value = results.hex;
           this.setState({working: false});
+          this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+          this.saveToLocalStorage();
         }
       }catch(e) {
         validateNewInput.buttonVal = false;
         validateNewInput.buttonValMsg = e.message;
         this.setState({working: false});
+        this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
         console.log("error " + e.message);
       }
     } 
-    this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
 
   }
   validationCheck() {
