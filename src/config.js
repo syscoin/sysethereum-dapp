@@ -1,11 +1,11 @@
   class CONFIGURATION {
     constructor() {
       this.testnet = true;
-      this.agentURL = "localhost";
+      this.agentURL = "https://bridge-testnet.syscoin.org";
       this.agentPort = 8443;
       this.infuraURL = "https://rinkeby.infura.io/v3/b168da11b4da49b0aee04717e7904a06";
-      this.superblockContract = "0x4d4375bAD051B227e5ff4b964561fd6807f11F0B";
-      this.ERC20Manager = "0x8F25fD86Fd0bC74682D7b5293C1b87da6dC29B82";
+      this.superblockContract = "0xd745BC855e72e8535a929B13Aaa630894d43A2bd";
+      this.ERC20Manager = "0x38945d8004cf4671c45686853452A6510812117c";
     }
   }
   export default new CONFIGURATION();
