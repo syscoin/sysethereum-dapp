@@ -111,8 +111,7 @@ i18n.use(LanguageDetector).init({
         'step5ReceiptGas': 'Gas Used',
         'step5ReceiptConfirmations': 'Confirmations',
         'step5Download': 'Download Receipt Log',
-        'step5ErrorEVMCheckLog': 'Error! EVM Rejection. Please check the Receipt Log for more details',
-        'step5ErrorEventCheckLog': 'Error! Cannot find event in Transaction Receipt. Please check the Receipt Log for more details',
+        'step5ErrorEventCheckLog': 'Error! Cannot find TokenUnfreeze event in Transaction Receipt. Please check the Receipt Log for more details',
         'step6Head': '<em class="step">Step 6:</em> Complete!',
         'step6Description': 'Transaction was successfully completed. You now can use your Syscoin or Syscoin Asset on the Ethereum network through an ERC20. You can view your transaction here: '
       }
@@ -226,8 +225,7 @@ i18n.use(LanguageDetector).init({
         'step5ReceiptGas': 'Gas usado',
         'step5ReceiptConfirmations': 'Conformaciones',
         'step5Download': 'Descarga del registro de recibos',
-        'step5ErrorEVMCheckLog': 'Error! EVM Rechazado. Compruebe el registro de recibos para mas detalles',
-        'step5ErrorEventCheckLog': 'Error! No se encuentra el evento en el recibo de la transacción. Compruebe el registro de recibos para mas detalles',
+        'step5ErrorEventCheckLog': 'Error! No se encuentra el TokenUnfreeze evento en el recibo de la transacción. Compruebe el registro de recibos para mas detalles',
         'step6Head': 'Paso 6: Completado!',
         'step6Description': 'La transacción se completo con éxito. Ahora puedes usar tus Syscoins o tus Syscoin Assets en la red the Ethereum a través de un ERC20. Puedes ver tu transacción aquí: '
       }
@@ -338,8 +336,7 @@ i18n.use(LanguageDetector).init({
         'step5ReceiptGas': "'Gas' Utilisé",
         'step5ReceiptConfirmations': "Confirmations",
         'step5Download': "Télécharger le journal de réception",
-        'step5ErrorEVMCheckLog': "Erreur! Rejet EVM. S'il vous plaît consulter le journal de réception pour plus de détails",
-        'step5ErrorEventCheckLog': "Erreur! Impossible de trouver l'événement dans le reçu de transaction. S'il vous plaît consulter le journal de réception pour plus de détails",
+        'step5ErrorEventCheckLog': "Erreur! Impossible de trouver l'événement TokenUnfreeze dans le reçu de transaction. S'il vous plaît consulter le journal de réception pour plus de détails",
         'step6Head': "Step 6: Complète!",
         'step6Description': "La transaction a été complétée avec succès. Vous pouvez maintenant utiliser votre actif Syscoin ou Syscoin sur le réseau Ethereum via un ERC20. Vous pouvez voir votre transaction ici: "
       }
