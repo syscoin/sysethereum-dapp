@@ -62,7 +62,20 @@ class Step5 extends Component {
     if(receipt.transactionHash && this.state.receiptTxHash !== receipt.transactionHash){
       return;
     }
-    if(!receipt.events || !receipt.events.TokenUnfreeze){
+    var found = false;
+    if(receipt.events){
+      var TokenUnfreezeFn = '0xb925ba840e2f36bcb317f8179bd8b5ed01aba4a22abf5f169162c0894dea87ab';
+      for (var key in receipt.events) {
+        if (receipt.events.hasOwnProperty(key)) {
+          if(receipt.events[key].raw && receipt.events[key].raw.topics && receipt.events[key].raw.topics.length > 0){
+            if(receipt.events[key].raw.topics[0] === TokenUnfreezeFn){
+              found = true;
+            }
+          }
+        }
+      }
+    }
+    if(!found){
       error = this.props.t("step5ErrorEventCheckLog");
     }
     this.setState({
