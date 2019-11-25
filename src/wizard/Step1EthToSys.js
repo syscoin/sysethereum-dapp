@@ -261,6 +261,57 @@ class Step1ES extends Component {
         }
       })
   }
+  isString(s) {
+    return (typeof s === 'string' || s instanceof String);
+  }
+  toBaseUnit(value, decimals, BN) {
+    if (!this.isString(value)) {
+      console.error('Pass strings to prevent floating point precision issues.');
+      return;
+    }
+    const ten = new BN(10);
+    const base = ten.pow(new BN(decimals));
+  
+    // Is it negative?
+    let negative = (value.substring(0, 1) === '-');
+    if (negative) {
+      value = value.substring(1);
+    }
+  
+    if (value === '.') { 
+      console.error(
+      `Invalid value ${value} cannot be converted to`
+      + ` base unit with ${decimals} decimals.`); 
+      return;
+    }
+  
+    // Split it into a whole and fractional part
+    let comps = value.split('.');
+    if (comps.length > 2) { console.error('Too many decimal points'); return;}
+  
+    let whole = comps[0], fraction = comps[1];
+  
+    if (!whole) { whole = '0'; }
+    if (!fraction) { fraction = '0'; }
+    if (fraction.length > decimals) { 
+      console.error('Too many decimal places'); 
+      return;
+    }
+  
+    while (fraction.length < decimals) {
+      fraction += '0';
+    }
+  
+    whole = new BN(whole);
+    fraction = new BN(fraction);
+    let wei = (whole.mul(base)).add(fraction);
+  
+    if (negative) {
+      wei = wei.neg();
+    }
+  
+    return new BN(wei.toString(10), 10);
+  }
   async submitProofs() {
     let userInput = this._grabUserInput(); // grab user entered vals
     let validateNewInput = this._validateData(userInput); // run the new input against the validator
@@ -345,8 +396,7 @@ class Step1ES extends Component {
     let balance = await contractBase.methods.balanceOf(fromAccount).call();
     balance = web3.utils.toBN(balance.toString());
     let decimals = await contractBase.methods.decimals().call();
-    let amount = web3.utils.toBN(userInput.toSysAmount);
-    amount = amount.mul(web3.utils.toBN(10).pow(web3.utils.toBN(decimals)));
+    let amount = this.toBaseUnit(userInput.toSysAmount, decimals, web3.utils.BN);
     let assetGUID = userInput.toSysAssetGUID;
     
 
