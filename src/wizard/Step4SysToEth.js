@@ -81,7 +81,7 @@ class Step4 extends Component {
     let failed = false;
     this.setState({working: true});
     try {
-      let results = await axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=syscoingetspvproof&txid=' + this.props.getStore().txid.toString() + '&blockhash=' + this.props.getStore().blockhash.toString());
+      let results = await axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=syscoingetspvproof&txid=' + this.props.getStore().txid.toString());
       results = results.data;
       if(results.error){
         validateNewInput.buttonVal = false;
