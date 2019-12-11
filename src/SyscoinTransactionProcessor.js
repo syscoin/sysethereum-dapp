@@ -84,6 +84,61 @@ const tpabi = [
     "payable": false,
     "stateMutability": "nonpayable",
     "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "bridgeTransferId",
+        "type": "uint32"
+      }
+    ],
+    "name": "cancelTransferRequest",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "bridgeTransferId",
+        "type": "uint32"
+      },
+      {
+        "internalType": "address",
+        "name": "challengerAddress",
+        "type": "address"
+      }
+    ],
+    "name": "cancelTransferSuccess",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "bridgeTransferId",
+        "type": "uint32"
+      },
+      {
+        "internalType": "address payable",
+        "name": "challengerAddress",
+        "type": "address"
+      }
+    ],
+    "name": "processCancelTransferFail",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
   }
 ]
   export default tpabi;
