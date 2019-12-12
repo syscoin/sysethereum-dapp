@@ -60,7 +60,7 @@ i18n.use(LanguageDetector).init({
         'step1ESCCancelRequested': 'Bridge Transfer cancellation has been requested and is able to complete to get your ERC20 back. Please proceed with the next step',
         'step1ESCCancelChallenged': 'Bridge Transfer cancellation request has been challenged! Challenger won deposit and the request has been rejected',
         'step1ESCWaitOneHalfWeek': 'Bridge Transfer cannot be initiated as you must wait atleast 1.5 weeks from the time of the burn to cancel',
-        'step1ESCOk': 'Bridge Transfer may be cancelled',
+        'step1ESCOk': 'Bridge Transfer is eligible for cancellation',
         'step1ESCCancelOk': 'Bridge Transfer cancelleation request is complete. ERC20 tokens as well as deposit has been refunded',
         'step1ESCUnknown': 'Bridge Transfer is in an unknown state',
         'step1ESCBridgeTransferId': 'Bridge Transfer ID',

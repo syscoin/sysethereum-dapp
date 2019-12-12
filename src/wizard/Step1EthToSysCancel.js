@@ -90,7 +90,7 @@ class Step1ESC extends Component {
     this.setState({working: true});
     this.state.receiptObj = null;
     let syscoinTransactionProcessor = new web3.eth.Contract(erc20Managerabi,  CONFIGURATION.ERC20Manager);
-    syscoinTransactionProcessor.methods.cancelTransferRequest(this.state.bridgeTransferId).send({from: this.state.freezer, gas: 500000})
+    syscoinTransactionProcessor.methods.cancelTransferRequest(this.state.bridgeTransferId).send({from: this.state.freezer, value: web3.utils.toWei("3"), gas: 500000})
       .on('transactionHash', function(hash){
         this.setState({working: true, receiptTxHash: hash, buttonVal: false, buttonValMsg: this.props.t("step5AuthMetamask")});
       })
@@ -188,7 +188,7 @@ class Step1ESC extends Component {
     let buttonVal = false;
     let buttonValMsg = "";
     if(statusValue === "CancelRequested"){
-      if(Date.now() - bridgeTransferDetails.timestamp < 3600){
+      if((Date.now() / 1000) - parseInt(bridgeTransferDetails._timestamp) < 3600){
         buttonVal = true;
         buttonValMsg = this.props.t("step1ESCWaitOneHr");
       }
@@ -207,7 +207,7 @@ class Step1ESC extends Component {
       buttonValMsg = this.props.t("step1ESCCancelOk");
     }
     else if(statusValue === "Ok"){
-      if(Date.now() - bridgeTransferDetails.timestamp < (CONFIGURATION.testnet? 36000: 907200)){
+      if((Date.now() / 1000) - parseInt(bridgeTransferDetails._timestamp) < (CONFIGURATION.testnet? 36000: 907200)){
         buttonVal = false;
         buttonValMsg = this.props.t("step1ESCWaitOneHalfWeek");
       }
