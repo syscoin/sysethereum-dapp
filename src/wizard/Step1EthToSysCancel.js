@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import Web3 from 'web3';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import "react-tabs/style/react-tabs.css";
-import tpabi from '../SyscoinTransactionProcessor';  
+import erc20Managerabi from '../SyscoinERC20Manager';  
 import CONFIGURATION from '../config';
 const axios = require('axios');
 const web3 = new Web3(Web3.givenProvider);
@@ -89,7 +89,7 @@ class Step1ESC extends Component {
     
     this.setState({working: true});
     this.state.receiptObj = null;
-    let syscoinTransactionProcessor = new web3.eth.Contract(tpabi,  CONFIGURATION.ERC20Manager);
+    let syscoinTransactionProcessor = new web3.eth.Contract(erc20Managerabi,  CONFIGURATION.ERC20Manager);
     syscoinTransactionProcessor.methods.cancelTransferRequest(this.state.bridgeTransferId).send({from: this.state.freezer, gas: 500000})
       .on('transactionHash', function(hash){
         this.setState({working: true, receiptTxHash: hash, buttonVal: false, buttonValMsg: this.props.t("step5AuthMetamask")});
@@ -139,7 +139,7 @@ class Step1ESC extends Component {
     
     this.setState({working: true});
     this.state.receiptObj = null;
-    let syscoinTransactionProcessor = new web3.eth.Contract(tpabi,  CONFIGURATION.ERC20Manager);
+    let syscoinTransactionProcessor = new web3.eth.Contract(erc20Managerabi,  CONFIGURATION.ERC20Manager);
     syscoinTransactionProcessor.methods.cancelTransferSuccess(this.state.bridgeTransferId).send({from: this.state.freezer, gas: 500000})
       .on('transactionHash', function(hash){
         this.setState({working: true, receiptTxHash: hash, buttonVal: false, buttonValMsg: this.props.t("step5AuthMetamask")});
@@ -177,9 +177,10 @@ class Step1ESC extends Component {
       return "CancelOk";
     }
   }
-  async getBridgeTransferDetails(setButtonState){
-    let syscoinTransactionProcessor = new web3.eth.Contract(tpabi,  CONFIGURATION.ERC20Manager);
-    const bridgeTransferDetails = await syscoinTransactionProcessor.methods.getBridgeTransfer(this.state.bridgeTransferId).call();
+  async getBridgeTransferDetails(bridgeTransferId){
+    console.log("getBridgeTransferDetails: " + bridgeTransferId);
+    let syscoinTransactionProcessor = new web3.eth.Contract(erc20Managerabi,  CONFIGURATION.ERC20Manager);
+    const bridgeTransferDetails = await syscoinTransactionProcessor.methods.getBridgeTransfer(bridgeTransferId).call();
     let statusValue = this.getStatus(bridgeTransferDetails.status);
     let buttonTimeoutVal = false;
     let buttonNewCancelVal = false;
@@ -219,7 +220,7 @@ class Step1ESC extends Component {
       buttonVal = false;
       buttonValMsg = this.props.t("step1ESCUnknown");
     }
-    this.setState({allowTimeout: buttonTimeoutVal, allowNewCancel: buttonNewCancelVal, bridgeTransferId: this.state.bridgeTransferId, requesttimestamp: bridgeTransferDetails.timestamp, value: bridgeTransferDetails.value, erc: bridgeTransferDetails.erc20, spt: bridgeTransferDetails.assetGUID, freezer: bridgeTransferDetails.tokenFreezer, status: statusValue });
+    this.setState({allowTimeout: buttonTimeoutVal, allowNewCancel: buttonNewCancelVal, bridgeTransferId: bridgeTransferId, requesttimestamp: bridgeTransferDetails.timestamp, value: bridgeTransferDetails.value, erc: bridgeTransferDetails.erc20, spt: bridgeTransferDetails.assetGUID, freezer: bridgeTransferDetails.tokenFreezer, status: statusValue });
     if(setButtonState){
       this.setState({buttonVal: buttonVal, buttonValMsg: buttonValMsg});
     }

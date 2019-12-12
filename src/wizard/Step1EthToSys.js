@@ -4,7 +4,7 @@ import Web3 from 'web3';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import "react-tabs/style/react-tabs.css";
 import assetabi from '../SyscoinERC20I';
-import tpabi from '../SyscoinTransactionProcessor';  
+import erc20Managerabi from '../SyscoinERC20Manager';  
 import CONFIGURATION from '../config';
 const axios = require('axios');
 const web3 = new Web3(Web3.givenProvider);
@@ -388,7 +388,7 @@ class Step1ES extends Component {
     validateNewInput.buttonVal = true;
     validateNewInput.buttonValMsg = this.props.t("step5AuthMetamask");
     this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-    let syscoinTransactionProcessor = new web3.eth.Contract(tpabi,  CONFIGURATION.ERC20Manager);
+    let syscoinTransactionProcessor = new web3.eth.Contract(erc20Managerabi,  CONFIGURATION.ERC20Manager);
     let contractBase = new web3.eth.Contract(assetabi, userInput.sysxContract);
     let fromAccount = userInput.sysxFromAccount;
     let allowance = await contractBase.methods.allowance(fromAccount, CONFIGURATION.ERC20Manager).call();
