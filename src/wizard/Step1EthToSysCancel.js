@@ -266,7 +266,7 @@ class Step1ESC extends Component {
       this.setState({searchError: this.props.t("step1ESCWrongTransaction")});
       return;
     }
-    axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoincheckmint?bridgetransferid=' + bridgeTransferId)
+    axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=syscoincheckmint&bridgetransferid=' + bridgeTransferId)
       .then(response => {
         console.log(response);
         if(response.data.error){
