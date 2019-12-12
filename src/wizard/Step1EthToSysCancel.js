@@ -165,23 +165,24 @@ class Step1ESC extends Component {
       })
   }
   getStatus(status){
-    if(status === 0){
+    if(status === "0"){
       return "Unitialized";
-    } else if(status === 1){
+    } else if(status === "1"){
       return "Ok";
-    } else if(status === 2){
+    } else if(status === "2"){
       return "CancelRequested";
-    } else if(status === 3){
+    } else if(status === "3"){
       return "CancelChallenged";
-    } else if(status === 4){
+    } else if(status === "4"){
       return "CancelOk";
     }
+    return "Unknown";
   }
   async getBridgeTransferDetails(bridgeTransferId, setButtonState){
     console.log("getBridgeTransferDetails: " + bridgeTransferId);
     let syscoinTransactionProcessor = new web3.eth.Contract(erc20Managerabi,  CONFIGURATION.ERC20Manager);
     const bridgeTransferDetails = await syscoinTransactionProcessor.methods.getBridgeTransfer(bridgeTransferId).call();
-    let statusValue = this.getStatus(bridgeTransferDetails.status);
+    let statusValue = this.getStatus(bridgeTransferDetails._status);
     let buttonTimeoutVal = false;
     let buttonNewCancelVal = false;
     let buttonVal = false;
@@ -220,7 +221,7 @@ class Step1ESC extends Component {
       buttonVal = false;
       buttonValMsg = this.props.t("step1ESCUnknown");
     }
-    this.setState({allowTimeout: buttonTimeoutVal, allowNewCancel: buttonNewCancelVal, bridgeTransferId: bridgeTransferId, requesttimestamp: bridgeTransferDetails.timestamp, value: bridgeTransferDetails.value, erc: bridgeTransferDetails.erc20, spt: bridgeTransferDetails.assetGUID, freezer: bridgeTransferDetails.tokenFreezer, status: statusValue });
+    this.setState({allowTimeout: buttonTimeoutVal, allowNewCancel: buttonNewCancelVal, bridgeTransferId: bridgeTransferId, requesttimestamp: bridgeTransferDetails._timestamp, value: bridgeTransferDetails._value, erc: bridgeTransferDetails._erc20ContractAddress, spt: bridgeTransferDetails._assetGUID, freezer: bridgeTransferDetails._tokenFreezerAddress, status: statusValue });
     if(setButtonState){
       this.setState({buttonVal: buttonVal, buttonValMsg: buttonValMsg});
     }
