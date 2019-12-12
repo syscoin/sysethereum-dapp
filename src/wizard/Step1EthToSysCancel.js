@@ -177,7 +177,7 @@ class Step1ESC extends Component {
       return "CancelOk";
     }
   }
-  async getBridgeTransferDetails(bridgeTransferId){
+  async getBridgeTransferDetails(bridgeTransferId, setButtonState){
     console.log("getBridgeTransferDetails: " + bridgeTransferId);
     let syscoinTransactionProcessor = new web3.eth.Contract(erc20Managerabi,  CONFIGURATION.ERC20Manager);
     const bridgeTransferDetails = await syscoinTransactionProcessor.methods.getBridgeTransfer(bridgeTransferId).call();
