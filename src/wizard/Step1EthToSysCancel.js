@@ -97,7 +97,7 @@ class Step1ESC extends Component {
       })
       .on('confirmation', function(confirmationNumber, receipt){ 
         if(thisObj.state.receiptObj === null){
-          if(this.receiptStatus !== "false"){
+          if(thisObj.state.receiptStatus !== "false"){
             thisObj.setStateFromReceipt(receipt, null);
           }
           thisObj.setState({working: false});
@@ -148,7 +148,7 @@ class Step1ESC extends Component {
       })
       .on('confirmation', function(confirmationNumber, receipt){ 
         if(thisObj.state.receiptObj === null){
-          if(this.receiptStatus !== "false"){
+          if(thisObj.state.receiptStatus !== "false"){
             thisObj.setStateFromReceipt(receipt, null);
           }
           thisObj.setState({working: false});
