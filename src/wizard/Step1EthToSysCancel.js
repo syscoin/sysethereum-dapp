@@ -53,10 +53,7 @@ class Step1ESC extends Component {
     if(receipt.transactionHash && this.state.receiptTxHash !== receipt.transactionHash){
       return;
     }
-    if(receipt.status  && receipt.status !== "1" && receipt.status !== true && receipt.status !== "true" && receipt.status !== "0x1"){
-      errorMsg = this.props.t("step5ErrorEVMCheckLog");
-    }
-    else if(receipt.status === false){
+    if(receipt.status !== undefined  && receipt.status !== "1" && receipt.status !== true && receipt.status !== "true" && receipt.status !== "0x1"){
       errorMsg = this.props.t("step5ErrorEVMCheckLog");
     }
     this.setState({receiptObj: receipt, receiptStatus: receipt.status === true? "true":"false", receiptTxHash: receipt.transactionHash});

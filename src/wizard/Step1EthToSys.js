@@ -155,9 +155,8 @@ class Step1ES extends Component {
     if(receipt.transactionHash && this.state.receiptTxHash !== receipt.transactionHash){
       return;
     }
-    if(receipt.status  && receipt.status !== "1" && receipt.status !== true && receipt.status !== "true" && receipt.status !== "0x1"){
+    if(receipt.status !== undefined && receipt.status !== "1" && receipt.status !== true && receipt.status !== "true" && receipt.status !== "0x1"){
       error = this.props.t("step5ErrorEVMCheckLog");
-      return;
     }
     
     validateNewInput.receiptObj = receipt;
