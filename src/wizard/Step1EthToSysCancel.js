@@ -184,7 +184,7 @@ class Step1ESC extends Component {
     const bridgeTransferDetails = await syscoinTransactionProcessor.methods.getBridgeTransfer(bridgeTransferId).call();
     let statusValue = this.getStatus(bridgeTransferDetails._status);
     let buttonTimeoutVal = false;
-    let buttonNewCancelVal = true;
+    let buttonNewCancelVal = false;
     let _buttonVal = false;
     let _buttonValMsg = "";
     if(statusValue === "CancelRequested"){
@@ -223,7 +223,6 @@ class Step1ESC extends Component {
     }
     this.setState({allowTimeout: buttonTimeoutVal, allowNewCancel: buttonNewCancelVal, bridgeTransferId: bridgeTransferId, requesttimestamp: bridgeTransferDetails._timestamp, value: bridgeTransferDetails._value, erc: bridgeTransferDetails._erc20ContractAddress, spt: bridgeTransferDetails._assetGUID, freezer: bridgeTransferDetails._tokenFreezerAddress, status: statusValue });
     if(setButtonState === true){
-      console.log("Setting button value: " + _buttonValMsg);
       this.setState({buttonVal: _buttonVal, buttonValMsg: _buttonValMsg});
     }
   }
