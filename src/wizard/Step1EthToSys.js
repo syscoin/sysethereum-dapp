@@ -225,14 +225,14 @@ class Step1ES extends Component {
   freezeBurnERC20(syscoinTP, validateNewInput, thisObj, amount, assetGUID, decimals, syscoinWitnessProgram, userInput, fromAccount) {
     thisObj.state.receiptObj = null;
     syscoinTP.methods.freezeBurnERC20(amount, assetGUID, userInput.sysxContract, decimals, syscoinWitnessProgram).send({from: fromAccount, gas: 500000})
-      .on('transactionHash', function(hash){
+      .once('transactionHash', function(hash){
         validateNewInput.buttonVal = true;
         validateNewInput.receiptTxHash = hash;
         validateNewInput.buttonValMsg = thisObj.props.t("step5AuthMetamask");
         thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
         thisObj.setState({working: true});
       })
-      .on('confirmation', function(confirmationNumber, receipt){ 
+      .once('confirmation', function(confirmationNumber, receipt){ 
         if(thisObj.state.receiptObj === null){
           thisObj.setStateFromReceipt(receipt, null, confirmationNumber, validateNewInput);
           thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
@@ -413,12 +413,12 @@ class Step1ES extends Component {
     if(allowance.lt(amount)){
       console.log("Allowance needed.");
       contractBase.methods.approve(CONFIGURATION.ERC20Manager, amount.toString()).send({from: fromAccount, gas: 500000})
-      .on('transactionHash', function(hash){
+      .once('transactionHash', function(hash){
         validateNewInput.buttonVal = true;
         validateNewInput.buttonValMsg = thisObj.props.t("step5AuthAllowanceMetamask");
         thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
       })
-      .on('confirmation', function(confirmationNumber, receipt){
+      .once('confirmation', function(confirmationNumber, receipt){
         if(bFirstConfirmation){
           bFirstConfirmation = false; 
           thisObj.freezeBurnERC20(syscoinTransactionProcessor, validateNewInput, thisObj, amount.toString(), assetGUID, decimals, syscoinWitnessProgram, userInput, fromAccount);

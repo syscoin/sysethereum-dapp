@@ -93,10 +93,10 @@ class Step1ESC extends Component {
     thisObj.state.receiptStatus = "true"; 
     let syscoinTransactionProcessor = new web3.eth.Contract(erc20Managerabi,  CONFIGURATION.ERC20Manager);
     syscoinTransactionProcessor.methods.cancelTransferRequest(this.state.bridgeTransferId).send({from: this.state.freezer, value: web3.utils.toWei("3"), gas: 500000})
-      .on('transactionHash', function(hash){
+      .once('transactionHash', function(hash){
         thisObj.setState({working: true, receiptTxHash: hash, buttonVal: false, buttonValMsg: thisObj.props.t("step5AuthMetamask")});
       })
-      .on('confirmation', function(confirmationNumber, receipt){ 
+      .once('confirmation', function(confirmationNumber, receipt){ 
         if(thisObj.state.receiptObj === null){
           if(thisObj.state.receiptStatus !== "false"){
             thisObj.setStateFromReceipt(receipt);
@@ -143,10 +143,10 @@ class Step1ESC extends Component {
     thisObj.state.receiptStatus = "true"; 
     let syscoinTransactionProcessor = new web3.eth.Contract(erc20Managerabi,  CONFIGURATION.ERC20Manager);
     syscoinTransactionProcessor.methods.cancelTransferSuccess(this.state.bridgeTransferId).send({from: this.state.freezer, gas: 500000})
-      .on('transactionHash', function(hash){
+      .once('transactionHash', function(hash){
         thisObj.setState({working: true, receiptTxHash: hash, buttonVal: false, buttonValMsg: thisObj.props.t("step5AuthMetamask")});
       })
-      .on('confirmation', function(confirmationNumber, receipt){ 
+      .once('confirmation', function(confirmationNumber, receipt){ 
         if(thisObj.state.receiptObj === null){
           if(thisObj.state.receiptStatus !== "false"){
             thisObj.setStateFromReceipt(receipt);

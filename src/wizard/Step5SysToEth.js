@@ -161,10 +161,10 @@ class Step5 extends Component {
 
      SyscoinSuperblocks.methods.relayTx(_txBytes, this.props.getStore().txindex, merkleProof.sibling, _syscoinBlockHeader, 
       this.props.getStore().syscoinblockindex, _syscoinBlockSiblings, _superblockHash).send({from: accounts[0], gas: 500000})
-      .on('transactionHash', function(hash){
+      .once('transactionHash', function(hash){
         thisObj.setState({receiptTxHash: hash, buttonVal: true, buttonValMsg: thisObj.props.t("step5PleaseWait")});
       })
-      .on('confirmation', function(confirmationNumber, receipt){ 
+      .once('confirmation', function(confirmationNumber, receipt){ 
         if(thisObj.state.receiptObj === null){
           thisObj.setStateFromReceipt(receipt, null, confirmationNumber);
           thisObj.setState({working: false});
