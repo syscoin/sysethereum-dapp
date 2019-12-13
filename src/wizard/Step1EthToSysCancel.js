@@ -173,45 +173,46 @@ class Step1ESC extends Component {
     let statusValue = this.getStatus(bridgeTransferDetails._status);
     let buttonTimeoutVal = false;
     let buttonNewCancelVal = true;
-    let buttonVal = false;
-    let buttonValMsg = "";
+    let _buttonVal = false;
+    let _buttonValMsg = "";
     if(statusValue === "CancelRequested"){
       if((Date.now() / 1000) - parseInt(bridgeTransferDetails._timestamp) < 3600){
-        buttonVal = true;
-        buttonValMsg = this.props.t("step1ESCWaitOneHr");
+        _buttonVal = true;
+        _buttonValMsg = this.props.t("step1ESCWaitOneHr");
       }
       else{
         buttonTimeoutVal = true;
-        buttonVal = true;
-        buttonValMsg = this.props.t("step1ESCCancelRequested");
+        _buttonVal = true;
+        _buttonValMsg = this.props.t("step1ESCCancelRequested");
       }
     }
     else if(statusValue === "CancelChallenged"){
-      buttonVal = false;
-      buttonValMsg = this.props.t("step1ESCCancelChallenged");
+      _buttonVal = false;
+      _buttonValMsg = this.props.t("step1ESCCancelChallenged");
     }
     else if(statusValue === "CancelOk"){
-      buttonVal = true;
-      buttonValMsg = this.props.t("step1ESCCancelOk");
+      _buttonVal = true;
+      _buttonValMsg = this.props.t("step1ESCCancelOk");
     }
     else if(statusValue === "Ok"){
       if((Date.now() / 1000) - parseInt(bridgeTransferDetails._timestamp) < (CONFIGURATION.testnet? 36000: 907200)){
-        buttonVal = false;
-        buttonValMsg = this.props.t("step1ESCWaitOneHalfWeek");
+        _buttonVal = false;
+        _buttonValMsg = this.props.t("step1ESCWaitOneHalfWeek");
       }
       else{
         buttonNewCancelVal = true;
-        buttonVal = true;
-        buttonValMsg = this.props.t("step1ESCOk");
+        _buttonVal = true;
+        _buttonValMsg = this.props.t("step1ESCOk");
       }
     }
     else{
-      buttonVal = false;
-      buttonValMsg = this.props.t("step1ESCUnknown");
+      _buttonVal = false;
+      _buttonValMsg = this.props.t("step1ESCUnknown");
     }
     this.setState({allowTimeout: buttonTimeoutVal, allowNewCancel: buttonNewCancelVal, bridgeTransferId: bridgeTransferId, requesttimestamp: bridgeTransferDetails._timestamp, value: bridgeTransferDetails._value, erc: bridgeTransferDetails._erc20ContractAddress, spt: bridgeTransferDetails._assetGUID, freezer: bridgeTransferDetails._tokenFreezerAddress, status: statusValue });
     if(setButtonState === true){
-      this.setState({buttonVal: buttonVal, buttonValMsg: buttonValMsg});
+      console.log("Setting button value: " + _buttonValMsg);
+      this.setState({buttonVal: _buttonVal, buttonValMsg: _buttonValMsg});
     }
   }
   async searchBridgeTransfer() {
