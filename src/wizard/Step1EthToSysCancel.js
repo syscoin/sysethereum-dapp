@@ -89,28 +89,29 @@ class Step1ESC extends Component {
     
     this.setState({working: true});
     this.state.receiptObj = null;
+    let thisObj = this;
     let syscoinTransactionProcessor = new web3.eth.Contract(erc20Managerabi,  CONFIGURATION.ERC20Manager);
     syscoinTransactionProcessor.methods.cancelTransferRequest(this.state.bridgeTransferId).send({from: this.state.freezer, value: web3.utils.toWei("3"), gas: 500000})
       .on('transactionHash', function(hash){
-        this.setState({working: true, receiptTxHash: hash, buttonVal: false, buttonValMsg: this.props.t("step5AuthMetamask")});
+        thisObj.setState({working: true, receiptTxHash: hash, buttonVal: false, buttonValMsg: thisObj.props.t("step5AuthMetamask")});
       })
       .on('confirmation', function(confirmationNumber, receipt){ 
-        if(this.state.receiptObj === null){
-          this.setStateFromReceipt(receipt, null);
-          this.setState({working: false});
+        if(thisObj.state.receiptObj === null){
+          thisObj.setStateFromReceipt(receipt, null);
+          thisObj.setState({working: false});
         }
       })
       .on('error', (error, receipt) => {
-        this.setState({working: false});
+        thisObj.setState({working: false});
         if(error.message.length <= 512 && error.message.indexOf("{") !== -1){
           error = JSON.parse(error.message.substring(error.message.indexOf("{")));
         }
         let message = error.message.toString();
         if(receipt){
-          this.setStateFromReceipt(receipt, message);
+          thisObj.setStateFromReceipt(receipt, message);
         }
         else{
-          this.setState({buttonVal: false, buttonValMsg: message});
+          thisObj.setState({buttonVal: false, buttonValMsg: message});
         }
       })
   }
@@ -139,28 +140,29 @@ class Step1ESC extends Component {
     
     this.setState({working: true});
     this.state.receiptObj = null;
+    let thisObj = this;
     let syscoinTransactionProcessor = new web3.eth.Contract(erc20Managerabi,  CONFIGURATION.ERC20Manager);
     syscoinTransactionProcessor.methods.cancelTransferSuccess(this.state.bridgeTransferId).send({from: this.state.freezer, gas: 500000})
       .on('transactionHash', function(hash){
-        this.setState({working: true, receiptTxHash: hash, buttonVal: false, buttonValMsg: this.props.t("step5AuthMetamask")});
+        thisObj.setState({working: true, receiptTxHash: hash, buttonVal: false, buttonValMsg: thisObj.props.t("step5AuthMetamask")});
       })
       .on('confirmation', function(confirmationNumber, receipt){ 
-        if(this.state.receiptObj === null){
-          this.setStateFromReceipt(receipt, null);
-          this.setState({working: false});
+        if(thisObj.state.receiptObj === null){
+          thisObj.setStateFromReceipt(receipt, null);
+          thisObj.setState({working: false});
         }
       })
       .on('error', (error, receipt) => {
-        this.setState({working: false});
+        thisObj.setState({working: false});
         if(error.message.length <= 512 && error.message.indexOf("{") !== -1){
           error = JSON.parse(error.message.substring(error.message.indexOf("{")));
         }
         let message = error.message.toString();
         if(receipt){
-          this.setStateFromReceipt(receipt, message);
+          thisObj.setStateFromReceipt(receipt, message);
         }
         else{
-          this.setState({buttonVal: false, buttonValMsg: message});
+          thisObj.setState({buttonVal: false, buttonValMsg: message});
         }
       })
   }
