@@ -224,7 +224,7 @@ class Step1ESC extends Component {
       buttonValMsg = this.props.t("step1ESCUnknown");
     }
     this.setState({allowTimeout: buttonTimeoutVal, allowNewCancel: buttonNewCancelVal, bridgeTransferId: bridgeTransferId, requesttimestamp: bridgeTransferDetails._timestamp, value: bridgeTransferDetails._value, erc: bridgeTransferDetails._erc20ContractAddress, spt: bridgeTransferDetails._assetGUID, freezer: bridgeTransferDetails._tokenFreezerAddress, status: statusValue });
-    if(setButtonState){
+    if(setButtonState === true){
       this.setState({buttonVal: buttonVal, buttonValMsg: buttonValMsg});
     }
   }
