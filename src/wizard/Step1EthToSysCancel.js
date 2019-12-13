@@ -48,13 +48,13 @@ class Step1ESC extends Component {
   }
 
 
-  async setStateFromReceipt(receipt, error) {
+  async setStateFromReceipt(receipt) {
+    let error = null;
     if(receipt.transactionHash && this.state.receiptTxHash !== receipt.transactionHash){
       return;
     }
     if(receipt.status  && receipt.status !== "1" && receipt.status !== true && receipt.status !== "true" && receipt.status !== "0x1"){
       error = this.props.t("step5ErrorEVMCheckLog");
-      return;
     }
     this.setState({receiptObj: receipt, receiptStatus: receipt.status === true? "true":"false", receiptTxHash: receipt.transactionHash});
     if(error !== null){
@@ -98,21 +98,14 @@ class Step1ESC extends Component {
       .on('confirmation', function(confirmationNumber, receipt){ 
         if(thisObj.state.receiptObj === null){
           if(thisObj.state.receiptStatus !== "false"){
-            thisObj.setStateFromReceipt(receipt, null);
+            thisObj.setStateFromReceipt(receipt);
           }
           thisObj.setState({working: false});
         }
       })
       .on('error', (error, receipt) => {
+        thisObj.setStateFromReceipt(receipt);
         thisObj.setState({working: false});
-        if(error && error.message){
-          if(error.message.length <= 512 && error.message.indexOf("{") !== -1){
-            error = JSON.parse(error.message.substring(error.message.indexOf("{")));
-          }
-          let message = error.message.toString();
-          thisObj.setState({buttonVal: false, buttonValMsg: message});
-        }
-        
       })
   }
   async timeoutBridgeTransaction() {
@@ -149,21 +142,14 @@ class Step1ESC extends Component {
       .on('confirmation', function(confirmationNumber, receipt){ 
         if(thisObj.state.receiptObj === null){
           if(thisObj.state.receiptStatus !== "false"){
-            thisObj.setStateFromReceipt(receipt, null);
+            thisObj.setStateFromReceipt(receipt);
           }
           thisObj.setState({working: false});
         }
       })
       .on('error', (error, receipt) => {
+        thisObj.setStateFromReceipt(receipt);
         thisObj.setState({working: false});
-        if(error && error.message){
-          if(error.message.length <= 512 && error.message.indexOf("{") !== -1){
-            error = JSON.parse(error.message.substring(error.message.indexOf("{")));
-          }
-          let message = error.message.toString();
-          thisObj.setState({buttonVal: false, buttonValMsg: message});
-        }
-        
       })
   }
   getStatus(status){
