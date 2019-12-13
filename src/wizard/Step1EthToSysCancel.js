@@ -103,16 +103,14 @@ class Step1ESC extends Component {
       })
       .on('error', (error, receipt) => {
         thisObj.setState({working: false});
-        if(error.message.length <= 512 && error.message.indexOf("{") !== -1){
-          error = JSON.parse(error.message.substring(error.message.indexOf("{")));
-        }
-        let message = error.message.toString();
-        if(receipt){
-          thisObj.setStateFromReceipt(receipt, message);
-        }
-        else{
+        if(error && error.message){
+          if(error.message.length <= 512 && error.message.indexOf("{") !== -1){
+            error = JSON.parse(error.message.substring(error.message.indexOf("{")));
+          }
+          let message = error.message.toString();
           thisObj.setState({buttonVal: false, buttonValMsg: message});
         }
+        
       })
   }
   async timeoutBridgeTransaction() {
@@ -154,16 +152,14 @@ class Step1ESC extends Component {
       })
       .on('error', (error, receipt) => {
         thisObj.setState({working: false});
-        if(error.message.length <= 512 && error.message.indexOf("{") !== -1){
-          error = JSON.parse(error.message.substring(error.message.indexOf("{")));
-        }
-        let message = error.message.toString();
-        if(receipt){
-          thisObj.setStateFromReceipt(receipt, message);
-        }
-        else{
+        if(error && error.message){
+          if(error.message.length <= 512 && error.message.indexOf("{") !== -1){
+            error = JSON.parse(error.message.substring(error.message.indexOf("{")));
+          }
+          let message = error.message.toString();
           thisObj.setState({buttonVal: false, buttonValMsg: message});
         }
+        
       })
   }
   getStatus(status){
