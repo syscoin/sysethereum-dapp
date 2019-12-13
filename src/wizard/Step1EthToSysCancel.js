@@ -56,6 +56,9 @@ class Step1ESC extends Component {
     if(receipt.status  && receipt.status !== "1" && receipt.status !== true && receipt.status !== "true" && receipt.status !== "0x1"){
       errorMsg = this.props.t("step5ErrorEVMCheckLog");
     }
+    else if(receipt.status === false){
+      errorMsg = this.props.t("step5ErrorEVMCheckLog");
+    }
     this.setState({receiptObj: receipt, receiptStatus: receipt.status === true? "true":"false", receiptTxHash: receipt.transactionHash});
     if(errorMsg !== null){
       this.setState({buttonVal: false, buttonValMsg: errorMsg}); 
