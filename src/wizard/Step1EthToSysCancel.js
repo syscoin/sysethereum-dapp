@@ -49,18 +49,18 @@ class Step1ESC extends Component {
 
 
   async setStateFromReceipt(receipt) {
-    let error = null;
+    let errorMsg = null;
     if(receipt.transactionHash && this.state.receiptTxHash !== receipt.transactionHash){
       return;
     }
     if(receipt.status  && receipt.status !== "1" && receipt.status !== true && receipt.status !== "true" && receipt.status !== "0x1"){
-      error = this.props.t("step5ErrorEVMCheckLog");
+      errorMsg = this.props.t("step5ErrorEVMCheckLog");
     }
     this.setState({receiptObj: receipt, receiptStatus: receipt.status === true? "true":"false", receiptTxHash: receipt.transactionHash});
-    if(error !== null){
-      this.setState({buttonVal: false, buttonValMsg: error}); 
+    if(errorMsg !== null){
+      this.setState({buttonVal: false, buttonValMsg: errorMsg}); 
     }
-    await this.getBridgeTransferDetails(this.state.bridgeTransferId, error === null);
+    await this.getBridgeTransferDetails(this.state.bridgeTransferId, errorMsg === null);
   }
 
   
