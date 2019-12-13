@@ -105,7 +105,12 @@ class Step1ESC extends Component {
         }
       })
       .on('error', (error, receipt) => {
-        thisObj.setStateFromReceipt(receipt);
+        if(receipt){
+          thisObj.setStateFromReceipt(receipt);
+        }
+        else{
+          this.setState({buttonVal: false, buttonValMsg: error}); 
+        }
         thisObj.setState({working: false});
       })
   }
@@ -150,7 +155,12 @@ class Step1ESC extends Component {
         }
       })
       .on('error', (error, receipt) => {
-        thisObj.setStateFromReceipt(receipt);
+        if(receipt){
+          thisObj.setStateFromReceipt(receipt);
+        }
+        else{
+          this.setState({buttonVal: false, buttonValMsg: error}); 
+        }
         thisObj.setState({working: false});
       })
   }
