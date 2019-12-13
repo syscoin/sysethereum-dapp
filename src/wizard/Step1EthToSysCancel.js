@@ -186,7 +186,7 @@ class Step1ESC extends Component {
     const bridgeTransferDetails = await syscoinTransactionProcessor.methods.getBridgeTransfer(bridgeTransferId).call();
     let statusValue = this.getStatus(bridgeTransferDetails._status);
     let buttonTimeoutVal = false;
-    let buttonNewCancelVal = false;
+    let buttonNewCancelVal = true;
     let buttonVal = false;
     let buttonValMsg = "";
     if(statusValue === "CancelRequested"){
