@@ -43,7 +43,7 @@ i18n.use(LanguageDetector).init({
         'step1SuperblockParentId': 'Previous Superblock ID',
         'step1SearchBox': 'Enter a hash or height to locate a Superblock...',
         'step1ESHead': 'Welcome to the official Ethereum to Syscoin Bridge wizard!',
-        'step1ESDescription': '<p><em>This is a wizard for a bridge for users of Ethereum who has previously walked over from Syscoin to move back trustlessly.</em></p> <p>An SPV proof of the Ethereum burn transaction is required to move back to Syscoin.</p><p> <strong>Please enter details about which asset to move back to Syscoin:</strong></p> Enter <code>1965866356</code> for <code class="blue">Asset GUID</code> if moving Syscoin (SYSX) over otherwise enter the GUID of the Asset token you are moving back to Syscoin.',
+        'step1ESDescription': '<p><em>This is a wizard for a bridge for tokens on Ethereum to move to Syscoin trustlessly.</em></p> <p>An SPV proof of the Ethereum burn transaction is required to move back to Syscoin.</p><p> <strong>Please enter details about which asset to move back to Syscoin:</strong></p> Enter <code>1965866356</code> for <code class="blue">Asset GUID</code> if moving Syscoin (SYSX) over otherwise enter the GUID of the Asset token you are moving back to Syscoin.',
         'step1ESFromAccountLabel': 'Ethereum account',
         'step1ESEnterFromAccount': 'Enter your ethereum token address...',
         'step1ESWitnessAddressLabel': 'Syscoin Address',
