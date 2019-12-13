@@ -109,7 +109,7 @@ class Step1ESC extends Component {
           thisObj.setStateFromReceipt(receipt);
         }
         else{
-          thisObj.setState({buttonVal: false, buttonValMsg: error}); 
+          thisObj.setState({buttonVal: false, buttonValMsg: error.message.toString()}); 
         }
         thisObj.setState({working: false});
       })
@@ -159,7 +159,7 @@ class Step1ESC extends Component {
           thisObj.setStateFromReceipt(receipt);
         }
         else{
-          thisObj.setState({buttonVal: false, buttonValMsg: error}); 
+          thisObj.setState({buttonVal: false, buttonValMsg: error.message.toString()}); 
         }
         thisObj.setState({working: false});
       })
