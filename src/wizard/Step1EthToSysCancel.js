@@ -90,6 +90,7 @@ class Step1ESC extends Component {
     this.setState({working: true});
     this.state.receiptObj = null;
     let thisObj = this;
+    thisObj.state.receiptStatus = "true"; 
     let syscoinTransactionProcessor = new web3.eth.Contract(erc20Managerabi,  CONFIGURATION.ERC20Manager);
     syscoinTransactionProcessor.methods.cancelTransferRequest(this.state.bridgeTransferId).send({from: this.state.freezer, value: web3.utils.toWei("3"), gas: 500000})
       .on('transactionHash', function(hash){
@@ -134,6 +135,7 @@ class Step1ESC extends Component {
     this.setState({working: true});
     this.state.receiptObj = null;
     let thisObj = this;
+    thisObj.state.receiptStatus = "true"; 
     let syscoinTransactionProcessor = new web3.eth.Contract(erc20Managerabi,  CONFIGURATION.ERC20Manager);
     syscoinTransactionProcessor.methods.cancelTransferSuccess(this.state.bridgeTransferId).send({from: this.state.freezer, gas: 500000})
       .on('transactionHash', function(hash){
