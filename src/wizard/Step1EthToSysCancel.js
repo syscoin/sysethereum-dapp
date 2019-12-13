@@ -183,7 +183,7 @@ class Step1ESC extends Component {
       else{
         buttonTimeoutVal = true;
         buttonVal = true;
-        buttonValMsg = this.props.t("step1ESCCancellRequested");
+        buttonValMsg = this.props.t("step1ESCCancelRequested");
       }
     }
     else if(statusValue === "CancelChallenged"){
