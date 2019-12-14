@@ -190,6 +190,10 @@ class Step1ESC extends Component {
     if(statusValue === "CancelChallenged"){
       _buttonValMsg = this.props.t("step1ESCCancelChallenged");
     }
+    else if(statusValue === "CancelOk"){
+      _buttonVal = true;
+      _buttonValMsg = this.props.t("step1ESCCancelOk");
+    }
     else if(mintExists){
       _buttonValMsg = this.props.t("step1ESCExists");
     }
@@ -203,10 +207,6 @@ class Step1ESC extends Component {
         _buttonVal = true;
         _buttonValMsg = this.props.t("step1ESCCancelRequested");
       }
-    }
-    else if(statusValue === "CancelOk"){
-      _buttonVal = true;
-      _buttonValMsg = this.props.t("step1ESCCancelOk");
     }
     else if(statusValue === "Ok"){
       if((Date.now() / 1000) - parseInt(bridgeTransferDetails._timestamp) < (CONFIGURATION.testnet? 36000: 907200)){
