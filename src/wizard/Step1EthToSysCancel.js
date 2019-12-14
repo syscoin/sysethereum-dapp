@@ -187,15 +187,16 @@ class Step1ESC extends Component {
     let buttonNewCancelVal = false;
     let _buttonVal = false;
     let _buttonValMsg = "";
-    if(statusValue === "CancelRequested"){
+    if(mintExists){
+      _buttonValMsg = this.props.t("step1ESCExists");
+    }
+    else if(statusValue === "CancelRequested"){
       if((Date.now() / 1000) - parseInt(bridgeTransferDetails._timestamp) < 3600){
         _buttonVal = true;
         _buttonValMsg = this.props.t("step1ESCWaitOneHr");
       }
       else{
-        if(!mintExists){
-          buttonTimeoutVal = true;
-        }
+        buttonTimeoutVal = true;
         _buttonVal = true;
         _buttonValMsg = this.props.t("step1ESCCancelRequested");
       }
@@ -214,9 +215,7 @@ class Step1ESC extends Component {
         _buttonValMsg = this.props.t("step1ESCWaitOneHalfWeek");
       }
       else{
-        if(!mintExists){
-          buttonNewCancelVal = true;
-        }
+        buttonNewCancelVal = true;
         _buttonVal = true;
         _buttonValMsg = this.props.t("step1ESCOk");
       }
@@ -279,7 +278,6 @@ class Step1ESC extends Component {
           this.getBridgeTransferDetails(bridgeTransferId, true, false);
         }
         else{
-          this.setState({searchError: this.props.t("step1ESCExists")});
           this.getBridgeTransferDetails(bridgeTransferId, true, true);
         }
       })
