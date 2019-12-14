@@ -60,7 +60,7 @@ class Step1ESC extends Component {
     if(errorMsg !== null){
       this.setState({buttonVal: false, buttonValMsg: errorMsg}); 
     }
-    await this.getBridgeTransferDetails(this.state.bridgeTransferId, errorMsg === null);
+    await this.getBridgeTransferDetails(this.state.bridgeTransferId, errorMsg === null, false);
   }
 
   
@@ -178,7 +178,7 @@ class Step1ESC extends Component {
     }
     return "Unknown";
   }
-  async getBridgeTransferDetails(bridgeTransferId, setButtonState){
+  async getBridgeTransferDetails(bridgeTransferId, setButtonState, mintExists){
     console.log("getBridgeTransferDetails: " + bridgeTransferId);
     let syscoinTransactionProcessor = new web3.eth.Contract(erc20Managerabi,  CONFIGURATION.ERC20Manager);
     const bridgeTransferDetails = await syscoinTransactionProcessor.methods.getBridgeTransfer(bridgeTransferId).call();
@@ -193,7 +193,9 @@ class Step1ESC extends Component {
         _buttonValMsg = this.props.t("step1ESCWaitOneHr");
       }
       else{
-        buttonTimeoutVal = true;
+        if(!mintExists){
+          buttonTimeoutVal = true;
+        }
         _buttonVal = true;
         _buttonValMsg = this.props.t("step1ESCCancelRequested");
       }
@@ -212,7 +214,9 @@ class Step1ESC extends Component {
         _buttonValMsg = this.props.t("step1ESCWaitOneHalfWeek");
       }
       else{
-        buttonNewCancelVal = true;
+        if(!mintExists){
+          buttonNewCancelVal = true;
+        }
         _buttonVal = true;
         _buttonValMsg = this.props.t("step1ESCOk");
       }
@@ -272,10 +276,11 @@ class Step1ESC extends Component {
       .then(response => {
         console.log(response);
         if(response.data.error){
-          this.getBridgeTransferDetails(bridgeTransferId, true);
+          this.getBridgeTransferDetails(bridgeTransferId, true, false);
         }
         else{
           this.setState({searchError: this.props.t("step1ESCExists")});
+          this.getBridgeTransferDetails(bridgeTransferId, true, true);
         }
       })
       .catch(error => {
