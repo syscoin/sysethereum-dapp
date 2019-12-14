@@ -187,7 +187,10 @@ class Step1ESC extends Component {
     let buttonNewCancelVal = false;
     let _buttonVal = false;
     let _buttonValMsg = "";
-    if(mintExists){
+    if(statusValue === "CancelChallenged"){
+      _buttonValMsg = this.props.t("step1ESCCancelChallenged");
+    }
+    else if(mintExists){
       _buttonValMsg = this.props.t("step1ESCExists");
     }
     else if(statusValue === "CancelRequested"){
@@ -201,17 +204,12 @@ class Step1ESC extends Component {
         _buttonValMsg = this.props.t("step1ESCCancelRequested");
       }
     }
-    else if(statusValue === "CancelChallenged"){
-      _buttonVal = false;
-      _buttonValMsg = this.props.t("step1ESCCancelChallenged");
-    }
     else if(statusValue === "CancelOk"){
       _buttonVal = true;
       _buttonValMsg = this.props.t("step1ESCCancelOk");
     }
     else if(statusValue === "Ok"){
       if((Date.now() / 1000) - parseInt(bridgeTransferDetails._timestamp) < (CONFIGURATION.testnet? 36000: 907200)){
-        _buttonVal = false;
         _buttonValMsg = this.props.t("step1ESCWaitOneHalfWeek");
       }
       else{
@@ -221,7 +219,6 @@ class Step1ESC extends Component {
       }
     }
     else{
-      _buttonVal = false;
       _buttonValMsg = this.props.t("step1ESCUnknown");
     }
     this.setState({allowTimeout: buttonTimeoutVal, allowNewCancel: buttonNewCancelVal, bridgeTransferId: bridgeTransferId, requesttimestamp: bridgeTransferDetails._timestamp, value: bridgeTransferDetails._value, erc: bridgeTransferDetails._erc20ContractAddress, spt: bridgeTransferDetails._assetGUID, freezer: bridgeTransferDetails._tokenFreezerAddress, status: statusValue });
