@@ -1,0 +1,79 @@
+@import "_mixins.scss";
+
+/* only example specific CSS goes here - pls do not write any CSS that overwrite the ../css/main.css example css */
+.languageButtons 
+{
+  position: absolute;
+  top: 10px;
+  right: 10px;
+
+  .dropbtn 
+  {
+    background-color: #37435f;
+    color: white;
+    padding: 3px 13px 3px 3px;
+    font-size: 16px;
+    border: none;
+    text-transform: uppercase;
+    outline:none;
+    line-height: 16px;
+    @include border-radius(13px);
+
+    .selectedLang
+    {
+      display: block;
+      float: right;
+      line-height: 1.4em;
+      margin-left: 5px;
+  
+    }
+
+    .glyphicon
+    {
+      top:2px;
+      font-size: 1.3em;
+    }
+  }
+
+  .dropdown 
+  {
+    position: relative;
+    display: inline-block;
+    
+  }
+
+  .dropdown-content 
+  {
+    display: none;
+    position: absolute;
+    background-color: #37435f;
+    top:0;
+    min-width: 64px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+  }
+
+  .dropdown-content button
+  {
+    color: #ddd;
+    padding: 10px 12px;
+    text-decoration: none;
+    display: block;
+    background:none;
+    border:0;
+    text-align:center;
+    width:100%;
+    outline:none;
+  }
+  .dropdown-content button:hover, 
+  .dropdown-content button:active 
+  {
+    color:white;
+  }
+
+  .dropdown:hover .dropdown-content,
+  .dropdown:active .dropdown-content
+  {
+    display: block;
+  }
+}

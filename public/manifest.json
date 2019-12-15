@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Sysethereum DAPP",
+  "name": "Sysethereum distribtued application web interface for bridge reference implementation",
   "icons": [
     {
       "src": "favicon.ico",

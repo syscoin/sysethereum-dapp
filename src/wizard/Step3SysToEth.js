@@ -5,10 +5,11 @@ const axios = require('axios');
 class Step3 extends Component {
   constructor(props) {
     super(props);
+    let storageExists = typeof(Storage) !== "undefined";
     this.state = {
-      sysrawtxunsigned: props.getStore().sysrawtxunsigned,
-      txid: props.getStore().txid,
-      blockhash: props.getStore().blockhash,
+      sysrawtxunsigned: (storageExists && localStorage.getItem("sysrawtxunsigned")) || props.getStore().sysrawtxunsigned,
+      txid: (storageExists && localStorage.getItem("txid")) || props.getStore().txid,
+      blockhash: (storageExists && localStorage.getItem("blockhash")) || props.getStore().blockhash,
       working: false
     };
     
@@ -16,7 +17,6 @@ class Step3 extends Component {
     this.getBlockhash = this.getBlockhash.bind(this);
     this.validationCheck = this.validationCheck.bind(this);
     this.isValidated = this.isValidated.bind(this);
-   
   }
 
   componentDidMount() {
@@ -24,7 +24,15 @@ class Step3 extends Component {
   }
 
   componentWillUnmount() {}
-
+  saveToLocalStorage() {
+    if (typeof(Storage) !== "undefined") {
+      // Code for localStorage/sessionStorage.
+      localStorage.setItem("txid", this.refs.txid.value);
+      localStorage.setItem("blockhash", this.refs.blockhash.value);
+    } else {
+      // Sorry! No Web Storage support..
+    }
+  }
   isValidated() {
     const userInput = this._grabUserInput(); // grab user entered vals
     const validateNewInput = this._validateData(userInput); // run the new input against the validator
@@ -65,27 +73,30 @@ class Step3 extends Component {
       this.setState({working: true});
       let txid = userInput.txid.toString();
       try {
-        let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=getblockhashbytxid&txid=' + txid);
+        let results = await axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=getblockhashbytxid&txid=' + txid);
         results = results.data;
         if(results.error){
           validateNewInput.buttonVal = false;
           validateNewInput.buttonValMsg = results.error;
           this.setState({working: false});
+          this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
           console.log("error " + results.error);
         }
         else if(results && results.hex){
           validateNewInput.blockhashVal = true;
           this.refs.blockhash.value = results.hex;
           this.setState({working: false});
+          this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+          this.saveToLocalStorage();
         }
       }catch(e) {
         validateNewInput.buttonVal = false;
         validateNewInput.buttonValMsg = e.message;
         this.setState({working: false});
+        this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
         console.log("error " + e.message);
       }
     } 
-    this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
 
   }
   validationCheck() {
@@ -126,25 +137,25 @@ class Step3 extends Component {
     let notValidClasses = {};
 
     if (typeof this.state.txidVal == 'undefined' || this.state.txidVal) {
-      notValidClasses.txidCls = 'no-error col-md-8';
+      notValidClasses.txidCls = 'no-error';
     }
     else {
-      notValidClasses.txidCls = 'has-error col-md-8';
+      notValidClasses.txidCls = 'has-error';
       notValidClasses.txidValGrpCls = 'val-err-tooltip';
     }
 
     if (typeof this.state.blockhashVal == 'undefined' || this.state.blockhashVal) {
-        notValidClasses.blockhashCls = 'no-error col-md-8';
+        notValidClasses.blockhashCls = 'no-error';
     }
     else {
-       notValidClasses.blockhashCls = 'has-error col-md-8';
+       notValidClasses.blockhashCls = 'has-error';
        notValidClasses.blockhashValGrpCls = 'val-err-tooltip';
     }
     if (typeof this.state.buttonVal == 'undefined' || this.state.buttonVal) {
-      notValidClasses.buttonCls = 'no-error col-md-8';
+      notValidClasses.buttonCls = 'no-error';
     }
     else {
-      notValidClasses.buttonCls = 'has-error col-md-8';
+      notValidClasses.buttonCls = 'has-error';
       notValidClasses.buttonValGrpCls = 'val-err-tooltip';
     }
     return (
@@ -152,17 +163,17 @@ class Step3 extends Component {
         <div className="row">
           <form id="Form" className="form-horizontal">
             <div className="form-group">
-              <label className="col-md-12 control-label">
-                <h1>{this.props.t("step3Head")}</h1>
-                <h3>{this.props.t("step3Description")}</h3>
+              <label className="col-md-12">
+                <h1 dangerouslySetInnerHTML={{__html: this.props.t("step3Head")}}></h1>
+                <h3 dangerouslySetInnerHTML={{__html: this.props.t("step3Description")}}></h3>
               </label>
            
             <div className="row">
-            <div className="col-md-12 ">
+            <div className="col-md-12 no-error">
                 <label className="control-label col-md-4">
                   {this.props.t("step2RawTxLabel")}
                 </label>  
-                <div className="col-md-8">
+               
                     <textarea
                       rows="3"
                       autoComplete="off"
@@ -171,7 +182,7 @@ class Step3 extends Component {
                       defaultValue={this.state.sysrawtxunsigned}
                       />
                 </div>
-              </div>
+              
             </div>
             <div className="row">
             <div className="col-md-12">
@@ -194,10 +205,8 @@ class Step3 extends Component {
               </div>
               <div className="row">
               <div className="col-md-12">
-                <label className="control-label col-md-4">
-                </label>  
                 <div className={notValidClasses.buttonCls}>
-                    <button type="button" disabled={this.state.working} className="form-control btn btn-default" aria-label={this.props.t("step3Button")} onClick={this.getBlockhash}>
+                    <button type="button" disabled={this.state.working} className="form-control btn btn-default formbtn" aria-label={this.props.t("step3Button")} onClick={this.getBlockhash}>
                     <span className="glyphicon glyphicon-search" aria-hidden="true">&nbsp;</span>
                     {this.props.t("step3Button")}
                     </button>

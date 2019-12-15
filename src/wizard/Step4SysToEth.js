@@ -12,8 +12,7 @@ class Step4 extends Component {
       syscoinblockindex: props.getStore().syscoinblockindex,
       superblockhash: props.getStore().superblockhash,
       syscoinblocksiblings: props.getStore().syscoinblocksiblings,
-      txbytes: props.getStore().txbytes,
-      untrustedtargetcontract: props.getStore().untrustedtargetcontract
+      txbytes: props.getStore().txbytes
     };
           // INPUTS:
       // enter syscoin burn txid
@@ -32,7 +31,6 @@ class Step4 extends Component {
     // step 5: 
       // INPUTS:
       // _txBytes - transaction bytes (autofilled with getrawtransaction)
-      // _untrustedTargetContract - the contract that is going to process the transaction (input from assetinfo or genesis param)
     this._validateOnDemand = true; // this flag enables onBlur validation as user fills forms
     this.getProofs = this.getProofs.bind(this);
     this.validationCheck = this.validationCheck.bind(this);
@@ -60,7 +58,6 @@ class Step4 extends Component {
         this.props.getStore().syscoinblockindex !== userInput.syscoinblockindex ||
         this.props.getStore().syscoinblocksiblings !== userInput.syscoinblocksiblings ||
         this.props.getStore().txbytes !== userInput.txbytes ||
-        this.props.getStore().untrustedtargetcontract !== userInput.untrustedtargetcontract ||
         this.props.getStore().superblockhash !== userInput.superblockhash 
         ) { // only update store of something changed
           this.props.updateStore({
@@ -84,7 +81,7 @@ class Step4 extends Component {
     let failed = false;
     this.setState({working: true});
     try {
-      let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=syscoingetspvproof&txid=' + this.props.getStore().txid.toString() + '&blockhash=' + this.props.getStore().blockhash.toString());
+      let results = await axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=syscoingetspvproof&txid=' + this.props.getStore().txid.toString());
       results = results.data;
       if(results.error){
         validateNewInput.buttonVal = false;
@@ -101,8 +98,6 @@ class Step4 extends Component {
         console.log("txsiblingsVal " + validateNewInput.txsiblings);
         validateNewInput.txindex = results.index;
         console.log("txindexVal " + validateNewInput.txindex);
-        validateNewInput.untrustedtargetcontract = results.contract;
-        console.log("untrustedtargetcontractVal " + validateNewInput.untrustedtargetcontract);
       }
     }catch(e) {
       validateNewInput.buttonVal = false;
@@ -111,7 +106,7 @@ class Step4 extends Component {
       failed = true;
     }
     if(failed === false){
-      axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/spvproof?hash=' + (this.props.getStore().blockhash.toString()))
+      axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/spvproof?hash=' + (this.props.getStore().blockhash.toString()))
       .then(response => {
         this.setState({working: false});
         console.log(response);
@@ -165,8 +160,7 @@ class Step4 extends Component {
       syscoinblockindexVal: true,
       syscoinblocksiblingsVal: true,
       superblockhashVal: true,
-      txbytesVal: true,
-      untrustedtargetcontractVal: true
+      txbytesVal: true
     }
   }
 
@@ -178,8 +172,7 @@ class Step4 extends Component {
       syscoinblockindexValMsg: '',
       syscoinblocksiblingsValMsg: '',
       superblockhashValMsg: '',
-      txbytesValMsg: '',
-      untrustedtargetcontractValMsg: ''
+      txbytesValMsg: ''
     }
     return errMsgs;
   }
@@ -192,8 +185,7 @@ class Step4 extends Component {
       syscoinblockindex: this.state.syscoinblockindex,
       syscoinblocksiblings: this.state.syscoinblocksiblings,
       superblockhash: this.state.superblockhash,
-      txbytes: this.state.txbytes,
-      untrustedtargetcontract: this.state.untrustedtargetcontract
+      txbytes: this.state.txbytes
     };
   }
   render() {
@@ -212,17 +204,15 @@ class Step4 extends Component {
         <div className="row">
           <form id="Form" className="form-horizontal">
             <div className="form-group">
-              <label className="col-md-12 control-label">
-                <h1>{this.props.t("step4Head")}</h1>
-                <h3>{this.props.t("step4Description")}</h3>
+              <label className="col-md-12">
+                <h1 dangerouslySetInnerHTML={{__html: this.props.t("step4Head")}}></h1>
+                <h3 dangerouslySetInnerHTML={{__html: this.props.t("step4Description")}}></h3>
               </label>
             
             <div className="row">
               <div className="col-md-12">
-                <label className="control-label col-md-4">
-                </label>  
                 <div className={notValidClasses.buttonCls}>
-                    <button type="button" disabled={this.state.working} className="form-control btn btn-default" aria-label={this.props.t("step4Button")} onClick={this.getProofs}>
+                    <button type="button" disabled={this.state.working} className="form-control btn btn-default formbtn" aria-label={this.props.t("step4Button")} onClick={this.getProofs}>
                     <span className="glyphicon glyphicon-search" aria-hidden="true">&nbsp;</span>
                     {this.props.t("step4Button")}
                     </button>

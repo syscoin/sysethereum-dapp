@@ -1,0 +1,398 @@
+@import "_mixins.scss";
+
+.wizardTitleCont
+{
+  margin-top:70px;
+}
+.EthToSysWizard,
+.SysToEthWizard
+{
+    max-width:1000px;
+    margin:0 auto;
+    // background: rgba(#fff,0.8);
+    background: rgba(113, 229, 255, 0.14);
+    position: relative;
+    color: #dddfe8;
+    -webkit-box-shadow: 0 14px 32px 0 rgba(2, 92, 221, 0.3), 0 16px 32px 0 rgba(0, 0, 0, 0.12);
+    box-shadow: 0 14px 32px 0 rgba(2, 92, 221, 0.3), 0 16px 32px 0 rgba(0, 0, 0, 0.12);
+    @include border-radius(3px);
+
+    // override bootstrap
+    input.form-control,
+    textarea.form-control
+    {
+        color: #dedede;
+        background-color: #1f1c5e85;
+        background-image: none;
+        border: 0px solid #232e73;
+        @include border-radius(0);   
+
+        &::focus 
+        {
+           background:#232e73ad;   
+        }
+    }
+
+    label 
+    {
+        color:#d3dfff;
+
+        h1 
+        {
+            text-align: center;
+        }
+    }
+
+    .control-label 
+    {
+        font-size: 16px;
+        font-weight: 700;
+        /* margin-bottom: 9px; */
+        color: #d3dfff;
+        padding: 7px 15px 2px 12px;
+        background: #1f1c5e85;
+        margin-top:20px;
+        margin-bottom:0;
+        width:auto;
+    }
+
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+        -webkit-appearance: none; 
+        margin: 0; 
+    }
+
+    .val-err-tooltip {
+        background-color: #981a1a75;
+    }
+
+    .has-success, .has-error, .no-error 
+    {
+        input.form-control,
+        textarea.form-control
+        {
+            box-shadow: none !important;
+            -webkit-box-shadow: none !important;
+        }
+        .val-success-tooltip
+        {
+            padding:0;
+        }
+
+        .val-success-tooltip.active
+        {
+            padding: 3px 5px 3px 10px;
+        }
+    }
+
+    .formbtn 
+    {
+        margin:30px auto 30px;
+        background:#359ef6;
+        text-shadow: none;
+        color:white;
+        @include border-radius(3px);
+        font-size: 16px;
+        line-height:28px;
+        height:40px;
+        border:0;
+        box-shadow: none;
+        -webkit-box-shadow: none;
+
+        &:hover,
+        &:active,
+        &:focus
+        {
+            background: #252c6c;
+            color:white;
+        }
+    }
+
+    .formbtnmini
+    {
+        background:#359ef6;
+        text-shadow: none;
+        color:white;
+        @include border-radius(3px);
+        font-size: 16px;
+        border:0;
+        box-shadow: none;
+        -webkit-box-shadow: none;
+
+        &:hover,
+        &:active,
+        &:focus
+        {
+            background: #252c6c;
+            color:white;
+        }
+    }
+
+    code
+    {
+        line-height: 1em;
+        padding:3px;
+        background-color:#d3dfff;
+        left:0;
+
+        .result
+        {
+            color:#1d5f96;
+            display: inline-block;
+            float: left;
+        }
+
+        .dataname
+        {
+          width: 280px;
+          display: inline-block;
+          float: left;
+          clear: both;
+        }
+    }
+
+    code.block 
+    {
+        display:block;
+        padding:6px;
+        line-height: 1.2em;
+        overflow: hidden;
+        word-break: break-all;
+    }
+
+    code.blue 
+    {
+        color:#1d5f96;
+    }
+
+    em.step 
+    {
+        color: #359ef6;
+        font-weight: 700;
+        font-style: normal;
+        font-size: 24px;
+        text-transform: uppercase;
+    }
+
+    .btn-default.disabled, .btn-default.disabled.active, .btn-default.disabled.focus, .btn-default.disabled:active, .btn-default.disabled:focus, .btn-default.disabled:hover, .btn-default[disabled], .btn-default[disabled].active, .btn-default[disabled].focus, .btn-default[disabled]:active, .btn-default[disabled]:focus, .btn-default[disabled]:hover, fieldset[disabled] .btn-default, fieldset[disabled] .btn-default.active, fieldset[disabled] .btn-default.focus, fieldset[disabled] .btn-default:active, fieldset[disabled] .btn-default:focus, fieldset[disabled] .btn-default:hover {
+        background-color: #6f6f6f;
+        background-image: none;
+    }
+
+    a.vivid 
+    {
+        color: #88b2d6;
+        background: #1f1c5e;
+        padding: 3px 6px;
+        margin-top: 5px;
+        display: inline-block;
+        text-decoration: none;
+        @include border-radius(3px);
+        -webkit-box-shadow: 0 14px 32px 0 rgba(2, 92, 221, 0.3), 0 16px 32px 0 rgba(0, 0, 0, 0.12);
+        box-shadow: 0 14px 32px 0 rgba(2, 92, 221, 0.3), 0 16px 32px 0 rgba(0, 0, 0, 0.12);
+
+        &:hover
+        {
+            color:white;
+        }
+    }
+
+    .mb30 
+    {
+        margin-bottom:30px;
+    }
+
+}
+
+
+.react-tabs__tab-list
+{
+  margin-bottom: 0;
+  margin-left: 10px;
+  border: 0;
+
+  .react-tabs__tab
+  {
+    border:0;
+  }
+  .react-tabs__tab--selected
+  {
+    background:#d3dfff
+  }
+}
+
+.col-centered{
+    float: none !important;
+    margin: 0 auto;
+    }
+    
+
+ol.progtrckr {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  ol.progtrckr li {
+    display: inline-block;
+    text-align: center;
+    line-height: 4.5rem;
+    cursor: pointer;
+  }
+  
+  ol.progtrckr li span {
+    padding: 0 1.5rem;
+  }
+  
+  @media (max-width: 750px) {
+    .progtrckr li span {
+      display: none;
+    }
+  }
+  .progtrckr em {
+    display: none;
+    font-weight: 700;
+    padding-left: 1rem;
+  }
+  
+  @media (max-width: 750px) {
+    .progtrckr em {
+      display: inline;
+    }
+  }
+
+  @media (max-width: 450px) {
+    ol.progtrckr
+    {
+        padding-top:40px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    code
+    {
+        .result
+        {
+            color:#1d5f96;
+            display: inline-block;
+            float: left;
+            clear: both;
+        }
+
+        .dataname
+        {
+          display: inline-block;
+          float: left;
+          clear: both;
+        }
+    }
+  }
+
+  ol.progtrckr li.progtrckr-todo {
+    color: silver;
+    border-bottom: 4px solid silver;
+  }
+  
+  ol.progtrckr li.progtrckr-doing {
+    color: #359ef6;;
+    border-bottom: 4px solid #359ef6;
+  }
+  
+  ol.progtrckr li.progtrckr-done {
+    color: white;
+    border-bottom: 4px solid #5cb85c;
+  }
+  
+  ol.progtrckr li:after {
+    content: "\00a0\00a0";
+  }
+  
+  ol.progtrckr li:before {
+    position: relative;
+    bottom: -3.7rem;
+    float: left;
+    left: 50%;
+  }
+  
+  ol.progtrckr li.progtrckr-todo:before {
+    content: "\2022";
+    color: silver;
+    background-color: white;
+    width: 1.3em;
+    line-height: 1.3em;
+    border-radius: 1.3em;
+  }
+  
+  ol.progtrckr li.progtrckr-todo:hover:before {
+    color: #359ef6;
+  }
+  
+  ol.progtrckr li.progtrckr-doing:before {
+    content: "\2022";
+    color: #202f64;
+    background-color: #359ef6;
+    width: 1.3em;
+    line-height: 1.3em;
+    border-radius: 1.3em;
+  }
+  
+  ol.progtrckr li.progtrckr-doing:hover:before {
+    color: #fff;
+  }
+  
+  ol.progtrckr li.progtrckr-done:before {
+    content: "\2713";
+    color: white;
+    background-color: #5cb85c;
+    width: 1.3em;
+    line-height: 1.3em;
+    border-radius: 1.3em;
+  }
+  
+  ol.progtrckr li.progtrckr-done:hover:before {
+    color: #333;
+  }
+  .superblockpagecontainer {
+    display: inline-flex;
+    margin-top:20px;
+  }
+  .superblockpageicon {
+    cursor: pointer;
+  }
+  .superblockpage {
+    color: #359ef6;
+    margin-top: 7px;
+    font-size: 24px;
+    font-weight: bolder;
+  }
+  .superblocksearcherror{
+    color: #ff4500;
+    font-size:16px;
+    font-weight: bolder;
+  }
+  .add-on .input-group-btn > .btn {
+    border-left-width:0;left:-2px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  }
+  /* stop the glowing blue shadow */
+  .add-on .form-control:focus {
+   box-shadow:none;
+   -webkit-box-shadow:none; 
+   border-color:#cccccc; 
+  }
+  .add-on {
+    width:100%;
+  }
+  .val-success-tooltip {
+    background-color: green;
+    padding: 3px 5px 3px 10px;
+    font-size: 14px;
+    color: #fff;
+  }
+
+  @media (max-width: 835px) {
+    .wizardTitleCont
+    {
+      margin-top:105px;
+    }
+  }

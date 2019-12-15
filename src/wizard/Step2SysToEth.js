@@ -5,12 +5,13 @@ const axios = require('axios');
 class Step2 extends Component {
   constructor(props) {
     super(props);
+    let storageExists = typeof(Storage) !== "undefined";
     this.state = {
-      asset: props.getStore().asset,
-      fundingaddress: props.getStore().fundingaddress,
-      amount: props.getStore().amount,
-      ethaddress: props.getStore().ethaddress,
-      sysrawtxunsigned: props.getStore().sysrawtxunsigned,
+      asset: (storageExists && localStorage.getItem("asset")) || props.getStore().asset,
+      fundingaddress: (storageExists && localStorage.getItem("fundingaddress")) || props.getStore().fundingaddress,
+      amount: (storageExists && localStorage.getItem("amount")) || props.getStore().amount,
+      ethaddress: (storageExists && localStorage.getItem("ethaddress")) || props.getStore().ethaddress,
+      sysrawtxunsigned: (storageExists && localStorage.getItem("sysrawtxunsigned")) || props.getStore().sysrawtxunsigned,
       working: false
     };
     
@@ -18,13 +19,23 @@ class Step2 extends Component {
     this.getBurnTx = this.getBurnTx.bind(this);
     this.validationCheck = this.validationCheck.bind(this);
     this.isValidated = this.isValidated.bind(this);
-   
   }
 
   componentDidMount() {}
 
   componentWillUnmount() {}
-
+  saveToLocalStorage() {
+    if (typeof(Storage) !== "undefined") {
+      // Code for localStorage/sessionStorage.
+      localStorage.setItem("asset", this.refs.asset.value);
+      localStorage.setItem("amount", this.refs.amount.value);
+      localStorage.setItem("fundingaddress", this.refs.fundingaddress.value);
+      localStorage.setItem("ethaddress", this.refs.ethaddress.value);
+      localStorage.setItem("sysrawtxunsigned", this.refs.sysrawtxunsigned.value);
+    } else {
+      // Sorry! No Web Storage support..
+    }
+  }
   isValidated() {
     const userInput = this._grabUserInput(); // grab user entered vals
     const validateNewInput = this._validateData(userInput); // run the new input against the validator
@@ -83,7 +94,7 @@ class Step2 extends Component {
           ethAddressStripped = ethAddressStripped.substr(2, ethAddressStripped.length);
         }
         try {
-          let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=assetallocationburn&asset_guid=' + assetGuid + '&address=' + fundingAddress + '&amount=' + userInput.amount.toString() + '&ethereum_destination_address=' + ethAddressStripped);
+          let results = await axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=assetallocationburn&asset_guid=' + assetGuid + '&address=' + fundingAddress + '&amount=' + userInput.amount.toString() + '&ethereum_destination_address=' + ethAddressStripped);
           results = results.data;
           if(results.error){
             validateNewInput.buttonVal = false;
@@ -95,34 +106,8 @@ class Step2 extends Component {
             this.refs.sysrawtxunsigned.value = results.hex;
             self.setState({working: false});
             self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+            self.saveToLocalStorage();
           }
-        }catch(e) {
-          validateNewInput.buttonVal = false;
-          validateNewInput.buttonValMsg = e.message;
-          self.setState({working: false});
-          self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-        }
-      }
-      else{
-        let ethAddressStripped = userInput.ethaddress.toString();
-        if(ethAddressStripped && ethAddressStripped.startsWith("0x")){
-          ethAddressStripped = ethAddressStripped.substr(2, ethAddressStripped.length);
-        }
-        try {
-          let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=syscoinburn&address=' + fundingAddress + '&amount=' + userInput.amount.toString() + '&ethereum_destination_address=' + ethAddressStripped);
-          results = results.data;
-          if(results.error){
-            validateNewInput.buttonVal = false;
-            validateNewInput.buttonValMsg = results.error;
-            self.setState({working: false});      
-          }
-          else if(results && results.hex){
-            validateNewInput.sysrawtxunsignedVal = true;
-            this.refs.sysrawtxunsigned.value = results.hex;
-            self.setState({working: false});
-            self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-          }
-        
         }catch(e) {
           validateNewInput.buttonVal = false;
           validateNewInput.buttonValMsg = e.message;
@@ -179,46 +164,46 @@ class Step2 extends Component {
     let notValidClasses = {};
 
     if (typeof this.state.assetVal == 'undefined' || this.state.assetVal) {
-      notValidClasses.assetCls = 'no-error col-md-8';
+      notValidClasses.assetCls = 'no-error';
     }
     else {
-       notValidClasses.assetCls = 'has-error col-md-8';
+       notValidClasses.assetCls = 'has-error';
        notValidClasses.assetValGrpCls = 'val-err-tooltip';
     }
     if (typeof this.state.fundingaddressVal == 'undefined' || this.state.fundingaddressVal) {
-      notValidClasses.fundingaddressCls = 'no-error col-md-8';
+      notValidClasses.fundingaddressCls = 'no-error';
     }
     else {
-      notValidClasses.fundingaddressCls = 'has-error col-md-8';
+      notValidClasses.fundingaddressCls = 'has-error';
       notValidClasses.fundingaddressValGrpCls = 'val-err-tooltip';
     }
 
     if (typeof this.state.amountVal == 'undefined' || this.state.amountVal) {
-        notValidClasses.amountCls = 'no-error col-md-8';
+        notValidClasses.amountCls = 'no-error';
     }
     else {
-       notValidClasses.amountCls = 'has-error col-md-8';
+       notValidClasses.amountCls = 'has-error';
        notValidClasses.amountValGrpCls = 'val-err-tooltip';
     }
     if (typeof this.state.ethaddressVal == 'undefined' || this.state.ethaddressVal) {
-      notValidClasses.ethaddressCls = 'no-error col-md-8';
+      notValidClasses.ethaddressCls = 'no-error';
     }
     else {
-      notValidClasses.ethaddressCls = 'has-error col-md-8';
+      notValidClasses.ethaddressCls = 'has-error';
       notValidClasses.ethaddressValGrpCls = 'val-err-tooltip';
     }
     if (typeof this.state.sysrawtxunsignedVal == 'undefined' || this.state.sysrawtxunsignedVal) {
-      notValidClasses.sysrawtxunsignedCls = 'no-error col-md-8';
+      notValidClasses.sysrawtxunsignedCls = 'no-error';
     }
     else {
-      notValidClasses.sysrawtxunsignedCls = 'has-error col-md-8';
+      notValidClasses.sysrawtxunsignedCls = 'has-error';
       notValidClasses.sysrawtxunsignedValGrpCls = 'val-err-tooltip';
     }
     if (typeof this.state.buttonVal == 'undefined' || this.state.buttonVal) {
-      notValidClasses.buttonCls = 'no-error col-md-8';
+      notValidClasses.buttonCls = 'no-error';
     }
     else {
-      notValidClasses.buttonCls = 'has-error col-md-8';
+      notValidClasses.buttonCls = 'has-error';
       notValidClasses.buttonValGrpCls = 'val-err-tooltip';
     }
     return (
@@ -226,9 +211,9 @@ class Step2 extends Component {
         <div className="row">
           <form id="Form" className="form-horizontal">
             <div className="form-group">
-            <label className="col-md-12 control-label">
-                <h1>{this.props.t("step2Head")}</h1>
-                <h3>{this.props.t("step2Description")}</h3>
+            <label className="col-md-12">
+                <h1 dangerouslySetInnerHTML={{__html: this.props.t("step2Head")}}></h1>
+                <h3 dangerouslySetInnerHTML={{__html: this.props.t("step2Description")}}></h3>
               </label>
               <div className="row">
               <div className="col-md-12">
@@ -306,10 +291,8 @@ class Step2 extends Component {
               </div>
               <div className="row">
               <div className="col-md-12">
-                <label className="control-label col-md-4">
-                </label>  
                 <div className={notValidClasses.buttonCls}>
-                    <button type="button" disabled={this.state.working} className="form-control btn btn-default" aria-label={this.props.t("step2Button")} onClick={this.getBurnTx}>
+                    <button type="button" disabled={this.state.working} className="form-control btn btn-default formbtn" aria-label={this.props.t("step2Button")} onClick={this.getBurnTx}>
                     <span className="glyphicon glyphicon-send" aria-hidden="true">&nbsp;</span>
                     {this.props.t("step2Button")}
                     </button>

@@ -7,26 +7,31 @@ const axios = require('axios');
 class Step2ES extends Component {
   constructor(props) {
     super(props);
+    let storageExists = typeof(Storage) !== "undefined";
     this.state = {
-      mintsysrawtxunsigned: props.getStore().mintsysrawtxunsigned,
-      ethburntxid: this.props.getStore().ethburntxid,
+      mintsysrawtxunsigned: (storageExists && localStorage.getItem("mintsysrawtxunsigned")) || props.getStore().mintsysrawtxunsigned,
+      ethburntxid: (storageExists && localStorage.getItem("receiptTxHash")) || this.props.getStore().receiptTxHash,
       working: false
     };
-    
     this._validateOnDemand = true; // this flag enables onBlur validation as user fills forms
     this.getMintTx = this.getMintTx.bind(this);
     this.validationCheck = this.validationCheck.bind(this);
     this.isValidated = this.isValidated.bind(this);
   }
-
+  saveToLocalStorage() {
+    if (typeof(Storage) !== "undefined") {
+      // Code for localStorage/sessionStorage.
+      localStorage.setItem("receiptTxHash", this.refs.ethburntxid.value);
+      localStorage.setItem("mintsysrawtxunsigned", this.refs.mintsysrawtxunsigned.value);
+    } else {
+      // Sorry! No Web Storage support..
+    }
+  }
   componentDidMount() {
-    if((!this.props.getStore().toSysAssetGUID && !this.props.getStore().toSysAssetGUID == 0) ||
+    if((!this.props.getStore().toSysAssetGUID && !this.props.getStore().toSysAssetGUID === 0) ||
     !this.props.getStore().toSysAmount ||
     !this.props.getStore().syscoinWitnessAddress){
       this.props.jumpToStep(0);
-    }
-    if(this.props.getStore().receiptTxHash){
-      this.state.ethburntxid = this.props.getStore().receiptTxHash;
     }
   }
 
@@ -99,58 +104,31 @@ class Step2ES extends Component {
         console.log("receipt_hex: " + receipt_hex);
         console.log("receiptmerkleproof_hex: " + receiptmerkleproof_hex);
         console.log("block number: " + blockNumber);
-        if(toSysAssetGUID.length > 0 && toSysAssetGUID !== "0" && toSysAssetGUID !== 0){
-          
-          try {
-            // [asset] [address] [amount] [tx_hex] [txroot_hex] [txmerkleproof_hex] [txmerkleroofpath_hex] [receipt_hex] [receiptroot_hex] [receiptmerkleproof_hex] [receiptmerkleroofpath_hex] [witness]
-            let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=assetallocationmint&asset=' + toSysAssetGUID + '&address=' + syscoinWitnessAddress + '&amount=' + toSysAmount + '&blocknumber=' + blockNumber + '&tx_hex=' + tx_hex + '&txroot_hex=' + tx_root_hex + '&txmerkleproof_hex=' + txmerkleproof_hex + '&txmerkleproofpath_hex=' + txmerkleproofpath_hex + '&receipt_hex=' + receipt_hex + '&receiptroot_hex=' + receipt_root_hex + '&receiptmerkleproof_hex=' + receiptmerkleproof_hex + "&witness=''");
-            results = results.data;
-            if(results.error){
-              validateNewInput.buttonVal = false;
-              validateNewInput.buttonValMsg = results.error;
-              console.log("error " + results.error);
-              self.setState({working: false});
-            }
-            else if(results && results.hex){
-              validateNewInput.mintsysrawtxunsignedVal = true;
-              this.refs.mintsysrawtxunsigned.value = results.hex;
-              userInput.mintsysrawtxunsigned = results.hex;
-              self.setState({working: false});
-              self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-            }
-          }catch(e) {
+        try {
+          // [asset] [address] [amount] [tx_hex] [txroot_hex] [txmerkleproof_hex] [txmerkleroofpath_hex] [receipt_hex] [receiptroot_hex] [receiptmerkleproof_hex] [receiptmerkleroofpath_hex] [witness]
+          let results = await axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=assetallocationmint&asset=' + toSysAssetGUID + '&address=' + syscoinWitnessAddress + '&amount=' + toSysAmount + '&blocknumber=' + blockNumber + '&tx_hex=' + tx_hex + '&txroot_hex=' + tx_root_hex + '&txmerkleproof_hex=' + txmerkleproof_hex + '&txmerkleproofpath_hex=' + txmerkleproofpath_hex + '&receipt_hex=' + receipt_hex + '&receiptroot_hex=' + receipt_root_hex + '&receiptmerkleproof_hex=' + receiptmerkleproof_hex + "&witness=''");
+          results = results.data;
+          if(results.error){
             validateNewInput.buttonVal = false;
-            validateNewInput.buttonValMsg = e.message;
+            validateNewInput.buttonValMsg = results.error;
+            console.log("error " + results.error);
+            self.setState({working: false});
+          }
+          else if(results && results.hex){
+            validateNewInput.mintsysrawtxunsignedVal = true;
+            this.refs.mintsysrawtxunsigned.value = results.hex;
+            userInput.mintsysrawtxunsigned = results.hex;
             self.setState({working: false});
             self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+            this.saveToLocalStorage();
           }
+        }catch(e) {
+          validateNewInput.buttonVal = false;
+          validateNewInput.buttonValMsg = e.message;
+          self.setState({working: false});
+          self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
         }
-        else{
-          
-          try {
-            //  [address] [amount] [tx_hex] [txroot_hex] [txmerkleproof_hex] [txmerkleproofpath_hex] [receipt_hex] [receiptroot_hex] [receiptmerkleproof_hex] [receiptmerkleroofpath_hex] [witness]
-            let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=syscoinmint&address=' + syscoinWitnessAddress + '&amount=' + toSysAmount + '&blocknumber=' + blockNumber + '&tx_hex=' + tx_hex + '&txroot_hex=' + tx_root_hex + '&txmerkleproof_hex=' + txmerkleproof_hex + '&txmerkleproofpath_hex=' + txmerkleproofpath_hex + '&receipt_hex=' + receipt_hex + '&receiptroot_hex=' + receipt_root_hex + '&receiptmerkleproof_hex=' + receiptmerkleproof_hex + "&witness=''");
-            results = results.data;
-            if(results.error){
-              validateNewInput.buttonVal = false;
-              validateNewInput.buttonValMsg = results.error;
-              self.setState({working: false});
-            }
-            else if(results && results.hex){
-              validateNewInput.mintsysrawtxunsignedVal = true;
-              this.refs.mintsysrawtxunsigned.value = results.hex;
-              userInput.mintsysrawtxunsigned = results.hex;
-              self.setState({working: false});
-              self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-            }
-          
-          }catch(e) {
-            validateNewInput.buttonVal = false;
-            validateNewInput.buttonValMsg = e.message;
-            self.setState({working: false});
-            self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-          }
-        }
+        
 
         this.setState({working: false});
     }catch(e){      
@@ -198,89 +176,95 @@ class Step2ES extends Component {
     let notValidClasses = {};
 
     if (typeof this.state.ethburntxidVal == 'undefined' || this.state.ethburntxidVal) {
-      notValidClasses.ethburntxidCls = 'no-error col-md-8';
+      notValidClasses.ethburntxidCls = 'no-error';
     }
     else {
-      notValidClasses.ethburntxidCls = 'has-error col-md-8';
+      notValidClasses.ethburntxidCls = 'has-error';
       notValidClasses.ethburntxidValGrpCls = 'val-err-tooltip';
     }
     if (typeof this.state.mintsysrawtxunsignedVal == 'undefined' || this.state.mintsysrawtxunsignedVal) {
-      notValidClasses.mintsysrawtxunsignedCls = 'no-error col-md-8';
+      notValidClasses.mintsysrawtxunsignedCls = 'no-error ';
     }
     else {
-      notValidClasses.mintsysrawtxunsignedCls = 'has-error col-md-8';
+      notValidClasses.mintsysrawtxunsignedCls = 'has-error';
       notValidClasses.mintsysrawtxunsignedValGrpCls = 'val-err-tooltip';
     }
     if (typeof this.state.buttonVal == 'undefined' || this.state.buttonVal) {
-      notValidClasses.buttonCls = 'no-error col-md-8';
+      notValidClasses.buttonCls = 'no-error ';
     }
     else {
-      notValidClasses.buttonCls = 'has-error col-md-8';
+      notValidClasses.buttonCls = 'has-error ';
       notValidClasses.buttonValGrpCls = 'val-err-tooltip';
     }
     return (
       <div className="step step2es">
         <div className="row">
-          <form id="Form" className="form-horizontal">
+          <form id="Form" >
             <div className="form-group">
-            <label className="col-md-12 control-label">
-                <h1>{this.props.t("step2ESHead")}</h1>
-                <h3>{this.props.t("step2ESDescription")}</h3>
+
+              <label className="col-md-12">
+                  <h1 dangerouslySetInnerHTML={{__html: this.props.t("step2ESHead")}}></h1>
+                  <h3 dangerouslySetInnerHTML={{__html: this.props.t("step2ESDescription")}}></h3>
               </label>
              
-              <div className="row">
-              <div className="col-md-12">
-                <label className="control-label col-md-4">
-                  {this.props.t("step3TxidLabel")}
-                </label>
-                <div className={notValidClasses.ethburntxidCls}>
-                  <input
-                    ref="ethburntxid"
-                    autoComplete="off"
-                    type="text"
-                    placeholder={this.props.t("step2ESEnterTxid")}
-                    className="form-control"
-                    defaultValue={this.state.ethburntxid}
-                    required
-                     />
-                  <div className={notValidClasses.ethburntxidValGrpCls}>{this.state.ethburntxidValMsg}</div>
-                </div>
-              </div>
-              </div>          
-              <div className="row">
-              <div className="col-md-12">
-                <label className="control-label col-md-4">
-                </label>  
-                <div className={notValidClasses.buttonCls}>
-                    <button type="button" disabled={this.state.working} className="form-control btn btn-default" aria-label={this.props.t("step2Button")} onClick={this.getMintTx}>
-                    <span className="glyphicon glyphicon-send" aria-hidden="true">&nbsp;</span>
-                    {this.props.t("step2Button")}
-                    </button>
-                  <div className={notValidClasses.buttonValGrpCls}>{this.state.buttonValMsg}</div>
-                </div>
-              </div>
-              </div>
+                <div className="row">
+                <div className="col-md-12">
+                    <label className="control-label col-md-4">
+                      {this.props.t("step3TxidLabel")}
+                    </label>
+                    <div className={notValidClasses.ethburntxidCls}>
+                      <input
+                        ref="ethburntxid"
+                        autoComplete="off"
+                        type="text"
+                        placeholder={this.props.t("step2ESEnterTxid")}
+                        className="form-control"
+                        required
+                        defaultValue={this.state.ethburntxid}
+                        />
+                      <div className={notValidClasses.ethburntxidValGrpCls}>{this.state.ethburntxidValMsg}</div>
+                    </div>
+                  </div>
+                </div> 
 
-              <div className="row">
-              <div className="col-md-12">
-                <label className="control-label col-md-4">
-                  {this.props.t("step2RawTxLabel")}
-                </label>  
-                <div className={notValidClasses.mintsysrawtxunsignedCls}>
-                  <textarea
-                    rows="3"
-                    ref="mintsysrawtxunsigned"
-                    autoComplete="off"
-                    type="text"
-                    placeholder={this.props.t("step2EnterRawTx")}
-                    className="form-control"
-                    required
-                    defaultValue={this.state.mintsysrawtxunsigned}
-                     />
-                  <div className={notValidClasses.mintsysrawtxunsignedValGrpCls}>{this.state.mintsysrawtxunsignedValMsg}</div>
+
+                <div className="row">
+                <div className="col-md-4 col-sm-12 col-centered">
+  
+                  <div className={notValidClasses.buttonCls}>
+                      <button type="button" disabled={this.state.working} className="form-control btn btn-default formbtn" aria-label={this.props.t("step2Button")} onClick={this.getMintTx}>
+                      <span className="glyphicon glyphicon-send" aria-hidden="true">&nbsp;</span>
+                      {this.props.t("step2Button")}
+                      </button>
+                    <div className={notValidClasses.buttonValGrpCls}>{this.state.buttonValMsg}</div>
+                  </div>
                 </div>
-              </div>
-              </div>
+                </div>
+
+                <div className="row">
+                <div className="col-md-12">
+                  <label className="control-label col-md-4">
+                    {this.props.t("step2RawTxLabel")}
+                  </label>  
+                  <div className={notValidClasses.mintsysrawtxunsignedCls}>
+                    <textarea
+                      rows="3"
+                      ref="mintsysrawtxunsigned"
+                      autoComplete="off"
+                      type="text"
+                      placeholder={this.props.t("step2EnterRawTx")}
+                      className="form-control"
+                      required
+                      defaultValue={this.state.mintsysrawtxunsigned}
+                      />
+                    <div className={notValidClasses.mintsysrawtxunsignedValGrpCls}>{this.state.mintsysrawtxunsignedValMsg}</div>
+                  </div>
+                </div>
+                </div>
+              
+
+              
+
             </div>
           </form>
         </div>

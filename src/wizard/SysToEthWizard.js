@@ -12,6 +12,8 @@ import { withNamespaces } from 'react-i18next';
 import './css/wizard.css';
 import './css/i18n.css';
 
+import { Beforeunload } from 'react-beforeunload';
+
 class SysToEthWizard extends Component {
   constructor(props) {
     super(props);
@@ -54,11 +56,20 @@ class SysToEthWizard extends Component {
 
     return (
       <div className='SysToEthWizard'>
+        <Beforeunload onBeforeunload={() => "Do you want to leave this page? You'll lose your data!"} />
         <div className='step-progress'>
+
           <div className='languageButtons'>
-            <button onClick={() =>  i18n.changeLanguage("en")}>🇬🇧</button>
-            <button onClick={() =>  i18n.changeLanguage("de")}>🇩🇪</button>
+            <div className="dropdown">
+              <button className="dropbtn"><i className="glyphicon glyphicon-globe"></i><span className="selectedLang">{ i18n.language }</span></button>
+              <div className="dropdown-content">
+              <button onClick={() =>  i18n.changeLanguage("en")}>EN</button>
+              <button onClick={() =>  i18n.changeLanguage("es")}>ES</button>
+              <button onClick={() =>  i18n.changeLanguage("fr")}>FR</button>
+              </div>
+            </div>
           </div>
+
           <StepZilla
             steps={steps}
             preventEnterSubmission={true}
