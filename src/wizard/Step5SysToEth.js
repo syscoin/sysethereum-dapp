@@ -62,24 +62,20 @@ class Step5 extends Component {
     if(receipt.transactionHash && this.state.receiptTxHash !== receipt.transactionHash){
       return;
     }
-    if(receipt.events && receipt.events.RelayTransaction && receipt.events.RelayTransaction.returnValues && receipt.events.RelayTransaction.returnValues[0]){
-      if(receipt.events.RelayTransaction.returnValues[0] === 0 || receipt.events.RelayTransaction.returnValues[1] === 0){
-        error = this.props.t("step5ErrorEVMCheckLog");
-      }
-    }
-    else if(receipt.logs){
-      for(let i = 0;i< receipt.logs.length;i++){
-        if(receipt.logs[i].address.toLowerCase() === CONFIGURATION.superblockContract.toLowerCase()){
-          let topic1 = "0x" + receipt.logs[i].data.substring(2, 66);
-          let topic2 = "0x" + receipt.logs[i].data.substring(66, 130);
-          if(parseInt(topic1) === 0 || parseInt(topic2) === 0){
-            error = this.props.t("step5ErrorEVMCheckLog");
-            break;
+    var found = false;
+    if(receipt.events){
+      var TokenUnfreezeFn = '0xb925ba840e2f36bcb317f8179bd8b5ed01aba4a22abf5f169162c0894dea87ab';
+      for (var key in receipt.events) {
+        if (receipt.events.hasOwnProperty(key)) {
+          if(receipt.events[key].raw && receipt.events[key].raw.topics && receipt.events[key].raw.topics.length > 0){
+            if(receipt.events[key].raw.topics[0] === TokenUnfreezeFn){
+              found = true;
+            }
           }
         }
       }
     }
-    else{
+    if(!found){
       error = this.props.t("step5ErrorEventCheckLog");
     }
     this.setState({
@@ -165,10 +161,10 @@ class Step5 extends Component {
 
      SyscoinSuperblocks.methods.relayTx(_txBytes, this.props.getStore().txindex, merkleProof.sibling, _syscoinBlockHeader, 
       this.props.getStore().syscoinblockindex, _syscoinBlockSiblings, _superblockHash).send({from: accounts[0], gas: 500000})
-      .on('transactionHash', function(hash){
+      .once('transactionHash', function(hash){
         thisObj.setState({receiptTxHash: hash, buttonVal: true, buttonValMsg: thisObj.props.t("step5PleaseWait")});
       })
-      .on('confirmation', function(confirmationNumber, receipt){ 
+      .once('confirmation', function(confirmationNumber, receipt){ 
         if(thisObj.state.receiptObj === null){
           thisObj.setStateFromReceipt(receipt, null, confirmationNumber);
           thisObj.setState({working: false});

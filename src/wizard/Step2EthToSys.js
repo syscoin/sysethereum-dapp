@@ -7,9 +7,10 @@ const axios = require('axios');
 class Step2ES extends Component {
   constructor(props) {
     super(props);
+    let storageExists = typeof(Storage) !== "undefined";
     this.state = {
-      mintsysrawtxunsigned: props.getStore().mintsysrawtxunsigned,
-      ethburntxid: this.props.getStore().receiptTxHash,
+      mintsysrawtxunsigned: (storageExists && localStorage.getItem("mintsysrawtxunsigned")) || props.getStore().mintsysrawtxunsigned,
+      ethburntxid: (storageExists && localStorage.getItem("receiptTxHash")) || this.props.getStore().receiptTxHash,
       working: false
     };
     this._validateOnDemand = true; // this flag enables onBlur validation as user fills forms
@@ -17,7 +18,15 @@ class Step2ES extends Component {
     this.validationCheck = this.validationCheck.bind(this);
     this.isValidated = this.isValidated.bind(this);
   }
-
+  saveToLocalStorage() {
+    if (typeof(Storage) !== "undefined") {
+      // Code for localStorage/sessionStorage.
+      localStorage.setItem("receiptTxHash", this.refs.ethburntxid.value);
+      localStorage.setItem("mintsysrawtxunsigned", this.refs.mintsysrawtxunsigned.value);
+    } else {
+      // Sorry! No Web Storage support..
+    }
+  }
   componentDidMount() {
     if((!this.props.getStore().toSysAssetGUID && !this.props.getStore().toSysAssetGUID === 0) ||
     !this.props.getStore().toSysAmount ||
@@ -95,58 +104,31 @@ class Step2ES extends Component {
         console.log("receipt_hex: " + receipt_hex);
         console.log("receiptmerkleproof_hex: " + receiptmerkleproof_hex);
         console.log("block number: " + blockNumber);
-        if(toSysAssetGUID.length > 0 && toSysAssetGUID !== "0" && toSysAssetGUID !== 0){
-          
-          try {
-            // [asset] [address] [amount] [tx_hex] [txroot_hex] [txmerkleproof_hex] [txmerkleroofpath_hex] [receipt_hex] [receiptroot_hex] [receiptmerkleproof_hex] [receiptmerkleroofpath_hex] [witness]
-            let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=assetallocationmint&asset=' + toSysAssetGUID + '&address=' + syscoinWitnessAddress + '&amount=' + toSysAmount + '&blocknumber=' + blockNumber + '&tx_hex=' + tx_hex + '&txroot_hex=' + tx_root_hex + '&txmerkleproof_hex=' + txmerkleproof_hex + '&txmerkleproofpath_hex=' + txmerkleproofpath_hex + '&receipt_hex=' + receipt_hex + '&receiptroot_hex=' + receipt_root_hex + '&receiptmerkleproof_hex=' + receiptmerkleproof_hex + "&witness=''");
-            results = results.data;
-            if(results.error){
-              validateNewInput.buttonVal = false;
-              validateNewInput.buttonValMsg = results.error;
-              console.log("error " + results.error);
-              self.setState({working: false});
-            }
-            else if(results && results.hex){
-              validateNewInput.mintsysrawtxunsignedVal = true;
-              this.refs.mintsysrawtxunsigned.value = results.hex;
-              userInput.mintsysrawtxunsigned = results.hex;
-              self.setState({working: false});
-              self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-            }
-          }catch(e) {
+        try {
+          // [asset] [address] [amount] [tx_hex] [txroot_hex] [txmerkleproof_hex] [txmerkleroofpath_hex] [receipt_hex] [receiptroot_hex] [receiptmerkleproof_hex] [receiptmerkleroofpath_hex] [witness]
+          let results = await axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=assetallocationmint&asset=' + toSysAssetGUID + '&address=' + syscoinWitnessAddress + '&amount=' + toSysAmount + '&blocknumber=' + blockNumber + '&tx_hex=' + tx_hex + '&txroot_hex=' + tx_root_hex + '&txmerkleproof_hex=' + txmerkleproof_hex + '&txmerkleproofpath_hex=' + txmerkleproofpath_hex + '&receipt_hex=' + receipt_hex + '&receiptroot_hex=' + receipt_root_hex + '&receiptmerkleproof_hex=' + receiptmerkleproof_hex + "&witness=''");
+          results = results.data;
+          if(results.error){
             validateNewInput.buttonVal = false;
-            validateNewInput.buttonValMsg = e.message;
+            validateNewInput.buttonValMsg = results.error;
+            console.log("error " + results.error);
+            self.setState({working: false});
+          }
+          else if(results && results.hex){
+            validateNewInput.mintsysrawtxunsignedVal = true;
+            this.refs.mintsysrawtxunsigned.value = results.hex;
+            userInput.mintsysrawtxunsigned = results.hex;
             self.setState({working: false});
             self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+            this.saveToLocalStorage();
           }
+        }catch(e) {
+          validateNewInput.buttonVal = false;
+          validateNewInput.buttonValMsg = e.message;
+          self.setState({working: false});
+          self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
         }
-        else{
-          
-          try {
-            //  [address] [amount] [tx_hex] [txroot_hex] [txmerkleproof_hex] [txmerkleproofpath_hex] [receipt_hex] [receiptroot_hex] [receiptmerkleproof_hex] [receiptmerkleroofpath_hex] [witness]
-            let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=syscoinmint&address=' + syscoinWitnessAddress + '&amount=' + toSysAmount + '&blocknumber=' + blockNumber + '&tx_hex=' + tx_hex + '&txroot_hex=' + tx_root_hex + '&txmerkleproof_hex=' + txmerkleproof_hex + '&txmerkleproofpath_hex=' + txmerkleproofpath_hex + '&receipt_hex=' + receipt_hex + '&receiptroot_hex=' + receipt_root_hex + '&receiptmerkleproof_hex=' + receiptmerkleproof_hex + "&witness=''");
-            results = results.data;
-            if(results.error){
-              validateNewInput.buttonVal = false;
-              validateNewInput.buttonValMsg = results.error;
-              self.setState({working: false});
-            }
-            else if(results && results.hex){
-              validateNewInput.mintsysrawtxunsignedVal = true;
-              this.refs.mintsysrawtxunsigned.value = results.hex;
-              userInput.mintsysrawtxunsigned = results.hex;
-              self.setState({working: false});
-              self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-            }
-          
-          }catch(e) {
-            validateNewInput.buttonVal = false;
-            validateNewInput.buttonValMsg = e.message;
-            self.setState({working: false});
-            self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-          }
-        }
+        
 
         this.setState({working: false});
     }catch(e){      

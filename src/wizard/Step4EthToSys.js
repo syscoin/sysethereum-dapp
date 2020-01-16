@@ -1,5 +1,6 @@
 
 import React, { Component } from 'react';
+import CONFIGURATION from '../config';
 class Step4ES extends Component {
   constructor(props) {
     super(props);
@@ -8,17 +9,33 @@ class Step4ES extends Component {
     };
 
   }
-
+  clearLocalStorage() {
+    if (typeof(Storage) !== "undefined") {
+      localStorage.removeItem("sysxContract");
+      localStorage.removeItem("sysxFromAccount");
+      localStorage.removeItem("toSysAssetGUID");
+      localStorage.removeItem("toSysAmount");
+      localStorage.removeItem("syscoinWitnessAddress");
+      localStorage.removeItem("receiptTxHash");
+      localStorage.removeItem("mintsysrawtxunsigned");
+    } else {
+      // Sorry! No Web Storage support..
+    }
+    
+  }
   componentDidMount() {
     if(!this.props.getStore().mintblockhash || !this.props.getStore().minttxid){
       this.props.jumpToStep(3);
       return;
     }
-    let baseURL = "";
-    
-    //baseURL = "http://explorer.blockchainfoundry.co/tx/" + this.props.getStore().minttxid;
-    baseURL = "http://52.203.169.241:9000/tx/" + this.props.getStore().minttxid;
+
+    let baseURL = "https://explorer";
+    if(CONFIGURATION.testnet){
+      baseURL += "-testnet"
+    }
+    baseURL += ".blockchainfoundry.co/tx/" + this.props.getStore().minttxid;
     this.setState({explorerLink: baseURL});
+    this.clearLocalStorage();
   }
 
   componentWillUnmount() {}

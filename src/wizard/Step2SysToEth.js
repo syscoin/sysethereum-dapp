@@ -5,12 +5,13 @@ const axios = require('axios');
 class Step2 extends Component {
   constructor(props) {
     super(props);
+    let storageExists = typeof(Storage) !== "undefined";
     this.state = {
-      asset: props.getStore().asset,
-      fundingaddress: props.getStore().fundingaddress,
-      amount: props.getStore().amount,
-      ethaddress: props.getStore().ethaddress,
-      sysrawtxunsigned: props.getStore().sysrawtxunsigned,
+      asset: (storageExists && localStorage.getItem("asset")) || props.getStore().asset,
+      fundingaddress: (storageExists && localStorage.getItem("fundingaddress")) || props.getStore().fundingaddress,
+      amount: (storageExists && localStorage.getItem("amount")) || props.getStore().amount,
+      ethaddress: (storageExists && localStorage.getItem("ethaddress")) || props.getStore().ethaddress,
+      sysrawtxunsigned: (storageExists && localStorage.getItem("sysrawtxunsigned")) || props.getStore().sysrawtxunsigned,
       working: false
     };
     
@@ -18,13 +19,23 @@ class Step2 extends Component {
     this.getBurnTx = this.getBurnTx.bind(this);
     this.validationCheck = this.validationCheck.bind(this);
     this.isValidated = this.isValidated.bind(this);
-   
   }
 
   componentDidMount() {}
 
   componentWillUnmount() {}
-
+  saveToLocalStorage() {
+    if (typeof(Storage) !== "undefined") {
+      // Code for localStorage/sessionStorage.
+      localStorage.setItem("asset", this.refs.asset.value);
+      localStorage.setItem("amount", this.refs.amount.value);
+      localStorage.setItem("fundingaddress", this.refs.fundingaddress.value);
+      localStorage.setItem("ethaddress", this.refs.ethaddress.value);
+      localStorage.setItem("sysrawtxunsigned", this.refs.sysrawtxunsigned.value);
+    } else {
+      // Sorry! No Web Storage support..
+    }
+  }
   isValidated() {
     const userInput = this._grabUserInput(); // grab user entered vals
     const validateNewInput = this._validateData(userInput); // run the new input against the validator
@@ -83,7 +94,7 @@ class Step2 extends Component {
           ethAddressStripped = ethAddressStripped.substr(2, ethAddressStripped.length);
         }
         try {
-          let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=assetallocationburn&asset_guid=' + assetGuid + '&address=' + fundingAddress + '&amount=' + userInput.amount.toString() + '&ethereum_destination_address=' + ethAddressStripped);
+          let results = await axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=assetallocationburn&asset_guid=' + assetGuid + '&address=' + fundingAddress + '&amount=' + userInput.amount.toString() + '&ethereum_destination_address=' + ethAddressStripped);
           results = results.data;
           if(results.error){
             validateNewInput.buttonVal = false;
@@ -95,34 +106,8 @@ class Step2 extends Component {
             this.refs.sysrawtxunsigned.value = results.hex;
             self.setState({working: false});
             self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+            self.saveToLocalStorage();
           }
-        }catch(e) {
-          validateNewInput.buttonVal = false;
-          validateNewInput.buttonValMsg = e.message;
-          self.setState({working: false});
-          self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-        }
-      }
-      else{
-        let ethAddressStripped = userInput.ethaddress.toString();
-        if(ethAddressStripped && ethAddressStripped.startsWith("0x")){
-          ethAddressStripped = ethAddressStripped.substr(2, ethAddressStripped.length);
-        }
-        try {
-          let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=syscoinburn&address=' + fundingAddress + '&amount=' + userInput.amount.toString() + '&ethereum_destination_address=' + ethAddressStripped);
-          results = results.data;
-          if(results.error){
-            validateNewInput.buttonVal = false;
-            validateNewInput.buttonValMsg = results.error;
-            self.setState({working: false});      
-          }
-          else if(results && results.hex){
-            validateNewInput.sysrawtxunsignedVal = true;
-            this.refs.sysrawtxunsigned.value = results.hex;
-            self.setState({working: false});
-            self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-          }
-        
         }catch(e) {
           validateNewInput.buttonVal = false;
           validateNewInput.buttonValMsg = e.message;

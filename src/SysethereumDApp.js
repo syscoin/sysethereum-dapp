@@ -3,6 +3,7 @@ import './SysethereumDApp.css';
 import bridgeAnim from './imgs/bridge_diagram.svg';
 import SysToEthWizardi18n from './wizard/SysToEthWizard';
 import EthToSysWizardi18n from './wizard/EthToSysWizard';
+import EthToSysCancelWizardi18n from './wizard/EthToSysCancelWizard';
 import { I18nextProvider } from "react-i18next";
 import i18n from "./wizard/i18n";
 import Textarea from 'react-textarea-autosize';
@@ -24,6 +25,7 @@ class SysethereumDApp extends Component {
       
     this.onSysToEth = this.onSysToEth.bind(this);
     this.onEthToSys = this.onEthToSys.bind(this);
+    this.onEthToSysCancel = this.onEthToSysCancel.bind(this);
     this.onHome = this.onHome.bind(this);
     this.handleEmailChange = this.handleEmailChange.bind(this);
     this.handleEmailSubmit = this.handleEmailSubmit.bind(this);
@@ -40,13 +42,16 @@ class SysethereumDApp extends Component {
   async componentDidMount() {
   }
   onSysToEth() {
-    this.setState({ introDisplay: false, ethToSysDisplay: false,  sysToEthDisplay: true});
+    this.setState({ introDisplay: false, ethToSysDisplay: false,  ethToSysCancelDisplay: false, sysToEthDisplay: true});
   }
   onEthToSys() {
-    this.setState({ introDisplay: false, ethToSysDisplay: true,  sysToEthDisplay: false});
+    this.setState({ introDisplay: false, ethToSysDisplay: true,  ethToSysCancelDisplay: false, sysToEthDisplay: false});
+  }
+  onEthToSysCancel() {
+    this.setState({ introDisplay: false, ethToSysDisplay: false,  ethToSysCancelDisplay: true, sysToEthDisplay: false});
   }
   onHome() {
-    this.setState({ introDisplay: true, ethToSysDisplay: false,  sysToEthDisplay: false});
+    this.setState({ introDisplay: true, ethToSysDisplay: false,  ethToSysCancelDisplay: false, sysToEthDisplay: false});
   }
 
   handleEmailChange(evt) {
@@ -59,7 +64,7 @@ class SysethereumDApp extends Component {
 
     axios.post('https://syscoin.org/email_sender.php', {name:this.state.emailName, email:this.state.emailSender, msg: this.state.emailMessage})
     .then(function (response) {
-      if(response.data.status == 1)
+      if(response.data.status === 1)
         self.setState({ emailSent: true });
     });
 
@@ -139,6 +144,12 @@ class SysethereumDApp extends Component {
                 <a className="ethtosys" href="javascript:void(0)" onClick={this.onEthToSys}>
                   <div className="mybtn mybtn-two">
                     <span>ETH ➜ SYS</span>
+                  </div>
+                </a>
+
+                <a className="ethtosys" href="javascript:void(0)" onClick={this.onEthToSysCancel}>
+                  <div className="mybtn mybtn-two">
+                    <span>Cancel Transfer</span>
                   </div>
                 </a>
 
@@ -477,7 +488,7 @@ class SysethereumDApp extends Component {
               <a href="https://faucet.syscoin.org" target="_blank" rel="noopener noreferrer">Syscoin faucet</a>
               <a href="https://syscoin.network/syslinks/" target="_blank" rel="noopener noreferrer">Syscoin links</a>
               <a href="https://syscoin.readme.io/" target="_blank" rel="noopener noreferrer">Developer Portal</a>
-              <a href="http://explorer.blockchainfoundry.co/" target="_blank" rel="noopener noreferrer">Syscoin explorer</a>
+              <a href="https://explorer.blockchainfoundry.co/" target="_blank" rel="noopener noreferrer">Syscoin explorer</a>
               <a href="https://syscoin.org/whitepaper" target="_blank" rel="noopener noreferrer">Syscoin Whitepapers</a>
               <a href="https://github.com/syscoin" target="_blank" rel="noopener noreferrer">Syscoin Github</a>
             </div>
@@ -537,6 +548,34 @@ class SysethereumDApp extends Component {
       <button type="button" className="close closeButton wizardCancel" aria-label="Close" onClick={this.onHome}>
       <span className="glyphicon glyphicon-remove" aria-hidden="true"></span> Close
       </button>
+
+
+    </div>
+    <div className={(this.state.ethToSysCancelDisplay  ? "visible" : "hidden")}>
+
+    <div id="menu"> 
+      <div className="goHome" onClick={this.onHome}></div>
+      <div className="title">Walk over the Syscoin Bridge</div>
+    </div>
+
+    <div className="wizardTitleCont">
+      <div className="wizardTitle">
+        <span className="ethl">ETH</span>
+        <span className="direction">➜</span>
+        <span className="sysr">SYS</span>
+        
+      </div> 
+    </div>
+
+
+
+    <I18nextProvider i18n={i18n}>
+      <EthToSysCancelWizardi18n />
+    </I18nextProvider>
+
+    <button type="button" className="close closeButton wizardCancel" aria-label="Close" onClick={this.onHome}>
+    <span className="glyphicon glyphicon-remove" aria-hidden="true"></span> Close
+    </button>
 
 
     </div>

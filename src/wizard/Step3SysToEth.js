@@ -5,10 +5,11 @@ const axios = require('axios');
 class Step3 extends Component {
   constructor(props) {
     super(props);
+    let storageExists = typeof(Storage) !== "undefined";
     this.state = {
-      sysrawtxunsigned: props.getStore().sysrawtxunsigned,
-      txid: props.getStore().txid,
-      blockhash: props.getStore().blockhash,
+      sysrawtxunsigned: (storageExists && localStorage.getItem("sysrawtxunsigned")) || props.getStore().sysrawtxunsigned,
+      txid: (storageExists && localStorage.getItem("txid")) || props.getStore().txid,
+      blockhash: (storageExists && localStorage.getItem("blockhash")) || props.getStore().blockhash,
       working: false
     };
     
@@ -16,7 +17,6 @@ class Step3 extends Component {
     this.getBlockhash = this.getBlockhash.bind(this);
     this.validationCheck = this.validationCheck.bind(this);
     this.isValidated = this.isValidated.bind(this);
-   
   }
 
   componentDidMount() {
@@ -24,7 +24,15 @@ class Step3 extends Component {
   }
 
   componentWillUnmount() {}
-
+  saveToLocalStorage() {
+    if (typeof(Storage) !== "undefined") {
+      // Code for localStorage/sessionStorage.
+      localStorage.setItem("txid", this.refs.txid.value);
+      localStorage.setItem("blockhash", this.refs.blockhash.value);
+    } else {
+      // Sorry! No Web Storage support..
+    }
+  }
   isValidated() {
     const userInput = this._grabUserInput(); // grab user entered vals
     const validateNewInput = this._validateData(userInput); // run the new input against the validator
@@ -65,27 +73,30 @@ class Step3 extends Component {
       this.setState({working: true});
       let txid = userInput.txid.toString();
       try {
-        let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=getblockhashbytxid&txid=' + txid);
+        let results = await axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=getblockhashbytxid&txid=' + txid);
         results = results.data;
         if(results.error){
           validateNewInput.buttonVal = false;
           validateNewInput.buttonValMsg = results.error;
           this.setState({working: false});
+          this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
           console.log("error " + results.error);
         }
         else if(results && results.hex){
           validateNewInput.blockhashVal = true;
           this.refs.blockhash.value = results.hex;
           this.setState({working: false});
+          this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+          this.saveToLocalStorage();
         }
       }catch(e) {
         validateNewInput.buttonVal = false;
         validateNewInput.buttonValMsg = e.message;
         this.setState({working: false});
+        this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
         console.log("error " + e.message);
       }
     } 
-    this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
 
   }
   validationCheck() {

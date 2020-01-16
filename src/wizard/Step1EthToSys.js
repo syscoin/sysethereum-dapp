@@ -4,21 +4,22 @@ import Web3 from 'web3';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import "react-tabs/style/react-tabs.css";
 import assetabi from '../SyscoinERC20I';
-import erc20managerabi from '../ERC20ManagerI';  
+import erc20Managerabi from '../SyscoinERC20Manager';  
 import CONFIGURATION from '../config';
 const axios = require('axios');
 const web3 = new Web3(Web3.givenProvider);
 class Step1ES extends Component {
   constructor(props) {
     super(props);
+    let storageExists = typeof(Storage) !== "undefined";
     this.state = {
-      sysxContract: props.getStore().sysxContract,
-      sysxFromAccount: props.getStore().sysxFromAccount,
-      toSysAssetGUID: props.getStore().toSysAssetGUID,
-      toSysAmount: props.getStore().toSysAmount,
-      syscoinWitnessAddress: props.getStore().syscoinWitnessAddress,
+      sysxContract: (storageExists && localStorage.getItem("sysxContract")) || props.getStore().sysxContract,
+      sysxFromAccount: (storageExists && localStorage.getItem("sysxFromAccount")) || props.getStore().sysxFromAccount,
+      toSysAssetGUID: (storageExists && localStorage.getItem("toSysAssetGUID")) || props.getStore().toSysAssetGUID,
+      toSysAmount: (storageExists && localStorage.getItem("toSysAmount")) || props.getStore().toSysAmount,
+      syscoinWitnessAddress: (storageExists && localStorage.getItem("syscoinWitnessAddress")) || props.getStore().syscoinWitnessAddress,
       receiptStatus: props.getStore().receiptStatus,
-      receiptTxHash: props.getStore().receiptTxHash,
+      receiptTxHash: (storageExists && localStorage.getItem("receiptTxHash")) || props.getStore().receiptTxHash,
       receiptTxIndex: props.getStore().receiptTxIndex,
       receiptFrom: props.getStore().receiptFrom,
       receiptTo: props.getStore().receiptTo,
@@ -40,11 +41,9 @@ class Step1ES extends Component {
       this.faucetURL += "-testnet";
     }
     this.faucetURL += ".syscoin.org";
-    
   }
-
   componentDidMount() {
-   
+    
   }
   isValidated() {
     const userInput = this._grabUserInput(); // grab user entered vals
@@ -78,6 +77,19 @@ class Step1ES extends Component {
     element.download = "receipt.txt";
     document.body.appendChild(element); // Required for this to work in FireFox
     element.click();
+  }
+  saveToLocalStorage() {
+    if (typeof(Storage) !== "undefined") {
+      // Code for localStorage/sessionStorage.
+      localStorage.setItem("sysxContract", this.refs.sysxContract.value);
+      localStorage.setItem("sysxFromAccount", this.refs.sysxFromAccount.value);
+      localStorage.setItem("toSysAssetGUID", this.refs.toSysAssetGUID.value);
+      localStorage.setItem("toSysAmount", this.refs.toSysAmount.value);
+      localStorage.setItem("syscoinWitnessAddress", this.refs.syscoinWitnessAddress.value);
+      localStorage.setItem("receiptTxHash", this.state.receiptTxHash);
+    } else {
+      // Sorry! No Web Storage support..
+    }
   }
   validationCheck() {
     if (!this._validateOnDemand)
@@ -143,9 +155,8 @@ class Step1ES extends Component {
     if(receipt.transactionHash && this.state.receiptTxHash !== receipt.transactionHash){
       return;
     }
-    if(receipt.status  && receipt.status !== "1" && receipt.status !== true && receipt.status !== "true" && receipt.status !== "0x1"){
+    if(receipt.status !== undefined && receipt.status !== "1" && receipt.status !== true && receipt.status !== "true" && receipt.status !== "0x1"){
       error = this.props.t("step5ErrorEVMCheckLog");
-      return;
     }
     
     validateNewInput.receiptObj = receipt;
@@ -171,7 +182,7 @@ class Step1ES extends Component {
   async getWitnessProgram(address, validateNewInput){
     if(address.length > 0){
       try {
-        let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=getaddressinfo&address=' + address);
+        let results = await axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=getaddressinfo&address=' + address);
         results = results.data;
         if(results.error){
           validateNewInput.buttonVal = false;
@@ -193,7 +204,7 @@ class Step1ES extends Component {
   async getAssetContract(guid, validateNewInput){
     if(guid.length > 0){
       try {
-        let results = await axios.get('http://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=assetinfo&asset_guid=' + guid);
+        let results = await axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=assetinfo&asset_guid=' + guid);
         results = results.data;
         if(results.error){
           validateNewInput.buttonVal = false;
@@ -211,21 +222,22 @@ class Step1ES extends Component {
     }
     return "";
   }
-  freezeBurnERC20(ERC20Man, validateNewInput, thisObj, amount, assetGUID, decimals, syscoinWitnessProgram, userInput, fromAccount) {
+  freezeBurnERC20(syscoinTP, validateNewInput, thisObj, amount, assetGUID, decimals, syscoinWitnessProgram, userInput, fromAccount) {
     thisObj.state.receiptObj = null;
-    ERC20Man.methods.freezeBurnERC20(amount, assetGUID, userInput.sysxContract, decimals, syscoinWitnessProgram).send({from: fromAccount, gas: 500000})
-      .on('transactionHash', function(hash){
+    syscoinTP.methods.freezeBurnERC20(amount, assetGUID, userInput.sysxContract, decimals, syscoinWitnessProgram).send({from: fromAccount, gas: 500000})
+      .once('transactionHash', function(hash){
         validateNewInput.buttonVal = true;
         validateNewInput.receiptTxHash = hash;
         validateNewInput.buttonValMsg = thisObj.props.t("step5AuthMetamask");
         thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
         thisObj.setState({working: true});
       })
-      .on('confirmation', function(confirmationNumber, receipt){ 
+      .once('confirmation', function(confirmationNumber, receipt){ 
         if(thisObj.state.receiptObj === null){
           thisObj.setStateFromReceipt(receipt, null, confirmationNumber, validateNewInput);
           thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
           thisObj.setState({working: false});
+          thisObj.saveToLocalStorage();
         } else {
           validateNewInput.receiptConf = confirmationNumber;
           thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
@@ -247,6 +259,57 @@ class Step1ES extends Component {
           thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
         }
       })
+  }
+  isString(s) {
+    return (typeof s === 'string' || s instanceof String);
+  }
+  toBaseUnit(value, decimals, BN) {
+    if (!this.isString(value)) {
+      console.error('Pass strings to prevent floating point precision issues.');
+      return;
+    }
+    const ten = new BN(10);
+    const base = ten.pow(new BN(decimals));
+  
+    // Is it negative?
+    let negative = (value.substring(0, 1) === '-');
+    if (negative) {
+      value = value.substring(1);
+    }
+  
+    if (value === '.') { 
+      console.error(
+      `Invalid value ${value} cannot be converted to`
+      + ` base unit with ${decimals} decimals.`); 
+      return;
+    }
+  
+    // Split it into a whole and fractional part
+    let comps = value.split('.');
+    if (comps.length > 2) { console.error('Too many decimal points'); return;}
+  
+    let whole = comps[0], fraction = comps[1];
+  
+    if (!whole) { whole = '0'; }
+    if (!fraction) { fraction = '0'; }
+    if (fraction.length > decimals) { 
+      console.error('Too many decimal places'); 
+      return;
+    }
+  
+    while (fraction.length < decimals) {
+      fraction += '0';
+    }
+  
+    whole = new BN(whole);
+    fraction = new BN(fraction);
+    let wei = (whole.mul(base)).add(fraction);
+  
+    if (negative) {
+      wei = wei.neg();
+    }
+  
+    return new BN(wei.toString(10), 10);
   }
   async submitProofs() {
     let userInput = this._grabUserInput(); // grab user entered vals
@@ -324,16 +387,15 @@ class Step1ES extends Component {
     validateNewInput.buttonVal = true;
     validateNewInput.buttonValMsg = this.props.t("step5AuthMetamask");
     this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-    let erc20Manager = await web3.eth.Contract(erc20managerabi,  CONFIGURATION.ERC20Manager);
-    let contractBase = await web3.eth.Contract(assetabi, userInput.sysxContract);
+    let syscoinTransactionProcessor = new web3.eth.Contract(erc20Managerabi,  CONFIGURATION.ERC20Manager);
+    let contractBase = new web3.eth.Contract(assetabi, userInput.sysxContract);
     let fromAccount = userInput.sysxFromAccount;
     let allowance = await contractBase.methods.allowance(fromAccount, CONFIGURATION.ERC20Manager).call();
     allowance = web3.utils.toBN(allowance.toString());
     let balance = await contractBase.methods.balanceOf(fromAccount).call();
     balance = web3.utils.toBN(balance.toString());
     let decimals = await contractBase.methods.decimals().call();
-    let amount = web3.utils.toBN(userInput.toSysAmount);
-    amount = amount.mul(web3.utils.toBN(10).pow(web3.utils.toBN(decimals)));
+    let amount = this.toBaseUnit(userInput.toSysAmount, decimals, web3.utils.BN);
     let assetGUID = userInput.toSysAssetGUID;
     
 
@@ -351,15 +413,15 @@ class Step1ES extends Component {
     if(allowance.lt(amount)){
       console.log("Allowance needed.");
       contractBase.methods.approve(CONFIGURATION.ERC20Manager, amount.toString()).send({from: fromAccount, gas: 500000})
-      .on('transactionHash', function(hash){
+      .once('transactionHash', function(hash){
         validateNewInput.buttonVal = true;
         validateNewInput.buttonValMsg = thisObj.props.t("step5AuthAllowanceMetamask");
         thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
       })
-      .on('confirmation', function(confirmationNumber, receipt){
+      .once('confirmation', function(confirmationNumber, receipt){
         if(bFirstConfirmation){
           bFirstConfirmation = false; 
-          thisObj.freezeBurnERC20(erc20Manager, validateNewInput, thisObj, amount.toString(), assetGUID, decimals, syscoinWitnessProgram, userInput, fromAccount);
+          thisObj.freezeBurnERC20(syscoinTransactionProcessor, validateNewInput, thisObj, amount.toString(), assetGUID, decimals, syscoinWitnessProgram, userInput, fromAccount);
         }
       })
       .on('error', (error, receipt) => {
@@ -380,7 +442,7 @@ class Step1ES extends Component {
       })
     }
     else{
-      thisObj.freezeBurnERC20(erc20Manager, validateNewInput, thisObj, amount.toString(), assetGUID, decimals, syscoinWitnessProgram, userInput, fromAccount);
+      thisObj.freezeBurnERC20(syscoinTransactionProcessor, validateNewInput, thisObj, amount.toString(), assetGUID, decimals, syscoinWitnessProgram, userInput, fromAccount);
     }
   }
 

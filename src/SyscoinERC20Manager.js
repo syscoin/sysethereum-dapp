@@ -1,4 +1,61 @@
-const erc20managerabi = [
+const erc20Managerabi = [
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "canceller",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "bridgetransferid",
+        "type": "uint32"
+      }
+    ],
+    "name": "CancelTransferFailed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "canceller",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "bridgetransferid",
+        "type": "uint32"
+      }
+    ],
+    "name": "CancelTransferRequest",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "canceller",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "bridgetransferid",
+        "type": "uint32"
+      }
+    ],
+    "name": "CancelTransferSucceeded",
+    "type": "event"
+  },
   {
     "anonymous": false,
     "inputs": [
@@ -13,6 +70,12 @@ const erc20managerabi = [
         "internalType": "uint256",
         "name": "value",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "bridgetransferid",
+        "type": "uint32"
       }
     ],
     "name": "TokenFreeze",
@@ -58,36 +121,6 @@ const erc20managerabi = [
   },
   {
     "constant": true,
-    "inputs": [],
-    "name": "MIN_LOCK_VALUE",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [],
-    "name": "SUPERBLOCK_SUBMITTER_LOCK_FEE",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": true,
     "inputs": [
       {
         "internalType": "uint32",
@@ -125,6 +158,11 @@ const erc20managerabi = [
   {
     "constant": false,
     "inputs": [
+      {
+        "internalType": "enum SyscoinERC20Manager.Network",
+        "name": "_network",
+        "type": "uint8"
+      },
       {
         "internalType": "address",
         "name": "_trustedRelayerContract",
@@ -207,6 +245,56 @@ const erc20managerabi = [
     "constant": false,
     "inputs": [
       {
+        "internalType": "uint32",
+        "name": "bridgeTransferId",
+        "type": "uint32"
+      }
+    ],
+    "name": "cancelTransferRequest",
+    "outputs": [],
+    "payable": true,
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "bridgeTransferId",
+        "type": "uint32"
+      }
+    ],
+    "name": "cancelTransferSuccess",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "bridgeTransferId",
+        "type": "uint32"
+      },
+      {
+        "internalType": "address payable",
+        "name": "challengerAddress",
+        "type": "address"
+      }
+    ],
+    "name": "processCancelTransferFail",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
         "internalType": "uint256",
         "name": "value",
         "type": "uint256"
@@ -243,6 +331,52 @@ const erc20managerabi = [
     "payable": false,
     "stateMutability": "nonpayable",
     "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "bridgeTransferId",
+        "type": "uint32"
+      }
+    ],
+    "name": "getBridgeTransfer",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "_timestamp",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_value",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_erc20ContractAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_tokenFreezerAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint32",
+        "name": "_assetGUID",
+        "type": "uint32"
+      },
+      {
+        "internalType": "enum SyscoinERC20Manager.BridgeTransferStatus",
+        "name": "_status",
+        "type": "uint8"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
   }
 ]
-  export default erc20managerabi;
+  export default erc20Managerabi;
