@@ -86,6 +86,25 @@ const erc20Managerabi = [
     "inputs": [
       {
         "indexed": false,
+        "internalType": "uint32",
+        "name": "assetGuid",
+        "type": "uint32"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "erc20ContractAddress",
+        "type": "address"
+      }
+    ],
+    "name": "TokenRegistry",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
         "internalType": "address",
         "name": "receipient",
         "type": "address"
@@ -134,6 +153,27 @@ const erc20Managerabi = [
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "name": "assetRegistry",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
       }
     ],
     "payable": false,
@@ -236,6 +276,31 @@ const erc20Managerabi = [
       }
     ],
     "name": "processTransaction",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "txHash",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint32",
+        "name": "assetGUID",
+        "type": "uint32"
+      },
+      {
+        "internalType": "address",
+        "name": "erc20ContractAddress",
+        "type": "address"
+      }
+    ],
+    "name": "processAsset",
     "outputs": [],
     "payable": false,
     "stateMutability": "nonpayable",

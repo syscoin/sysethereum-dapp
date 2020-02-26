@@ -428,6 +428,57 @@ const abi = [
     "payable": false,
     "stateMutability": "view",
     "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "bytes",
+        "name": "_txBytes",
+        "type": "bytes"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_txIndex",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "_txSiblings",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "bytes",
+        "name": "_syscoinBlockHeader",
+        "type": "bytes"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_syscoinBlockIndex",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "_syscoinBlockSiblings",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "_superblockHash",
+        "type": "bytes32"
+      }
+    ],
+    "name": "relayAssetTx",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
   }
 ]
 var sbconfig = {
