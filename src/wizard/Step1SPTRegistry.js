@@ -27,11 +27,20 @@ class Step1Reg extends Component {
     };
     this.searchRegistry = this.searchRegistry.bind(this);
     this.updateRegistry = this.updateRegistry.bind(this);
+    this.downloadReceipt = this.downloadReceipt.bind(this);
   }
   componentDidMount() {
    
   }
   componentWillUnmount() {}
+  downloadReceipt () {
+    const element = document.createElement("a");
+    const file = new Blob([JSON.stringify(this.state.receiptObj, null, "   ")], {type: 'text/plain'});
+    element.href = URL.createObjectURL(file);
+    element.download = "receipt.txt";
+    document.body.appendChild(element); // Required for this to work in FireFox
+    element.click();
+  }
   async setStateFromReceipt(receipt) {
     let errorMsg = null;
     if(receipt.transactionHash && this.state.receiptTxHash !== receipt.transactionHash){
@@ -44,9 +53,12 @@ class Step1Reg extends Component {
     if(errorMsg !== null){
       this.setState({buttonVal: false, buttonValMsg: errorMsg}); 
     }
-    await this.searchRegistry(true);
   }
   async updateRegistry() {
+    const userInput = this.refs.assetTxid.value;
+    if(!userInput){
+      return;
+    }
     if(!web3 || !web3.currentProvider || web3.currentProvider.isMetaMask === false){
       this.setState({buttonVal: false, buttonValMsg: this.props.t("step5InstallMetamask")});
       return;  
@@ -82,7 +94,6 @@ class Step1Reg extends Component {
       return;
     }
     this.setState({buttonVal: true, buttonValMsg: this.props.t("step5AuthMetamask")});
-    const userInput = this.refs.assetTxid.value;
     let failed = false;
     this.setState({working: true});
     var txbytes, syscoinblockheader, txsiblings, txindex, syscoinblockindex, syscoinblocksiblings, superblockhash, blockhash;
@@ -136,7 +147,9 @@ class Step1Reg extends Component {
           this.setState({working: false});  
       }
     }   
-    
+    if(!txsiblings){
+      return;
+    }
     let _txBytes = "0x" + txbytes;
     let _txSiblings = [];
     for(let i = 0;i<txsiblings.length;i++){
@@ -187,8 +200,7 @@ class Step1Reg extends Component {
       })
 
   }
-  async searchRegistry(findOnConfirmation) {
-    let isFindOnConf = !findOnConfirmation || findOnConfirmation === "undefined";
+  async searchRegistry() {
     this.setState({foundErc20contract: "", foundErc20URL: "", searchError: ""});
     const userInput = this.refs.searchText.value;
     if(!userInput || userInput === "")
@@ -197,7 +209,7 @@ class Step1Reg extends Component {
     try{ 
       let syscoinERC20Manager = new web3.eth.Contract(erc20Managerabi,  CONFIGURATION.ERC20Manager);
       let assetRegistry = await syscoinERC20Manager.methods.assetRegistry(userInput).call();
-      if((assetRegistry === "" || !assetRegistry) && !isFindOnConf){
+      if(assetRegistry === "" || !assetRegistry){
         this.setState({foundContract: false, searchError: this.props.t("step1RegWrongAsset")});
         return;
       }
@@ -208,13 +220,9 @@ class Step1Reg extends Component {
       }
       baseEthURL += "etherscan.io/address/" + _foundErc20contract;
       this.setState({foundErc20contract: _foundErc20contract, foundErc20URL: baseEthURL});
-      if(!isFindOnConf){
-        this.setState({foundContract: true});
-      }
+      this.setState({foundContract: true});
     } catch(e){
-      if(!isFindOnConf){
-        this.setState({foundContract: false, searchError: e.message});
-      }
+      this.setState({foundContract: false, searchError: e.message});
       return;
     }
     
