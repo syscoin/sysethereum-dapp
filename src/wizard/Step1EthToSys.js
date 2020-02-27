@@ -387,7 +387,7 @@ class Step1ES extends Component {
     validateNewInput.buttonVal = true;
     validateNewInput.buttonValMsg = this.props.t("step5AuthMetamask");
     this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-    let syscoinTransactionProcessor = new web3.eth.Contract(erc20Managerabi,  CONFIGURATION.ERC20Manager);
+    let syscoinERC20Manager = new web3.eth.Contract(erc20Managerabi,  CONFIGURATION.ERC20Manager);
     let contractBase = new web3.eth.Contract(assetabi, userInput.sysxContract);
     let fromAccount = userInput.sysxFromAccount;
     let allowance = await contractBase.methods.allowance(fromAccount, CONFIGURATION.ERC20Manager).call();
@@ -421,7 +421,7 @@ class Step1ES extends Component {
       .once('confirmation', function(confirmationNumber, receipt){
         if(bFirstConfirmation){
           bFirstConfirmation = false; 
-          thisObj.freezeBurnERC20(syscoinTransactionProcessor, validateNewInput, thisObj, amount.toString(), assetGUID, decimals, syscoinWitnessProgram, userInput, fromAccount);
+          thisObj.freezeBurnERC20(syscoinERC20Manager, validateNewInput, thisObj, amount.toString(), assetGUID, decimals, syscoinWitnessProgram, userInput, fromAccount);
         }
       })
       .on('error', (error, receipt) => {
@@ -442,7 +442,7 @@ class Step1ES extends Component {
       })
     }
     else{
-      thisObj.freezeBurnERC20(syscoinTransactionProcessor, validateNewInput, thisObj, amount.toString(), assetGUID, decimals, syscoinWitnessProgram, userInput, fromAccount);
+      thisObj.freezeBurnERC20(syscoinERC20Manager, validateNewInput, thisObj, amount.toString(), assetGUID, decimals, syscoinWitnessProgram, userInput, fromAccount);
     }
   }
 

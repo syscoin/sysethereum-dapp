@@ -172,8 +172,13 @@ const erc20Managerabi = [
     "outputs": [
       {
         "internalType": "address",
-        "name": "",
+        "name": "erc20ContractAddress",
         "type": "address"
+      },
+      {
+        "internalType": "uint32",
+        "name": "height",
+        "type": "uint32"
       }
     ],
     "payable": false,
@@ -286,17 +291,22 @@ const erc20Managerabi = [
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "txHash",
+        "name": "_txHash",
         "type": "uint256"
       },
       {
         "internalType": "uint32",
-        "name": "assetGUID",
+        "name": "_assetGUID",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "_height",
         "type": "uint32"
       },
       {
         "internalType": "address",
-        "name": "erc20ContractAddress",
+        "name": "_erc20ContractAddress",
         "type": "address"
       }
     ],
