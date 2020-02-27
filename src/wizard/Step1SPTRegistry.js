@@ -198,7 +198,7 @@ class Step1Reg extends Component {
 
     try{ 
       let syscoinERC20Manager = new web3.eth.Contract(erc20Managerabi,  CONFIGURATION.ERC20Manager);
-      let assetRegistry = syscoinERC20Manager.assetRegistry(userInput);
+      let assetRegistry = syscoinERC20Manager.methods.assetRegistry(userInput);
       if((assetRegistry === "" || !assetRegistry) && !isFindOnConf){
         this.setState({foundContract: false, searchError: this.props.t("step1RegWrongAsset")});
         return;
