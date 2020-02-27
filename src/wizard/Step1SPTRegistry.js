@@ -205,7 +205,7 @@ class Step1Reg extends Component {
       }
       let _foundErc20contract = assetRegistry.erc20ContractAddress;
       let _foundHeight = assetRegistry.height;
-      let baseBlockURL = "https://";
+      let baseBlockURL = "https://txp";
       if(CONFIGURATION.testnet){
         baseBlockURL += "-testnet"
       }
