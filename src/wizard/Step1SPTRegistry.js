@@ -52,6 +52,8 @@ class Step1Reg extends Component {
     this.setState({receiptObj: receipt, receiptStatus: receipt.status === true? "true":"false", receiptTxHash: receipt.transactionHash});
     if(errorMsg !== null){
       this.setState({buttonVal: false, buttonValMsg: errorMsg}); 
+    } else {
+      this.setState({buttonVal: true, buttonValMsg: this.props.t("step5Success")}); 
     }
   }
   async updateRegistry() {
