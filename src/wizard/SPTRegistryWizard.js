@@ -59,7 +59,7 @@ class SPTRegistryWizard extends Component {
           <StepZilla
             steps={steps}
             preventEnterSubmission={true}
-            startAtStep={window.sessionStorage.getItem('stepesc') ? parseFloat(window.sessionStorage.getItem('stepesc')) : 0}
+            startAtStep={window.sessionStorage.getItem('stepreg') ? parseFloat(window.sessionStorage.getItem('stepreg')) : 0}
            />
         </div>
       </div>
