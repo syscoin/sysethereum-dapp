@@ -16,8 +16,6 @@ class Step1Reg extends Component {
       foundContract: false,
       foundErc20contract: "",
       foundErc20URL: "",
-      foundHeight: "",
-      foundHeightURL: "",
       assetTxid: "",
       receiptStatus: "",
       receiptTxHash: "",
@@ -191,31 +189,25 @@ class Step1Reg extends Component {
   }
   async searchRegistry(findOnConfirmation) {
     let isFindOnConf = !findOnConfirmation || findOnConfirmation === "undefined";
-    this.setState({foundErc20contract: "", foundErc20URL: "", foundHeight: "", foundHeightURL: "", searchError: ""});
+    this.setState({foundErc20contract: "", foundErc20URL: "", searchError: ""});
     const userInput = this.refs.searchText.value;
     if(!userInput || userInput === "")
       return;
 
     try{ 
       let syscoinERC20Manager = new web3.eth.Contract(erc20Managerabi,  CONFIGURATION.ERC20Manager);
-      let assetRegistry = syscoinERC20Manager.methods.assetRegistry(userInput);
+      let assetRegistry = await syscoinERC20Manager.methods.assetRegistry(userInput).call();
       if((assetRegistry === "" || !assetRegistry) && !isFindOnConf){
         this.setState({foundContract: false, searchError: this.props.t("step1RegWrongAsset")});
         return;
       }
       let _foundErc20contract = assetRegistry.erc20ContractAddress;
-      let _foundHeight = assetRegistry.height;
-      let baseBlockURL = "https://txp";
-      if(CONFIGURATION.testnet){
-        baseBlockURL += "-testnet"
-      }
-      baseBlockURL += ".syscoin.org/block/" + _foundHeight;
       let baseEthURL = "https://";
       if(CONFIGURATION.testnet){
         baseEthURL += "rinkeby."
       }
       baseEthURL += "etherscan.io/address/" + _foundErc20contract;
-      this.setState({foundErc20contract: _foundErc20contract, foundErc20URL: baseEthURL, foundHeight: _foundHeight, foundHeightURL: baseBlockURL});
+      this.setState({foundErc20contract: _foundErc20contract, foundErc20URL: baseEthURL});
       if(!isFindOnConf){
         this.setState({foundContract: true});
       }
@@ -239,12 +231,6 @@ class Step1Reg extends Component {
        notValidClasses.buttonCls = 'has-error';
        notValidClasses.buttonValGrpCls = 'val-err-tooltip';
     }   
-    if (this.state.foundContract === true) {
-      notValidClasses.foundErc20ContractValGrpCls = 'result val-success-tooltip';
-    }
-    else {
-       notValidClasses.foundErc20ContractValGrpCls = 'result';
-    }  
     
     return (
       <div className="step step1reg">
@@ -311,7 +297,7 @@ class Step1Reg extends Component {
                         <code className="block">
                             <span className="dataname">{this.props.t("step5ReceiptStatus")}:</span> <span className="result">{this.state.receiptStatus}</span><br />
                             <span className="dataname">{this.props.t("step5ReceiptTxHash")}:</span> <span className="result">{this.state.receiptTxHash}</span><br />
-                            <span className="dataname">{this.props.t("step1ESCERC")}:</span> <span className={notValidClasses.foundErc20ContractValGrpCls}><a href={this.state.foundErc20URL} target="_blank" rel="noopener noreferrer">{this.state.foundErc20contract}</a> - <a href={this.state.foundHeightURL} target="_blank" rel="noopener noreferrer">{this.state.foundHeight}</a> </span><br />
+                            <span className="dataname">{this.props.t("step1ESCERC")}:</span> <span><a href={this.state.foundErc20URL} target="_blank" rel="noopener noreferrer">{this.state.foundErc20contract}</a></span><br />
                         </code>
                       </TabPanel>
                     </Tabs>

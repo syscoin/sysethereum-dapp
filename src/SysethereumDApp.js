@@ -140,25 +140,25 @@ class SysethereumDApp extends Component {
 
               <div className="bridge">
 
-                <a className="systoeth" href="javascript:void(0)" onClick={this.onSysToEth}>
+                <a className="systoeth" href="#" onClick={this.onSysToEth}>
                   <div className="mybtn mybtn-two">
                     <span>SYS ➜ ETH</span>
                   </div>
                 </a>
 
-                <a className="ethtosys" href="javascript:void(0)" onClick={this.onEthToSys}>
+                <a className="ethtosys" href="#" onClick={this.onEthToSys}>
                   <div className="mybtn mybtn-two">
                     <span>ETH ➜ SYS</span>
                   </div>
                 </a>
 
-                <a className="ethtosys" href="javascript:void(0)" onClick={this.onEthToSysCancel}>
+                <a className="ethtosys" href="#" onClick={this.onEthToSysCancel}>
                   <div className="mybtn mybtn-two">
                     <span>Cancel Transfer</span>
                   </div>
                 </a>
 
-                <a className="ethtosys" href="javascript:void(0)" onClick={this.onAssetRegistry}>
+                <a className="ethtosys" href="#" onClick={this.onAssetRegistry}>
                   <div className="mybtn mybtn-two">
                     <span>Asset Registry</span>
                   </div>
@@ -223,7 +223,7 @@ class SysethereumDApp extends Component {
             <ol>
               <li>
                 <strong>Burn SPT</strong><br />
-                Provably burn SPT on the Syscoin blockchain. <a href="javascript:void(0)" onClick={this.onSysToEth}>SYS ➜ ETH</a>
+                Provably burn SPT on the Syscoin blockchain. <a href="#" onClick={this.onSysToEth}>SYS ➜ ETH</a>
               </li>
               <li>
                 <strong>Mint ERC20</strong><br />
@@ -245,7 +245,7 @@ class SysethereumDApp extends Component {
             <ol>
               <li>
                 <strong>Burn SPT ERC20</strong><br />
-                Provably burn ERC20 on the Ethereum blockchain. <a href="javascript:void(0)" onClick={this.onEthToSys}>ETH ➜ SYS</a>
+                Provably burn ERC20 on the Ethereum blockchain. <a href="#" onClick={this.onEthToSys}>ETH ➜ SYS</a>
               </li>
               <li>
                 <strong>Mint SPT</strong><br />
