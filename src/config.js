@@ -1,7 +1,7 @@
   class CONFIGURATION {
     constructor() {
-      this.testnet = false;
-      this.agentURL = "bridge.syscoin.org";
+      this.testnet = true;
+      this.agentURL = "bridge-testnet.syscoin.org";
       this.agentPort = 8443;
       this.infuraURL = "https://mainnet.infura.io/v3/b168da11b4da49b0aee04717e7904a06";
       this.superblockContract = "0xa0Fe740Ed57C9FCB0A04E330824aD8aD574bc54c";
