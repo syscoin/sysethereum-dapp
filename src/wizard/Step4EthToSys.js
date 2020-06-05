@@ -29,11 +29,11 @@ class Step4ES extends Component {
       return;
     }
 
-    let baseURL = "https://txp";
+    let baseURL = "https://sys1.";
     if(CONFIGURATION.testnet){
       baseURL += "-testnet"
     }
-    baseURL += ".syscoin.org/tx/" + this.props.getStore().minttxid;
+    baseURL += ".bcfn.org/tx/" + this.props.getStore().minttxid;
     this.setState({explorerLink: baseURL});
     this.clearLocalStorage();
   }
