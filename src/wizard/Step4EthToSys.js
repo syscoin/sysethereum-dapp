@@ -33,7 +33,7 @@ class Step4ES extends Component {
     if(CONFIGURATION.testnet){
       baseURL += "-testnet"
     }
-    baseURL += ".bcfn.org/tx/" + this.props.getStore().minttxid;
+    baseURL += ".bcfn.ca/tx/" + this.props.getStore().minttxid;
     this.setState({explorerLink: baseURL});
     this.clearLocalStorage();
   }
