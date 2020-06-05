@@ -29,7 +29,7 @@ class Step4ES extends Component {
       return;
     }
 
-    let baseURL = "https://sys1.";
+    let baseURL = "https://sys1";
     if(CONFIGURATION.testnet){
       baseURL += "-testnet"
     }
