@@ -73,9 +73,9 @@ const erc20Managerabi = [
       },
       {
         "indexed": false,
-        "internalType": "uint32",
-        "name": "bridgetransferid",
-        "type": "uint32"
+        "internalType": "uint256",
+        "name": "transferIdAndPrecisions",
+        "type": "uint256"
       }
     ],
     "name": "TokenFreeze",
@@ -179,6 +179,11 @@ const erc20Managerabi = [
         "internalType": "uint32",
         "name": "height",
         "type": "uint32"
+      },
+      {
+        "internalType": "uint8",
+        "name": "precision",
+        "type": "uint8"
       }
     ],
     "payable": false,
@@ -212,6 +217,21 @@ const erc20Managerabi = [
         "internalType": "address",
         "name": "_trustedRelayerContract",
         "type": "address"
+      },
+      {
+        "internalType": "uint32",
+        "name": "_sysxGuid",
+        "type": "uint32"
+      },
+      {
+        "internalType": "address",
+        "name": "_sysxAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint8",
+        "name": "_precision",
+        "type": "uint8"
       }
     ],
     "name": "init",
@@ -265,19 +285,9 @@ const erc20Managerabi = [
         "type": "address"
       },
       {
-        "internalType": "address",
-        "name": "erc20ContractAddress",
-        "type": "address"
-      },
-      {
         "internalType": "uint32",
         "name": "assetGUID",
         "type": "uint32"
-      },
-      {
-        "internalType": "uint8",
-        "name": "precision",
-        "type": "uint8"
       }
     ],
     "name": "processTransaction",
@@ -308,6 +318,11 @@ const erc20Managerabi = [
         "internalType": "address",
         "name": "_erc20ContractAddress",
         "type": "address"
+      },
+      {
+        "internalType": "uint8",
+        "name": "_precision",
+        "type": "uint8"
       }
     ],
     "name": "processAsset",
@@ -380,19 +395,9 @@ const erc20Managerabi = [
         "type": "uint32"
       },
       {
-        "internalType": "address",
-        "name": "erc20ContractAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint8",
-        "name": "precision",
-        "type": "uint8"
-      },
-      {
-        "internalType": "bytes",
+        "internalType": "string",
         "name": "syscoinAddress",
-        "type": "bytes"
+        "type": "string"
       }
     ],
     "name": "freezeBurnERC20",
