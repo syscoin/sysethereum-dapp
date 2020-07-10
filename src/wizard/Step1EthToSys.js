@@ -179,28 +179,6 @@ class Step1ES extends Component {
     var hexChar = ["0", "1", "2", "3", "4", "5", "6", "7","8", "9", "A", "B", "C", "D", "E", "F"];
     return hexChar[(b >> 4) & 0x0f] + hexChar[b & 0x0f];
   }
-  async getWitnessProgram(address, validateNewInput){
-    if(address.length > 0){
-      try {
-        let results = await axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=getaddressinfo&address=' + address);
-        results = results.data;
-        if(results.error){
-          validateNewInput.buttonVal = false;
-          validateNewInput.buttonValMsg = results.error;
-          return "";
-        }
-        else if(results){
-          let version = this.byteToHex(results.witness_version);
-          return "0x" + version + results.witness_program;
-        }
-      }catch(e) {
-        validateNewInput.buttonVal = false;
-        validateNewInput.buttonValMsg = e.message;
-        return "";
-      }
-    }
-    return "";
-  }
   async getAssetContract(guid, validateNewInput){
     if(guid.length > 0){
       try {
@@ -222,9 +200,9 @@ class Step1ES extends Component {
     }
     return "";
   }
-  freezeBurnERC20(syscoinTP, validateNewInput, thisObj, amount, assetGUID, decimals, syscoinWitnessProgram, userInput, fromAccount) {
+  freezeBurnERC20(syscoinTP, validateNewInput, thisObj, amount, assetGUID, syscoinWitnessAddress, userInput, fromAccount) {
     thisObj.state.receiptObj = null;
-    syscoinTP.methods.freezeBurnERC20(amount, assetGUID, userInput.sysxContract, decimals, syscoinWitnessProgram).send({from: fromAccount, gas: 500000})
+    syscoinTP.methods.freezeBurnERC20(amount, assetGUID, syscoinWitnessAddress).send({from: fromAccount, gas: 500000})
       .once('transactionHash', function(hash){
         validateNewInput.buttonVal = true;
         validateNewInput.receiptTxHash = hash;
@@ -372,12 +350,6 @@ class Step1ES extends Component {
     }
     
     this.setState({working: true});
-    let syscoinWitnessProgram = await this.getWitnessProgram(userInput.syscoinWitnessAddress, validateNewInput);
-    if(syscoinWitnessProgram === ""){
-      this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-      this.setState({working: false});
-      return;
-    }
     userInput.sysxContract = await this.getAssetContract(userInput.toSysAssetGUID, validateNewInput);
     if(userInput.sysxContract === ""){
       this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
@@ -397,7 +369,7 @@ class Step1ES extends Component {
     let decimals = await contractBase.methods.decimals().call();
     let amount = this.toBaseUnit(userInput.toSysAmount, decimals, web3.utils.BN);
     let assetGUID = userInput.toSysAssetGUID;
-    
+    let syscoinWitnessAddress = userInput.syscoinWitnessAddress
 
     let thisObj = this;
     if(amount.gt(balance)){
@@ -421,7 +393,7 @@ class Step1ES extends Component {
       .once('confirmation', function(confirmationNumber, receipt){
         if(bFirstConfirmation){
           bFirstConfirmation = false; 
-          thisObj.freezeBurnERC20(syscoinERC20Manager, validateNewInput, thisObj, amount.toString(), assetGUID, decimals, syscoinWitnessProgram, userInput, fromAccount);
+          thisObj.freezeBurnERC20(syscoinERC20Manager, validateNewInput, thisObj, amount.toString(), assetGUID, syscoinWitnessAddress, userInput, fromAccount);
         }
       })
       .on('error', (error, receipt) => {
@@ -442,7 +414,7 @@ class Step1ES extends Component {
       })
     }
     else{
-      thisObj.freezeBurnERC20(syscoinERC20Manager, validateNewInput, thisObj, amount.toString(), assetGUID, decimals, syscoinWitnessProgram, userInput, fromAccount);
+      thisObj.freezeBurnERC20(syscoinERC20Manager, validateNewInput, thisObj, amount.toString(), assetGUID, syscoinWitnessAddress, userInput, fromAccount);
     }
   }
 
