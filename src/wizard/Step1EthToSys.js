@@ -401,7 +401,7 @@ class Step1ES extends Component {
         if(error.message.length <= 512 && error.message.indexOf("{") !== -1){
           error = JSON.parse(error.message.substring(error.message.indexOf("{")));
         }
-        let message = error.message.toString();
+        let message = error.message? error.message.toString(): "Unknown error";
         if(receipt){
           thisObj.setStateFromReceipt(receipt, message, 0, validateNewInput);
           thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));

@@ -253,10 +253,10 @@ class Step1ESC extends Component {
               type: 'uint256',
               name: 'value'
           },{
-            type: 'uint32',
-            name: 'bridgetransferid'
+            type: 'uint',
+            name: 'transferIdAndPrecisions'
           }], txReceipt.logs[i].data);
-          bridgeTransferId = paramResults.bridgetransferid;
+          bridgeTransferId = paramResults.transferIdAndPrecisions & 0xFFFFFFFF;
           break;
         }
       }

@@ -2,8 +2,10 @@
 import React, { Component } from 'react';
 import CONFIGURATION from '../config';
 import EthProof from 'eth-proof';
+import Web3 from 'web3';
 const rlp = require('rlp');
 const axios = require('axios');
+const web3 = new Web3(Web3.givenProvider);
 class Step2ES extends Component {
   constructor(props) {
     super(props);
@@ -83,6 +85,46 @@ class Step2ES extends Component {
 
     const buildEthProof = new EthProof(CONFIGURATION.infuraURL);
     try{
+        let bridgeTransferId = 0;
+
+
+        let txReceipt = await web3.eth.getTransactionReceipt(ethTXID);
+        if(txReceipt.logs.length < 2 || txReceipt.logs.length > 10){
+          validateNewInput.buttonVal = false;
+          validateNewInput.buttonValMsg = this.props.t("step2ESInvalidProof");
+          this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+          this.setState({working: false});
+          return;
+        }
+        
+        for(var i =0;i<txReceipt.logs.length;i++){
+          if(txReceipt.logs[i].topics && txReceipt.logs[i].topics.length !== 1){
+            continue;
+          }
+          // event TokenFreeze(address freezer, uint value, uint transferIdAndPrecisions);
+          if(txReceipt.logs[i].topics[0] === CONFIGURATION.tokenFreezeFunction && txReceipt.logs[i].address === CONFIGURATION.ERC20Manager){
+            let paramResults = web3.eth.abi.decodeParameters([{
+              type: 'address',
+              name: 'freezer'
+            },{
+                type: 'uint256',
+                name: 'value'
+            },{
+              type: 'uint',
+              name: 'transferIdAndPrecisions'
+            }], txReceipt.logs[i].data);
+            bridgeTransferId = paramResults.transferIdAndPrecisions & 0xFFFFFFFF;
+            break;
+          }
+        }
+      
+        if(bridgeTransferId === 0){
+          validateNewInput.buttonVal = false;
+          validateNewInput.buttonValMsg = this.props.t("step2ESInvalidProof");
+          this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+          this.setState({working: false});
+          return;
+        }
         let result = await buildEthProof.getTransactionProof(ethTXID);
         let tx_hex = rlp.encode(result.value).toString('hex');
         let tx_root_hex = rlp.encode(result.header[4]).toString('hex') ;
@@ -105,8 +147,7 @@ class Step2ES extends Component {
         console.log("receiptmerkleproof_hex: " + receiptmerkleproof_hex);
         console.log("block number: " + blockNumber);
         try {
-          // [asset] [address] [amount] [tx_hex] [txroot_hex] [txmerkleproof_hex] [txmerkleroofpath_hex] [receipt_hex] [receiptroot_hex] [receiptmerkleproof_hex] [receiptmerkleroofpath_hex] [witness]
-          let results = await axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=assetallocationmint&asset=' + toSysAssetGUID + '&address=' + syscoinWitnessAddress + '&amount=' + toSysAmount + '&blocknumber=' + blockNumber + '&tx_hex=' + tx_hex + '&txroot_hex=' + tx_root_hex + '&txmerkleproof_hex=' + txmerkleproof_hex + '&txmerkleproofpath_hex=' + txmerkleproofpath_hex + '&receipt_hex=' + receipt_hex + '&receiptroot_hex=' + receipt_root_hex + '&receiptmerkleproof_hex=' + receiptmerkleproof_hex + "&witness=''");
+          let results = await axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=assetallocationmint&asset=' + toSysAssetGUID + '&address=' + syscoinWitnessAddress + '&amount=' + toSysAmount + '&blocknumber=' + blockNumber + '&bridgetransferid=' + bridgeTransferId + '&tx_hex=' + tx_hex + '&txroot_hex=' + tx_root_hex + '&txmerkleproof_hex=' + txmerkleproof_hex + '&txmerkleproofpath_hex=' + txmerkleproofpath_hex + '&receipt_hex=' + receipt_hex + '&receiptroot_hex=' + receipt_root_hex + '&receiptmerkleproof_hex=' + receiptmerkleproof_hex);
           results = results.data;
           if(results.error){
             validateNewInput.buttonVal = false;
