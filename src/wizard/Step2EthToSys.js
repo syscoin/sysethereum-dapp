@@ -1,7 +1,7 @@
 
 import React, { Component } from 'react';
 import CONFIGURATION from '../config';
-import EthProof from 'eth-proof';
+import { GetProof } from 'eth-proof';
 const rlp = require('rlp');
 const axios = require('axios');
 class Step2ES extends Component {
@@ -81,19 +81,19 @@ class Step2ES extends Component {
     let syscoinWitnessAddress =  this.props.getStore().syscoinWitnessAddress;
     let ethTXID = userInput.ethburntxid;
 
-    const buildEthProof = new EthProof(CONFIGURATION.infuraURL);
+    const buildEthProof = new GetProof(CONFIGURATION.infuraURL);
     try{
-        let result = await buildEthProof.getTransactionProof(ethTXID);
-        let tx_hex = rlp.encode(result.value).toString('hex');
-        let tx_root_hex = rlp.encode(result.header[4]).toString('hex') ;
-        let txmerkleproof_hex =  rlp.encode(result.parentNodes).toString('hex');
-        let txmerkleproofpath_hex = result.path.toString('hex');
-        let blockNumber = result.blockNumber || this.props.getStore().receiptBlocknumber;
+        let result = await buildEthProof.transactionProof(ethTXID);
+        let tx_hex = rlp.encode(rlp.decode(result.txProof[2][1])).toString('hex');
+        let tx_root_hex = rlp.encode(result.header[4]).toString('hex');
+        let txmerkleproof_hex = rlp.encode(result.txProof).toString('hex');
+        let txmerkleproofpath_hex = rlp.encode(result.txIndex).toString('hex');
+        let blockNumber = parseInt(result.header[8].toString('hex'), 16) || this.props.getStore().receiptBlocknumber;
 
-        result = await buildEthProof.getReceiptProof(ethTXID);
-        let receipt_hex = rlp.encode(result.value).toString('hex');
-        let receipt_root_hex = rlp.encode(result.header[5]).toString('hex') ;
-        let receiptmerkleproof_hex =  rlp.encode(result.parentNodes).toString('hex');
+        result = await buildEthProof.receiptProof(ethTXID);
+        let receipt_hex = rlp.encode(rlp.decode(result.receiptProof[2][1])).toString('hex');
+        let receipt_root_hex = rlp.encode(result.header[5]).toString('hex');
+        let receiptmerkleproof_hex =  rlp.encode(result.receiptProof).toString('hex');
 
         console.log("tx_root_hex " + tx_root_hex);
         console.log("tx_hex: " + tx_hex);
