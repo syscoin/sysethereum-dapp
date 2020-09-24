@@ -129,7 +129,7 @@ class Step2ES extends Component {
         let tx_hex = rlp.encode(rlp.decode(result.txProof[2][1])).toString('hex');
         let txmerkleproof_hex = rlp.encode(result.txProof).toString('hex');
         let txmerkleproofpath_hex = rlp.encode(result.txIndex).toString('hex');
-        let blockNumber = result.blockNumber || this.props.getStore().receiptBlocknumber;
+        let blockNumber = result.blockNumber;
 
         result = await buildEthProof.receiptProof(ethTXID);
         let receipt_hex = rlp.encode(rlp.decode(result.receiptProof[2][1])).toString('hex');
