@@ -1,11 +1,8 @@
 
 import React, { Component } from 'react';
 import CONFIGURATION from '../config';
-import { GetProof } from 'eth-proof';
-import Web3 from 'web3';
-const rlp = require('rlp');
+const sjs = require('syscoinjs-lib')
 const axios = require('axios');
-const web3 = new Web3(Web3.givenProvider);
 class Step2ES extends Component {
   constructor(props) {
     super(props);
@@ -29,15 +26,7 @@ class Step2ES extends Component {
       // Sorry! No Web Storage support..
     }
   }
-  componentDidMount() {
-    if((!this.props.getStore().toSysAssetGUID && !this.props.getStore().toSysAssetGUID === 0) ||
-    !this.props.getStore().toSysAmount ||
-    !this.props.getStore().syscoinWitnessAddress){
-      this.props.jumpToStep(0);
-    }
-  }
-
-
+  componentDidMount() {}
   componentWillUnmount() {}
 
   isValidated() {
@@ -77,97 +66,55 @@ class Step2ES extends Component {
        
     let self = this;
     this.setState({working: true});
-
-    let toSysAssetGUID = this.props.getStore().toSysAssetGUID ;
-    let toSysAmount =  this.props.getStore().toSysAmount.toString();
-    let syscoinWitnessAddress =  this.props.getStore().syscoinWitnessAddress;
     let ethTXID = userInput.ethburntxid;
-
-    const buildEthProof = new GetProof(CONFIGURATION.infuraURL);
+    
     try{
-        let bridgeTransferId = 0;
+      const buildEthProof = await sjs.utils.buildEthProof({infuraurl: CONFIGURATION.infuraURL, ethtxid: ethTXID});
+       
+      let tx_hex = buildEthProof.txvalue;
+      let txmerkleproof_hex = buildEthProof.txparentnodes;
+      let txmerkleproofpath_hex = buildEthProof.txpath;
+      let blockNumber = buildEthProof.blocknumber;
 
-
-        let txReceipt = await web3.eth.getTransactionReceipt(ethTXID);
-        if(txReceipt.logs.length < 2 || txReceipt.logs.length > 10){
-          validateNewInput.buttonVal = false;
-          validateNewInput.buttonValMsg = this.props.t("step2ESInvalidProof");
-          this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-          this.setState({working: false});
-          return;
-        }
-        
-        for(var i =0;i<txReceipt.logs.length;i++){
-          if(txReceipt.logs[i].topics && txReceipt.logs[i].topics.length !== 1){
-            continue;
-          }
-          // event TokenFreeze(address freezer, uint value, uint transferIdAndPrecisions);
-          if(txReceipt.logs[i].topics[0] === CONFIGURATION.tokenFreezeFunction && txReceipt.logs[i].address === CONFIGURATION.ERC20Manager){
-            let paramResults = web3.eth.abi.decodeParameters([{
-              type: 'address',
-              name: 'freezer'
-            },{
-                type: 'uint256',
-                name: 'value'
-            },{
-              type: 'uint',
-              name: 'transferIdAndPrecisions'
-            }], txReceipt.logs[i].data);
-            bridgeTransferId = paramResults.transferIdAndPrecisions & 0xFFFFFFFF;
-            break;
-          }
-        }
+      let receipt_hex = buildEthProof.receiptvalue;
+      let receiptmerkleproof_hex =  buildEthProof.receiptparentnodes;
+      let bridgeTransferId = buildEthProof.bridgetransferid;
+      let toSysAssetGUID = buildEthProof.assetguid ;
+      let toSysAmount =  buildEthProof.amount
+      let syscoinWitnessAddress =  buildEthProof.destinationaddress
+      console.log("tx_hex: " + tx_hex);
+      console.log("txmerkleproof_hex: " + txmerkleproof_hex);
+      console.log("txmerkleproofpath_hex: " + txmerkleproofpath_hex);
       
-        if(bridgeTransferId === 0){
+      console.log("receipt_hex: " + receipt_hex);
+      console.log("receiptmerkleproof_hex: " + receiptmerkleproof_hex);
+      console.log("block number: " + blockNumber);
+      try {
+        let results = await axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=assetallocationmint&asset=' + toSysAssetGUID + '&address=' + syscoinWitnessAddress + '&amount=' + toSysAmount + '&blocknumber=' + blockNumber + '&bridgetransferid=' + bridgeTransferId + '&tx_hex=' + tx_hex + '&txmerkleproof_hex=' + txmerkleproof_hex + '&txmerkleproofpath_hex=' + txmerkleproofpath_hex + '&receipt_hex=' + receipt_hex + '&receiptroot_hex=' + receiptmerkleproof_hex);
+        results = results.data;
+        if(results.error){
           validateNewInput.buttonVal = false;
-          validateNewInput.buttonValMsg = this.props.t("step2ESInvalidProof");
-          this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-          this.setState({working: false});
-          return;
+          validateNewInput.buttonValMsg = results.error;
+          console.log("error " + results.error);
+          self.setState({working: false});
         }
-        let result = await buildEthProof.transactionProof(ethTXID);
-        let tx_hex = rlp.encode(rlp.decode(result.txProof[2][1])).toString('hex');
-        let txmerkleproof_hex = rlp.encode(result.txProof).toString('hex');
-        let txmerkleproofpath_hex = rlp.encode(result.txIndex).toString('hex');
-        let blockNumber = result.blockNumber || this.props.getStore().receiptBlocknumber;
-
-        result = await buildEthProof.receiptProof(ethTXID);
-        let receipt_hex = rlp.encode(rlp.decode(result.receiptProof[2][1])).toString('hex');
-        let receiptmerkleproof_hex =  rlp.encode(result.receiptProof).toString('hex');
-
-        console.log("tx_hex: " + tx_hex);
-        console.log("txmerkleproof_hex: " + txmerkleproof_hex);
-        console.log("txmerkleproofpath_hex: " + txmerkleproofpath_hex);
-        
-        console.log("receipt_hex: " + receipt_hex);
-        console.log("receiptmerkleproof_hex: " + receiptmerkleproof_hex);
-        console.log("block number: " + blockNumber);
-        try {
-          let results = await axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=assetallocationmint&asset=' + toSysAssetGUID + '&address=' + syscoinWitnessAddress + '&amount=' + toSysAmount + '&blocknumber=' + blockNumber + '&bridgetransferid=' + bridgeTransferId + '&tx_hex=' + tx_hex + '&txmerkleproof_hex=' + txmerkleproof_hex + '&txmerkleproofpath_hex=' + txmerkleproofpath_hex + '&receipt_hex=' + receipt_hex + '&receiptroot_hex=' + receiptmerkleproof_hex);
-          results = results.data;
-          if(results.error){
-            validateNewInput.buttonVal = false;
-            validateNewInput.buttonValMsg = results.error;
-            console.log("error " + results.error);
-            self.setState({working: false});
-          }
-          else if(results && results.hex){
-            validateNewInput.mintsysrawtxunsignedVal = true;
-            this.refs.mintsysrawtxunsigned.value = results.hex;
-            userInput.mintsysrawtxunsigned = results.hex;
-            self.setState({working: false});
-            self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-            this.saveToLocalStorage();
-          }
-        }catch(e) {
-          validateNewInput.buttonVal = false;
-          validateNewInput.buttonValMsg = e.message;
+        else if(results && results.hex){
+          validateNewInput.mintsysrawtxunsignedVal = true;
+          this.refs.mintsysrawtxunsigned.value = results.hex;
+          userInput.mintsysrawtxunsigned = results.hex;
           self.setState({working: false});
           self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+          this.saveToLocalStorage();
         }
-        
+      }catch(e) {
+        validateNewInput.buttonVal = false;
+        validateNewInput.buttonValMsg = e.message;
+        self.setState({working: false});
+        self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+      }
+      
 
-        this.setState({working: false});
+      this.setState({working: false});
     }catch(e){      
       validateNewInput.buttonVal = false;
       validateNewInput.buttonValMsg = this.props.t("step2ESInvalidProof") + e;
