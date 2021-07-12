@@ -1,7 +1,7 @@
 
 import React, { Component } from 'react';
 import CONFIGURATION from '../config';
-const axios = require('axios');
+import * as SyscoinRpc from 'syscoin-js';
 class Step3 extends Component {
   constructor(props) {
     super(props);
@@ -20,7 +20,13 @@ class Step3 extends Component {
   }
 
   componentDidMount() {
-    
+    this.syscoinClient = new SyscoinRpc.default({baseUrl: CONFIGURATION.sysRPCURL, port: CONFIGURATION.sysRPCPort, username: CONFIGURATION.sysRPCUser, password: CONFIGURATION.sysRPCPassword});
+
+    try {
+      console.log("RESULT", (await this.syscoinClient.callRpc("getblockchaininfo", [])) );
+    } catch(e) {
+      console.log("ERR getblockchaininfo", e);
+    }
   }
 
   componentWillUnmount() {}
@@ -73,7 +79,7 @@ class Step3 extends Component {
       this.setState({working: true});
       let txid = userInput.txid.toString();
       try {
-        let results = await axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=getblockhashbytxid&txid=' + txid);
+        let results = await this.syscoinClient.callRpc("getrawtransaction", [txid])
         results = results.data;
         if(results.error){
           validateNewInput.buttonVal = false;
@@ -82,9 +88,9 @@ class Step3 extends Component {
           this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
           console.log("error " + results.error);
         }
-        else if(results && results.hex){
+        else if(results && results.blockhash){
           validateNewInput.blockhashVal = true;
-          this.refs.blockhash.value = results.hex;
+          this.refs.blockhash.value = results.blockhash;
           this.setState({working: false});
           this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
           this.saveToLocalStorage();

@@ -1,7 +1,7 @@
 
 import React, { Component } from 'react';
 import CONFIGURATION from '../config';
-const axios = require('axios');
+import * as SyscoinRpc from 'syscoin-js';
 class Step3ES extends Component {
   constructor(props) {
     super(props);
@@ -22,6 +22,13 @@ class Step3ES extends Component {
   componentDidMount() {
     if(!this.props.getStore().mintsysrawtxunsigned){
       this.props.jumpToStep(1);
+    }
+    this.syscoinClient = new SyscoinRpc.default({baseUrl: CONFIGURATION.sysRPCURL, port: CONFIGURATION.sysRPCPort, username: CONFIGURATION.sysRPCUser, password: CONFIGURATION.sysRPCPassword});
+
+    try {
+      console.log("RESULT", (await this.syscoinClient.callRpc("getblockchaininfo", [])) );
+    } catch(e) {
+      console.log("ERR getblockchaininfo", e);
     }
   }
 
@@ -67,7 +74,7 @@ class Step3ES extends Component {
       this.setState({working: true});
       let minttxid = userInput.minttxid.toString();
       try {
-        let results = await axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=getblockhashbytxid&txid=' + minttxid);
+        let results = await this.syscoinClient.callRpc("getrawtransaction", [minttxid])
         results = results.data;
         if(results.error){
           validateNewInput.buttonVal = false;
@@ -75,10 +82,10 @@ class Step3ES extends Component {
           this.setState({working: false});
           console.log("error " + results.error);
         }
-        else if(results && results.hex){
+        else if(results && results.blockhash){
           validateNewInput.mintblockhashVal = true;
-          this.refs.mintblockhash.value = results.hex;
-          userInput.mintblockhash = results.hex;
+          this.refs.mintblockhash.value = results.blockhash;
+          userInput.mintblockhash = results.blockhash;
           this.setState({working: false});
         }
       }catch(e) {

@@ -3,14 +3,13 @@ import './SysethereumDApp.css';
 import bridgeAnim from './imgs/bridge_diagram.svg';
 import SysToEthWizardi18n from './wizard/SysToEthWizard';
 import EthToSysWizardi18n from './wizard/EthToSysWizard';
-import EthToSysCancelWizardi18n from './wizard/EthToSysCancelWizard';
 import SPTRegistryWizardi18n from './wizard/SPTRegistryWizard';
 import { I18nextProvider } from "react-i18next";
 import i18n from "./wizard/i18n";
 import Textarea from 'react-textarea-autosize';
-import axios from 'axios';
-import sbconfig from './SyscoinSuperblocksI';
+import rconfig from './SyscoinRelayI';
 import CONFIGURATION from './config';
+import axios from 'axios';
 class SysethereumDApp extends Component {
   constructor(props) {
     super(props);
@@ -26,37 +25,27 @@ class SysethereumDApp extends Component {
       
     this.onSysToEth = this.onSysToEth.bind(this);
     this.onEthToSys = this.onEthToSys.bind(this);
-    this.onEthToSysCancel = this.onEthToSysCancel.bind(this);
     this.onAssetRegistry = this.onAssetRegistry.bind(this);
     this.onHome = this.onHome.bind(this);
     this.handleEmailChange = this.handleEmailChange.bind(this);
     this.handleEmailSubmit = this.handleEmailSubmit.bind(this);
-    this.superblockURL = "";
-    if(CONFIGURATION.testnet){
-      this.superblockURL += "https://rinkeby.etherscan.io/address/"+sbconfig.contract+"#code";
-    }
-    else{
-      this.superblockURL += "https://etherscan.io/address/"+sbconfig.contract+"#code";
-    }
+    this.relayURL = CONFIGURATION.NEVMAddressExplorerURL+rconfig.contract;
   }
 
 
   async componentDidMount() {
   }
   onSysToEth() {
-    this.setState({ introDisplay: false, ethToSysDisplay: false,  ethToSysCancelDisplay: false, assetRegistryDisplay: false, sysToEthDisplay: true});
+    this.setState({ introDisplay: false, ethToSysDisplay: false,  assetRegistryDisplay: false, sysToEthDisplay: true});
   }
   onEthToSys() {
-    this.setState({ introDisplay: false, ethToSysDisplay: true,  ethToSysCancelDisplay: false, assetRegistryDisplay: false, sysToEthDisplay: false});
-  }
-  onEthToSysCancel() {
-    this.setState({ introDisplay: false, ethToSysDisplay: false,  ethToSysCancelDisplay: true, assetRegistryDisplay: false, sysToEthDisplay: false});
+    this.setState({ introDisplay: false, ethToSysDisplay: true, assetRegistryDisplay: false, sysToEthDisplay: false});
   }
   onAssetRegistry() {
-    this.setState({ introDisplay: false, ethToSysDisplay: false,  ethToSysCancelDisplay: false, assetRegistryDisplay: true, sysToEthDisplay: false});
+    this.setState({ introDisplay: false, ethToSysDisplay: false, assetRegistryDisplay: true, sysToEthDisplay: false});
   }
   onHome() {
-    this.setState({ introDisplay: true, ethToSysDisplay: false,  ethToSysCancelDisplay: false, assetRegistryDisplay: false, sysToEthDisplay: false});
+    this.setState({ introDisplay: true, ethToSysDisplay: false, assetRegistryDisplay: false, sysToEthDisplay: false});
   }
 
   handleEmailChange(evt) {
@@ -149,12 +138,6 @@ class SysethereumDApp extends Component {
                 <a className="ethtosys" href="#" onClick={this.onEthToSys}>
                   <div className="mybtn mybtn-two">
                     <span>ETH ➜ SYS</span>
-                  </div>
-                </a>
-
-                <a className="ethtosys" href="#" onClick={this.onEthToSysCancel}>
-                  <div className="mybtn mybtn-two">
-                    <span>Cancel Transfer</span>
                   </div>
                 </a>
 
@@ -260,56 +243,25 @@ class SysethereumDApp extends Component {
 
             <div className="ornament intext"></div>
 
-            <h2>The Superblock Contract</h2>
+            <h2>The relay Contract</h2>
 
             <p className="italic">
               Linking blockchains through smart contracts
             </p>
 
             <p>
-              A key concept of the Syscoin Ethereum bridge is called the Superblock Contract. This contract anchors block header data from the Syscoin chain onto the Ethereum blockchain creating a sidechain. The data within this sidechain is used to facilitate the minting of new SPT ERC20 tokens.
+              A key concept of the Syscoin Ethereum bridge is called the relay Contract. This contract takes in an SPV proof and uses a custom sysblockhash opcode as well as the proof data to facilitate the minting of new SPT ERC20 tokens and base coin.
             </p>
 
             <p>
-            This sidechain is secured by Agents. This security layer incentivizes users with an opportunity to earn rewards and fees in both ETH and SYS for helping to secure the bridge.
-            </p>
-
-            <p>
-              <a href={this.superblockURL} target="_blank" rel="noopener noreferrer">Check out the Superblock contract on Rinkeby testnet</a>
+              <a href={this.relayURL} target="_blank" rel="noopener noreferrer">Check out the relay contract on Tanenbaum testnet</a>
             </p>
 
             <div className="ornament intext"></div>
 
-            <h2>Bridge Agents</h2>
-
-            <p>
-            Agents help to secure the Superblock contract while earning rewards and fees. It costs 3 ETH to run an Agent. Agents serve two primary roles- submitting block data to Ethereum and challenging bad submissions.
-            </p>
-
-            <p>
-              <strong>Earn SYS for submitting Syscoin Superblock data to Ethereum</strong>
-            </p>
-
-            <p>
-            Agents are responsible for collecting block header data from the Syscoin blockchain and grouping it into 'superblocks'. Each superblock contains 1 hour of Syscoin block headers. This approach reduces GAS costs for anchoring the block data on the Ethereum blockchain.
-            </p>
-
-            <p>
-            Agents earn a SYS fee for all bridge transactions contained within the superblock they are submitting once it is accepted by the Superblock contract.
-            </p>
-
-            <p>
-              <strong>Earn ETH by Challenging Agents submitting bad data</strong>
-            </p>
-
-            <p>
-            Agents secure the Superblock contract by watching for superblock submissions by other Agents and challenging them if the data they are submitting does not match their own. This challenge results in a game, the loser of which loses their 3 ETH bond.
-            </p>
-
             <p>
               <a href="https://github.com/syscoin/sysethereum-contracts" target="_blank" rel="noopener noreferrer">View Contract code</a><br />
               <a href="https://github.com/syscoin/sysethereum-dapp" target="_blank" rel="noopener noreferrer">View DApp code</a><br />
-              <a href="https://github.com/syscoin/sysethereum-agents" target="_blank" rel="noopener noreferrer">View Agent code</a>
             </p>
 
           </div>
@@ -342,45 +294,45 @@ class SysethereumDApp extends Component {
           The basic structure of how SYS bridge works is SYS &lt;-&gt; SYSX (SPT) &lt;-&gt; SYSX (ERC20).
           </p>
           <p>
-          You will need to burn your SYS for SYSX (SPT). You can then move your SYSX (SPT) across the bridge, which will then be minted as a SYSX (ERC20).
+          You will need to burn your SYS for SYSX (SPT). You can then move your SYSX (SPT) across the bridge, which will then be minted as either an ERC20 or base coin if you moved SYSX.
           </p>
           <p>
-          The total supply of SYS + SYSX (SPT) + SYSX (ERC20) = Total Circulating Supply.
+          The total supply of SYS remains the same.
           </p>
 
           <p className="question">
           Does the EVM run on Ethereum?
             </p>
           <p>
-          Yes, the EVM will run on Ethereum. EVM stands for Ethereum Virtual Machine.
+          The EVM will run on an Ethereum version that is integrated into Syscoin that leverages PoW of Bitcoin to secure its chain. EVM stands for Ethereum Virtual Machine. In Syscoin we refer to it as NEVM or Network-enhances Ethereum Virtual Machine.
           </p>
 
           <p className="question">
-          Will SPTs be transferable to Ethereum?
+          Will SPTs be transferable to NEVM?
             </p>
           <p>
-          Any Syscoin SPT can be transferred to Ethereum as an ERC20, and back, as needed, given the necessary Bridge smart contracts are in place on both the Syscoin and Ethereum blockchains pertaining to that particular SPT/ERC20.  These contracts are already in place for SYSX, and they can serve as a template for bridging other SPTs. You can reference them here: <a target="_blank" rel="noopener noreferrer" href="https://github.com/syscoin/sysethereum-contracts">https://github.com/syscoin/sysethereum-contracts</a>
+          Any Syscoin SPT can be transferred to the NEVM layer, and back, as needed. It is a trustless and decentralized process.
           </p>
 
           <p className="question">
           Will this mean I can use Ledger, Myetherwallet, Metamask etc?
           </p>
           <p>
-          Your SPT will become compatible with all the major service providers of Ethereum once moved across the bridge to become an ERC20 token.
+          Your SPT will become compatible with all the major service providers using EVM once moved across the bridge.
           </p>
 
           <p className="question">
           Syscoin supply will remain the same?
           </p>
           <p>
-          Yes. SYS + SYSX (SPT) + SYSX (ERC20) = Total Circulating Supply.  This supply is maintained via mint/burn as tokens move across the bridge in either direction.
+          Yes. SYS + SYSX (SPT) + SYSX (NEVM) = Total Circulating Supply.  This supply is maintained via mint/burn as tokens move across the bridge in either direction.
           </p>
 
           <p className="question">
           What counterparty or custodian related risks and/or limitations do I incur when using Syscoin Bridge?
           </p>
           <p>
-          None. You maintain full possession and control of your funds at all times. Furthermore, market demand (such as with atomic swap) is not required to take advantage of Syscoin Bridge. These benefits are made possible by first-class integration with Ethereum, utilizing dual smart contracts and SPV proofs on both sides.
+          None. You maintain full possession and control of your funds at all times. Furthermore, market demand (such as with atomic swap) is not required to take advantage of Syscoin Bridge. These benefits are made possible by first-class integration with the NEVM layer through a custom opcode (sysblockhash and utilizing dual smart contracts and SPV proofs on both sides.
           </p>
 
           <p className="question">
@@ -394,14 +346,14 @@ class SysethereumDApp extends Component {
           Can I have SYSX in my QT/Spark wallet?
           </p>
           <p>
-          SYSX is an SPT and an ERC20 token, thus it will depend on which chain your tokens are on. If they are on Ethereum, you will need to use the Ethereum supported wallets. If they are on Syscoin, you can use Spark. Syscoin QT can also be used if you are competent with command line interface.
+          SYSX is an SPT and an ERC20 token, thus it will depend on which chain your tokens are on. If they are on NEVM, you will need to use the Ethereum supported wallets. If they are on Syscoin, you can use Spark. Syscoin QT can also be used if you are competent with command line interface.
           </p>
 
           <p className="question">
           Do I need Ether to execute the smart contract, and if so how much?
           </p>
           <p>
-          You will need Ether to cover the costs of executing Ethereum smart contracts. These costs will vary depending on the Ethereum network.
+          You will need Ether on the NEVM to cover the costs of executing Ethereum smart contracts. These costs will vary depending on the NEVM network.
           </p>
 
           <p className="question">
@@ -411,19 +363,6 @@ class SysethereumDApp extends Component {
           SYS is required to execute any transaction within the Syscoin network, including SPT transfers.  Exact transaction costs depend on network conditions. Syscoin transaction fees are relatively inexpensive, especially in the case of SPTs which utilize Syscoin’s ZDAG protocol. Typically, thousands of SPT transfers can be funded with a single SYS, due to the unique fee market of the ZDAG network within which users usually do not require having PoW confirmation within an immediate block.
           </p>
 
-          <p className="question">
-          Are there any specific use cases for smart contracts with Syscoin?
-          </p>
-          <p>
-          As discussed in the blogpost on the evolution of Syscoin, there are multiple ways Syscoin can leverage smart contracts. Being a two-way bridge, smart contracts on Ethereum will be able to leverage advantages unique to Syscoin such as ZDAG speed, throughput, security, and low fees. Users on Syscoin also benefit from the security of merged-mining with the Bitcoin network, and Syscoin’s compliance with Bitcoin Core. A network resilient against 51% attacks, and a proven core, are of utmost importance when choosing a base layer blockchain to store your assets.
-          </p>
-
-          <p className="question">
-          Will SYSX be as fast on Ethereum, or will it be bound to Ethereum’s speed?
-          </p>
-          <p>
-          Since SYSX ERC20 tokens reside within the EVM, transactions will bear the performance characteristics of the Ethereum network. On the other hand, SYSX (SPT), and other SPTs on the Syscoin chain, do utilize and benefit from ZDAG speed, throughput, security and low fees. 
-          </p>
 
           <p className="question">
           Why have an SPT on Syscoin if I can have an ERC20 token?
@@ -433,24 +372,18 @@ class SysethereumDApp extends Component {
           </p>
 
           <p className="question">
-          Can other ERC20 tokens be migrated to the Syscoin chain for fast transfers and Point-of-Sale applications?
+          Can other ERC20 tokens be migrated to the Syscoin chain?
           </p>
           <p>
-          Yes ERC20 tokens will be able to leverage ZDAG’s advantages by burning and minting via the bridge, resulting in an SPT.  This is currently active for SYSX.  A reference implementation of the smart contracts necessary to enable your particular ERC20 with Syscoin Bridge is available here: <a href="https://github.com/syscoin/sysethereum-contracts" target="_blank" rel="noopener noreferrer">https://github.com/syscoin/sysethereum-contracts</a>
+          Yes by burning and minting via the bridge, resulting in an SPT.  This is currently active for SYSX.  A reference implementation of the smart contracts necessary to enable your particular ERC20 with Syscoin Bridge is available here: <a href="https://github.com/syscoin/sysethereum-contracts" target="_blank" rel="noopener noreferrer">https://github.com/syscoin/sysethereum-contracts</a>
           </p>
 
           <p className="question">
           How is this initiative different from others?
           </p>
           <p>
-          Syscoin Bridge is the first two-way interoperability solution without counterparties, a permissionless and trustless solution that leverages the security of each respective blockchain. This allows us to consider the SPT supply mechanism as a fractional supply across multiple blockchains. Users on Syscoin by extension will be able to leverage the vast toolset and network effect of Ethereum whilst Ethereum users can leverage Syscoin’s cost effective and efficient asset specific transactionality. You can read more about the technicals here: <a href="https://github.com/syscoin/sysethereum-docs" target="_blank" rel="noopener noreferrer">https://github.com/syscoin/sysethereum-docs</a>
+          Syscoin Bridge is the first two-way interoperability solution without counterparties, a permissionless and trustless solution that leverages the security of each respective blockchain. This allows us to consider the SPT supply mechanism as a fractional supply across multiple blockchains. Users on Syscoin by extension will be able to leverage the vast toolset of Ethereum whilst NEVM users can leverage Syscoin’s cost effective and efficient asset specific transactionality. You can read more about the technicals here: <a href="https://github.com/syscoin/sysethereum-docs" target="_blank" rel="noopener noreferrer">https://github.com/syscoin/sysethereum-docs</a>
           </p>
-
-
-
-
-
-
           </div>
         </div>
 
@@ -559,33 +492,6 @@ class SysethereumDApp extends Component {
       <button type="button" className="close closeButton wizardCancel" aria-label="Close" onClick={this.onHome}>
       <span className="glyphicon glyphicon-remove" aria-hidden="true"></span> Close
       </button>
-
-
-    </div>
-    <div className={(this.state.ethToSysCancelDisplay  ? "visible" : "hidden")}>
-    <div id="menu"> 
-      <div className="goHome" onClick={this.onHome}></div>
-      <div className="title">Walk over the Syscoin Bridge</div>
-    </div>
-
-    <div className="wizardTitleCont">
-      <div className="wizardTitle">
-        <span className="ethl">ETH</span>
-        <span className="direction">➜</span>
-        <span className="sysr">SYS</span>
-        
-      </div> 
-    </div>
-
-
-
-    <I18nextProvider i18n={i18n}>
-      <EthToSysCancelWizardi18n />
-    </I18nextProvider>
-
-    <button type="button" className="close closeButton wizardCancel" aria-label="Close" onClick={this.onHome}>
-    <span className="glyphicon glyphicon-remove" aria-hidden="true"></span> Close
-    </button>
 
 
     </div>

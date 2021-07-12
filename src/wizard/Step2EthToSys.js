@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 import CONFIGURATION from '../config';
 const sjs = require('syscoinjs-lib')
-const axios = require('axios');
 class Step2ES extends Component {
   constructor(props) {
     super(props);
@@ -26,7 +25,8 @@ class Step2ES extends Component {
       // Sorry! No Web Storage support..
     }
   }
-  componentDidMount() {}
+  componentDidMount() {
+  }
   componentWillUnmount() {}
 
   isValidated() {
@@ -52,6 +52,26 @@ class Step2ES extends Component {
 
     return isDataValid;
   }
+  async assetMintToSys(ethTXID) {
+    console.log("assetMintToSys ethTXID: " + JSON.stringify(buildEthProof));
+    const feeRate = new sjs.utils.BN(10)
+    const txOpts = { rbf: true }
+    // web3 URL + ID and ethereum burn txid
+    const assetOpts = {
+      web3url: CONFIGURATION.web3URL,
+      ethtxid: ethTXID
+    }
+    // will be auto filled based on ethtxid eth-proof
+    const assetMap = null
+    // if SYS need change sent, set this address. null to let HDSigner find a new address for you
+    const sysChangeAddress = null
+    const res = await sjs.assetAllocationMint(assetOpts, txOpts, assetMap, sysChangeAddress, feeRate)
+    const err = null
+    if (!res) {
+      err = 'Could not create transaction, not enough funds?'
+    }
+    return {data: result.psbt, error: err}
+  }
   async getMintTx() {
     let userInput = this._grabUserInput(); // grab user entered vals
     let validateNewInput = this._validateData(userInput); // run the new input against the validator
@@ -68,59 +88,30 @@ class Step2ES extends Component {
     this.setState({working: true});
     let ethTXID = userInput.ethburntxid;
     
-    try{
-      const buildEthProof = await sjs.utils.buildEthProof({infuraurl: CONFIGURATION.infuraURL, ethtxid: ethTXID});
-       
-      let tx_hex = buildEthProof.txvalue;
-      let txmerkleproof_hex = buildEthProof.txparentnodes;
-      let txmerkleproofpath_hex = buildEthProof.txpath;
-      let blockNumber = buildEthProof.blocknumber;
-
-      let receipt_hex = buildEthProof.receiptvalue;
-      let receiptmerkleproof_hex =  buildEthProof.receiptparentnodes;
-      let bridgeTransferId = buildEthProof.bridgetransferid;
-      let toSysAssetGUID = buildEthProof.assetguid ;
-      let toSysAmount =  buildEthProof.amount
-      let syscoinWitnessAddress =  buildEthProof.destinationaddress
-      console.log("tx_hex: " + tx_hex);
-      console.log("txmerkleproof_hex: " + txmerkleproof_hex);
-      console.log("txmerkleproofpath_hex: " + txmerkleproofpath_hex);
-      
-      console.log("receipt_hex: " + receipt_hex);
-      console.log("receiptmerkleproof_hex: " + receiptmerkleproof_hex);
-      console.log("block number: " + blockNumber);
-      try {
-        let results = await axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=assetallocationmint&asset=' + toSysAssetGUID + '&address=' + syscoinWitnessAddress + '&amount=' + toSysAmount + '&blocknumber=' + blockNumber + '&bridgetransferid=' + bridgeTransferId + '&tx_hex=' + tx_hex + '&txmerkleproof_hex=' + txmerkleproof_hex + '&txmerkleproofpath_hex=' + txmerkleproofpath_hex + '&receipt_hex=' + receipt_hex + '&receiptroot_hex=' + receiptmerkleproof_hex);
-        results = results.data;
-        if(results.error){
-          validateNewInput.buttonVal = false;
-          validateNewInput.buttonValMsg = results.error;
-          console.log("error " + results.error);
-          self.setState({working: false});
-        }
-        else if(results && results.hex){
-          validateNewInput.mintsysrawtxunsignedVal = true;
-          this.refs.mintsysrawtxunsigned.value = results.hex;
-          userInput.mintsysrawtxunsigned = results.hex;
-          self.setState({working: false});
-          self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-          this.saveToLocalStorage();
-        }
-      }catch(e) {
+    try {
+      let results = await assetMintToSys(ethTXID)
+      if(results.error){
         validateNewInput.buttonVal = false;
-        validateNewInput.buttonValMsg = e.message;
+        validateNewInput.buttonValMsg = results.error;
+        console.log("error " + results.error);
+        self.setState({working: false});
+      }
+      else if(results.data){
+        validateNewInput.mintsysrawtxunsignedVal = true;
+        this.refs.mintsysrawtxunsigned.value = results.data.extractTransaction().getId();
+        userInput.mintsysrawtxunsigned = results.data.extractTransaction().getId();
         self.setState({working: false});
         self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+        this.saveToLocalStorage();
       }
-      
-
-      this.setState({working: false});
-    }catch(e){      
+    }catch(e) {
       validateNewInput.buttonVal = false;
-      validateNewInput.buttonValMsg = this.props.t("step2ESInvalidProof") + e;
-      this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-      this.setState({working: false});
+      validateNewInput.buttonValMsg = e.message;
+      self.setState({working: false});
+      self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
     }
+    this.setState({working: false});
+  }
 
   }
   validationCheck() {

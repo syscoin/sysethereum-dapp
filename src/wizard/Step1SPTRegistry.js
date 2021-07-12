@@ -4,10 +4,10 @@ import Web3 from 'web3';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import "react-tabs/style/react-tabs.css";
 import erc20Managerabi from '../SyscoinERC20Manager'; 
-import sbconfig from '../SyscoinSuperblocksI'; 
+import rconfig from '../SyscoinRelayI'; 
 import CONFIGURATION from '../config';
 import { getProof } from 'bitcoin-proof'
-const axios = require('axios');
+import * as SyscoinRpc from 'syscoin-js';
 const web3 = new Web3(Web3.givenProvider);
 class Step1Reg extends Component {
   constructor(props) {
@@ -30,7 +30,13 @@ class Step1Reg extends Component {
     this.downloadReceipt = this.downloadReceipt.bind(this);
   }
   componentDidMount() {
-   
+    this.syscoinClient = new SyscoinRpc.default({baseUrl: CONFIGURATION.sysRPCURL, port: CONFIGURATION.sysRPCPort, username: CONFIGURATION.sysRPCUser, password: CONFIGURATION.sysRPCPassword});
+
+    try {
+      console.log("RESULT", (await this.syscoinClient.callRpc("getblockchaininfo", [])) );
+    } catch(e) {
+      console.log("ERR getblockchaininfo", e);
+    }
   }
   componentWillUnmount() {}
   downloadReceipt () {
@@ -66,17 +72,13 @@ class Step1Reg extends Component {
       return;  
     }
     let chainId = await web3.eth.getChainId();
-    if(CONFIGURATION.testnet && chainId !== 4){
-      this.setState({buttonVal: false, buttonValMsg: this.props.t("stepUseTestnet")});
+    if(chainId !== CONFIGURATION.chainId){
+      this.setState({buttonVal: false, buttonValMsg: this.props.t("stepUseProperNetwork")});
       return;       
     }
-    else if(!CONFIGURATION.testnet && chainId !== 1){
-      this.setState({buttonVal: false, buttonValMsg: this.props.t("stepUseMainnet")});
-      return;       
-    }
-    let SyscoinSuperblocks = new web3.eth.Contract(sbconfig.data, sbconfig.contract); 
-    if(!SyscoinSuperblocks || !SyscoinSuperblocks.methods || !SyscoinSuperblocks.methods.relayAssetTx){
-      this.setState({buttonVal: false, buttonValMsg: this.props.t("stepSuperblock")});
+    let SyscoinRelay = new web3.eth.Contract(rconfig.data, rconfig.contract); 
+    if(!SyscoinRelay || !SyscoinRelay.methods || !SyscoinRelay.methods.relayAssetTx){
+      this.setState({buttonVal: false, buttonValMsg: this.props.t("stepRelay")});
       return;  
     }
     this.setState({
@@ -98,9 +100,9 @@ class Step1Reg extends Component {
     this.setState({buttonVal: true, buttonValMsg: this.props.t("step5AuthMetamask")});
     let failed = false;
     this.setState({working: true});
-    var txbytes, syscoinblockheader, txsiblings, txindex, syscoinblockindex, syscoinblocksiblings, superblockhash, blockhash;
+    var txbytes, syscoinblockheader, txsiblings, txindex, blockhash;
     try {
-      let results = await axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=syscoingetspvproof&txid=' + userInput);
+      let results = await this.syscoinClient.callRpc("syscoingetspvproof", [userInput]);
       results = results.data;
       if(results.error){
         this.setState({buttonVal: false, buttonValMsg: results.error});
@@ -123,32 +125,7 @@ class Step1Reg extends Component {
       this.setState({buttonVal: false, buttonValMsg: e.message});
       console.log("error " + e.message);
       failed = true;
-    }
-    if(failed === false){
-      try {
-        let results = await axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/spvproof?hash=' + blockhash)
-        results = results.data;
-
-        this.setState({working: false});
-        if(results.error){
-          console.log("spvproof error1 " + results.error);
-          this.setState({buttonVal: false, buttonValMsg: results.error});
-        }
-        else{
-          syscoinblockindex = results.index;
-          console.log("syscoinblockindex " + syscoinblockindex);
-          syscoinblocksiblings = results.merklePath;
-          console.log("syscoinblocksiblings1 " + syscoinblocksiblings);
-          superblockhash = results.superBlock;
-          console.log("superblockhash " + superblockhash);
-          this.setState({buttonVal: true, buttonValMsg:  this.props.t("step1RegStatusSuccess")}); 
-        }
-      }catch(e) {
-          console.log("spvproof error2 " + e);
-          this.setState({buttonVal: false, buttonValMsg: e.message});
-          this.setState({working: false});  
-      }
-    }   
+    } 
     if(!txsiblings){
       return;
     }
@@ -158,13 +135,6 @@ class Step1Reg extends Component {
       let _txSibling = "0x" + txsiblings[i];
       _txSiblings.push(_txSibling);
     }
-    let _syscoinBlockHeader = "0x" + syscoinblockheader;
-    let _syscoinBlockSiblings = [];
-    for(let i = 0;i<syscoinblocksiblings.length;i++){
-      let _blockSibling = "0x" + syscoinblocksiblings[i];
-      _syscoinBlockSiblings.push(_blockSibling);
-    }  
-    let _superblockHash = "0x" + superblockhash;
     let merkleProof = getProof(txsiblings, txindex);
     for(let   i = 0;i<merkleProof.sibling.length;i++){
       merkleProof.sibling[i] = "0x" + merkleProof.sibling[i];
@@ -173,8 +143,7 @@ class Step1Reg extends Component {
     let thisObj = this;
     thisObj.state.receiptObj = null;
 
-     SyscoinSuperblocks.methods.relayAssetTx(_txBytes, txindex, merkleProof.sibling, _syscoinBlockHeader, 
-      syscoinblockindex, _syscoinBlockSiblings, _superblockHash).send({from: accounts[0], gas: 500000})
+     SyscoinRelay.methods.relayAssetTx(_txBytes, txindex, merkleProof.sibling, _syscoinBlockHeader).send({from: accounts[0], gas: 500000})
       .once('transactionHash', function(hash){
         thisObj.setState({receiptTxHash: hash, buttonVal: true, buttonValMsg: thisObj.props.t("step5PleaseWait")});
       })
@@ -216,11 +185,7 @@ class Step1Reg extends Component {
         return;
       }
       let _foundErc20contract = assetRegistry.erc20ContractAddress;
-      let baseEthURL = "https://";
-      if(CONFIGURATION.testnet){
-        baseEthURL += "rinkeby."
-      }
-      baseEthURL += "etherscan.io/address/" + _foundErc20contract;
+      let baseEthURL = CONFIGURATION.NEVMAddressExplorerURL + _foundErc20contract;
       this.setState({foundErc20contract: _foundErc20contract, foundErc20URL: baseEthURL});
       this.setState({foundContract: true});
     } catch(e){
@@ -293,7 +258,7 @@ class Step1Reg extends Component {
                         <button className="btn btn-default formbtnmini" type="button" onClick={this.searchRegistry}><i className="glyphicon glyphicon-search"></i></button>
                       </div>
                     </div>
-                    <div className="superblocksearcherror">{this.state.searchError}</div>
+                    <div className="relaysearcherror">{this.state.searchError}</div>
                   </div>
                 </div>
               </div>

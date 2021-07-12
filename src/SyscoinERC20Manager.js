@@ -1,64 +1,34 @@
 const erc20Managerabi = [
   {
-    "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
         "internalType": "address",
-        "name": "canceller",
+        "name": "_trustedRelayerContract",
         "type": "address"
       },
       {
-        "indexed": false,
         "internalType": "uint32",
-        "name": "bridgetransferid",
+        "name": "_sysxGuid",
         "type": "uint32"
+      },
+      {
+        "internalType": "address",
+        "name": "_erc20ContractAddress",
+        "type": "address"
       }
     ],
-    "name": "CancelTransferFailed",
-    "type": "event"
+    "stateMutability": "nonpayable",
+    "type": "constructor"
   },
   {
     "anonymous": false,
     "inputs": [
       {
         "indexed": false,
-        "internalType": "address",
-        "name": "canceller",
-        "type": "address"
-      },
-      {
-        "indexed": false,
         "internalType": "uint32",
-        "name": "bridgetransferid",
+        "name": "assetGUID",
         "type": "uint32"
-      }
-    ],
-    "name": "CancelTransferRequest",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "canceller",
-        "type": "address"
       },
-      {
-        "indexed": false,
-        "internalType": "uint32",
-        "name": "bridgetransferid",
-        "type": "uint32"
-      }
-    ],
-    "name": "CancelTransferSucceeded",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
       {
         "indexed": false,
         "internalType": "address",
@@ -74,7 +44,7 @@ const erc20Managerabi = [
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "transferIdAndPrecisions",
+        "name": "precisions",
         "type": "uint256"
       }
     ],
@@ -105,6 +75,12 @@ const erc20Managerabi = [
     "inputs": [
       {
         "indexed": false,
+        "internalType": "uint32",
+        "name": "assetGUID",
+        "type": "uint32"
+      },
+      {
+        "indexed": false,
         "internalType": "address",
         "name": "receipient",
         "type": "address"
@@ -120,26 +96,6 @@ const erc20Managerabi = [
     "type": "event"
   },
   {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "receipient",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "value",
-        "type": "uint256"
-      }
-    ],
-    "name": "TokenUnfreezeFee",
-    "type": "event"
-  },
-  {
-    "constant": true,
     "inputs": [
       {
         "internalType": "uint32",
@@ -155,12 +111,11 @@ const erc20Managerabi = [
         "type": "uint256"
       }
     ],
-    "payable": false,
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
-    "constant": true,
     "inputs": [
       {
         "internalType": "uint32",
@@ -176,9 +131,9 @@ const erc20Managerabi = [
         "type": "address"
       },
       {
-        "internalType": "uint32",
+        "internalType": "uint64",
         "name": "height",
-        "type": "uint32"
+        "type": "uint64"
       },
       {
         "internalType": "uint8",
@@ -186,12 +141,11 @@ const erc20Managerabi = [
         "type": "uint8"
       }
     ],
-    "payable": false,
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
-    "constant": true,
     "inputs": [],
     "name": "trustedRelayerContract",
     "outputs": [
@@ -201,47 +155,11 @@ const erc20Managerabi = [
         "type": "address"
       }
     ],
-    "payable": false,
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
-    "constant": false,
-    "inputs": [
-      {
-        "internalType": "enum SyscoinERC20Manager.Network",
-        "name": "_network",
-        "type": "uint8"
-      },
-      {
-        "internalType": "address",
-        "name": "_trustedRelayerContract",
-        "type": "address"
-      },
-      {
-        "internalType": "uint32",
-        "name": "_sysxGuid",
-        "type": "uint32"
-      },
-      {
-        "internalType": "address",
-        "name": "_sysxAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint8",
-        "name": "_precision",
-        "type": "uint8"
-      }
-    ],
-    "name": "init",
-    "outputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "constant": true,
     "inputs": [
       {
         "internalType": "uint256",
@@ -257,12 +175,11 @@ const erc20Managerabi = [
         "type": "bool"
       }
     ],
-    "payable": false,
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
-    "constant": false,
     "inputs": [
       {
         "internalType": "uint256",
@@ -280,11 +197,6 @@ const erc20Managerabi = [
         "type": "address"
       },
       {
-        "internalType": "address",
-        "name": "superblockSubmitterAddress",
-        "type": "address"
-      },
-      {
         "internalType": "uint32",
         "name": "assetGUID",
         "type": "uint32"
@@ -292,12 +204,10 @@ const erc20Managerabi = [
     ],
     "name": "processTransaction",
     "outputs": [],
-    "payable": false,
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "constant": false,
     "inputs": [
       {
         "internalType": "uint256",
@@ -310,9 +220,9 @@ const erc20Managerabi = [
         "type": "uint32"
       },
       {
-        "internalType": "uint32",
+        "internalType": "uint64",
         "name": "_height",
-        "type": "uint32"
+        "type": "uint64"
       },
       {
         "internalType": "address",
@@ -327,62 +237,10 @@ const erc20Managerabi = [
     ],
     "name": "processAsset",
     "outputs": [],
-    "payable": false,
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "constant": false,
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "bridgeTransferId",
-        "type": "uint32"
-      }
-    ],
-    "name": "cancelTransferRequest",
-    "outputs": [],
-    "payable": true,
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "constant": false,
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "bridgeTransferId",
-        "type": "uint32"
-      }
-    ],
-    "name": "cancelTransferSuccess",
-    "outputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "constant": false,
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "bridgeTransferId",
-        "type": "uint32"
-      },
-      {
-        "internalType": "address payable",
-        "name": "challengerAddress",
-        "type": "address"
-      }
-    ],
-    "name": "processCancelTransferFail",
-    "outputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "constant": false,
     "inputs": [
       {
         "internalType": "uint256",
@@ -408,55 +266,9 @@ const erc20Managerabi = [
         "type": "bool"
       }
     ],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "bridgeTransferId",
-        "type": "uint32"
-      }
-    ],
-    "name": "getBridgeTransfer",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "_timestamp",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_value",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "_erc20ContractAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_tokenFreezerAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint32",
-        "name": "_assetGUID",
-        "type": "uint32"
-      },
-      {
-        "internalType": "enum SyscoinERC20Manager.BridgeTransferStatus",
-        "name": "_status",
-        "type": "uint8"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
+    "stateMutability": "payable",
+    "type": "function",
+    "payable": true
   }
 ]
   export default erc20Managerabi;

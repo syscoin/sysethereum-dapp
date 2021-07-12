@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import "react-tabs/style/react-tabs.css";
-import sbconfig from '../SyscoinSuperblocksI';
+import rconfig from '../SyscoinRelayI';
 import { getProof } from 'bitcoin-proof'
 import Web3 from 'web3';
 import CONFIGURATION from '../config';
@@ -40,10 +40,7 @@ class Step5 extends Component {
     return true;
   }
   componentDidMount() {
-    if(!this.props.getStore().superblockhash){
-      this.props.jumpToStep(3);
-    }
-    else if(!this.props.getStore().blockhash || !this.props.getStore().txid){
+    if(!this.props.getStore().blockhash || !this.props.getStore().txid){
       this.props.jumpToStep(2);
     }
   }
@@ -100,17 +97,13 @@ class Step5 extends Component {
       return;  
     }
     let chainId = await web3.eth.getChainId();
-    if(CONFIGURATION.testnet && chainId !== 4){
-      this.setState({buttonVal: false, buttonValMsg: this.props.t("stepUseTestnet")});
+    if(chainId !== CONFIGURATION.chainId){
+      this.setState({buttonVal: false, buttonValMsg: this.props.t("stepUseProperNetwork")});
       return;       
     }
-    else if(!CONFIGURATION.testnet && chainId !== 1){
-      this.setState({buttonVal: false, buttonValMsg: this.props.t("stepUseMainnet")});
-      return;       
-    }
-    let SyscoinSuperblocks = new web3.eth.Contract(sbconfig.data, sbconfig.contract); 
-    if(!SyscoinSuperblocks || !SyscoinSuperblocks.methods || !SyscoinSuperblocks.methods.relayTx){
-      this.setState({buttonVal: false, buttonValMsg: this.props.t("stepSuperblock")});
+    let SyscoinRelay = new web3.eth.Contract(rconfig.data, rconfig.contract); 
+    if(!SyscoinRelay || !SyscoinRelay.methods || !SyscoinRelay.methods.relayTx){
+      this.setState({buttonVal: false, buttonValMsg: this.props.t("stepRelay")});
       return;  
     }
     this.setState({
@@ -144,13 +137,7 @@ class Step5 extends Component {
       let _txSibling = "0x" + this.props.getStore().txsiblings[i];
       _txSiblings.push(_txSibling);
     }
-    let _syscoinBlockHeader = "0x" + this.props.getStore().syscoinblockheader;
-    let _syscoinBlockSiblings = [];
-    for(let i = 0;i<this.props.getStore().syscoinblocksiblings.length;i++){
-      let _blockSibling = "0x" + this.props.getStore().syscoinblocksiblings[i];
-      _syscoinBlockSiblings.push(_blockSibling);
-    }  
-    let _superblockHash = "0x" + this.props.getStore().superblockhash;
+    let _syscoinBlockHeader = "0x" + this.props.getStore().syscoinblockheader; 
     let merkleProof = getProof(this.props.getStore().txsiblings, this.props.getStore().txindex);
     for(let   i = 0;i<merkleProof.sibling.length;i++){
       merkleProof.sibling[i] = "0x" + merkleProof.sibling[i];
@@ -159,8 +146,7 @@ class Step5 extends Component {
     let thisObj = this;
     thisObj.state.receiptObj = null;
 
-     SyscoinSuperblocks.methods.relayTx(_txBytes, this.props.getStore().txindex, merkleProof.sibling, _syscoinBlockHeader, 
-      this.props.getStore().syscoinblockindex, _syscoinBlockSiblings, _superblockHash).send({from: accounts[0], gas: 500000})
+     SyscoinRelay.methods.relayTx(_txBytes, this.props.getStore().txindex, merkleProof.sibling, _syscoinBlockHeader).send({from: accounts[0], gas: 500000})
       .once('transactionHash', function(hash){
         thisObj.setState({receiptTxHash: hash, buttonVal: true, buttonValMsg: thisObj.props.t("step5PleaseWait")});
       })

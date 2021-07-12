@@ -28,13 +28,7 @@ class Step6 extends Component {
       this.props.jumpToStep(4);
       return;
     }
-    let baseURL = "";
-    if(CONFIGURATION.testnet){
-      baseURL = "https://rinkeby.etherscan.io/tx/";
-    }
-    else{
-      baseURL = "https://etherscan.io/tx/";
-    }
+    let baseURL = CONFIGURATION.NEVMTxExplorerURL;
     this.setState({explorerLink: baseURL + this.props.getStore().receiptObj.transactionHash});
     this.clearLocalStorage();
   }

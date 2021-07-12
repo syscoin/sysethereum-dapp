@@ -6,7 +6,7 @@ import "react-tabs/style/react-tabs.css";
 import assetabi from '../SyscoinERC20I';
 import erc20Managerabi from '../SyscoinERC20Manager';  
 import CONFIGURATION from '../config';
-const axios = require('axios');
+import * as SyscoinRpc from 'syscoin-js';
 const web3 = new Web3(Web3.givenProvider);
 class Step1ES extends Component {
   constructor(props) {
@@ -36,14 +36,16 @@ class Step1ES extends Component {
     this.validationCheck = this.validationCheck.bind(this);
     this.isValidated = this.isValidated.bind(this);
     this.setStateFromReceipt = this.setStateFromReceipt.bind(this);
-    this.faucetURL = "https://faucet";
-    if(CONFIGURATION.testnet){
-      this.faucetURL += "-testnet";
-    }
-    this.faucetURL += ".syscoin.org";
+    this.faucetURL = CONFIGURATION.faucetURL;
   }
   componentDidMount() {
-    
+    this.syscoinClient = new SyscoinRpc.default({baseUrl: CONFIGURATION.sysRPCURL, port: CONFIGURATION.sysRPCPort, username: CONFIGURATION.sysRPCUser, password: CONFIGURATION.sysRPCPassword});
+
+    try {
+      console.log("RESULT", (await this.syscoinClient.callRpc("getblockchaininfo", [])) );
+    } catch(e) {
+      console.log("ERR getblockchaininfo", e);
+    }
   }
   isValidated() {
     const userInput = this._grabUserInput(); // grab user entered vals
@@ -182,7 +184,7 @@ class Step1ES extends Component {
   async getAssetContract(guid, validateNewInput){
     if(guid.length > 0){
       try {
-        let results = await axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=assetinfo&asset_guid=' + guid);
+        let results = await this.syscoinClient.callRpc("assetinfo", [guid])
         results = results.data;
         if(results.error){
           validateNewInput.buttonVal = false;
@@ -326,17 +328,12 @@ class Step1ES extends Component {
       return;  
     }
     let chainId = await web3.eth.getChainId();
-    if(CONFIGURATION.testnet && chainId !== 4){
+    if(chainId !== CONFIGURATION.chainId){
       validateNewInput.buttonVal = false;
-      validateNewInput.buttonValMsg = this.props.t("stepUseTestnet");
+      validateNewInput.buttonValMsg = this.props.t("stepUseProperNetwork");
       this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
       return;        
-    } else if(!CONFIGURATION.testnet && chainId !== 1){
-      validateNewInput.buttonVal = false;
-      validateNewInput.buttonValMsg = this.props.t("stepUseMainnet");
-      this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-      return;        
-    }
+    } 
     let accounts = await web3.eth.getAccounts();
     if(!accounts || !accounts[0] || accounts[0] === 'undefined')
     {

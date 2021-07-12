@@ -1,7 +1,6 @@
 
 import React, { Component } from 'react';
-import CONFIGURATION from '../config';
-const axios = require('axios');
+const sjs = require('syscoinjs-lib')
 class Step2 extends Component {
   constructor(props) {
     super(props);
@@ -21,7 +20,8 @@ class Step2 extends Component {
     this.isValidated = this.isValidated.bind(this);
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+  }
 
   componentWillUnmount() {}
   saveToLocalStorage() {
@@ -61,6 +61,28 @@ class Step2 extends Component {
 
     return isDataValid;
   }
+
+  async assetBurnToEth (assetGuid, fundingAddress, amount, ethAddressStripped) {
+    const feeRate = new sjs.utils.BN(10)
+    const txOpts = { rbf: true }
+    const COIN = new sjs.utils.BN(100000000);
+    const assetOpts = { ethaddress: Buffer.from(ethAddressStripped, 'hex') }
+    // burn 1 satoshi (not COINS)
+    // if assets need change sent, set this address. null to let HDSigner find a new address for you
+    const assetChangeAddress = fundingAddress
+    const assetMap = new Map([
+      [assetGuid, { changeAddress: assetChangeAddress, outputs: [{ value: new sjs.utils.BN(amount).mul(COIN), address: fundingAddress }] }]
+    ])
+    // if SYS need change sent, set this address. null to let HDSigner find a new address for you
+    const sysChangeAddress = fundingAddress
+    const sysFromXpubOrAddress = fundingAddress
+    const psbt = await sjs.assetAllocationBurn(assetOpts, txOpts, assetMap, sysChangeAddress, feeRate, sysFromXpubOrAddress)
+    const err = null
+    if (!res) {
+      err = 'Could not create transaction, not enough funds?';
+    }
+    return {data: result.psbt, error: err};
+  }
   async getBurnTx() {
     let userInput = this._grabUserInput(); // grab user entered vals
     let validateNewInput = this._validateData(userInput); // run the new input against the validator
@@ -94,16 +116,15 @@ class Step2 extends Component {
           ethAddressStripped = ethAddressStripped.substr(2, ethAddressStripped.length);
         }
         try {
-          let results = await axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=assetallocationburn&asset_guid=' + assetGuid + '&address=' + fundingAddress + '&amount=' + userInput.amount.toString() + '&ethereum_destination_address=' + ethAddressStripped);
-          results = results.data;
+          let results = await assetBurnToEth(assetGuid, fundingAddress, userInput.amount.toString(), ethAddressStripped);
           if(results.error){
             validateNewInput.buttonVal = false;
             validateNewInput.buttonValMsg = results.error;
             self.setState({working: false});      
           }
-          else if(results && results.hex){
+          else if(results.data){
             validateNewInput.sysrawtxunsignedVal = true;
-            this.refs.sysrawtxunsigned.value = results.hex;
+            this.refs.sysrawtxunsigned.value = results.data.extractTransaction().getId();
             self.setState({working: false});
             self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
             self.saveToLocalStorage();
@@ -115,8 +136,7 @@ class Step2 extends Component {
           self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
         }
       }
-    } 
-
+    }
   }
   validationCheck() {
     if (!this._validateOnDemand)

@@ -1,7 +1,7 @@
 
 import React, { Component } from 'react';
 import CONFIGURATION from '../config';
-const axios = require('axios');
+import * as SyscoinRpc from 'syscoin-js';
 class Step4 extends Component {
   constructor(props) {
     super(props);
@@ -9,26 +9,16 @@ class Step4 extends Component {
       txindex: props.getStore().txindex,
       txsiblings: props.getStore().txsiblings,
       syscoinblockheader: props.getStore().syscoinblockheader,
-      syscoinblockindex: props.getStore().syscoinblockindex,
-      superblockhash: props.getStore().superblockhash,
-      syscoinblocksiblings: props.getStore().syscoinblocksiblings,
       txbytes: props.getStore().txbytes
     };
-          // INPUTS:
+      // INPUTS:
       // enter syscoin burn txid
       // enter block hash 
       // OUTPUTS:
       // _txIndex - transaction's index within the block
       // _txSiblings - transaction's Merkle siblings
       // _syscoinBlockHeader - block header containing transaction
-    // step 4: get superblock spv proof
-      // INPUTS:
-      // enter block hash (auto fill from step 3) (show approval status of superblock, and how many superblocks to go to approve)
-      // OUTPUTS:
-      // _syscoinBlockIndex - block's index withing superblock
-      // _syscoinBlockSiblings - block's merkle siblings
-      // _superblockHash - superblock containing block header
-    // step 5: 
+    // step 4: 
       // INPUTS:
       // _txBytes - transaction bytes (autofilled with getrawtransaction)
     this._validateOnDemand = true; // this flag enables onBlur validation as user fills forms
@@ -40,6 +30,13 @@ class Step4 extends Component {
   componentDidMount() {
     if(!this.props.getStore().blockhash || !this.props.getStore().txid){
       this.props.jumpToStep(2);
+    }
+    this.syscoinClient = new SyscoinRpc.default({baseUrl: CONFIGURATION.sysRPCURL, port: CONFIGURATION.sysRPCPort, username: CONFIGURATION.sysRPCUser, password: CONFIGURATION.sysRPCPassword});
+
+    try {
+      console.log("RESULT", (await this.syscoinClient.callRpc("getblockchaininfo", [])) );
+    } catch(e) {
+      console.log("ERR getblockchaininfo", e);
     }
   }
 
@@ -55,10 +52,7 @@ class Step4 extends Component {
         if (this.props.getStore().txindex !== userInput.txindex  || 
         this.props.getStore().txsiblings !== userInput.txsiblings ||
         this.props.getStore().syscoinblockheader !== userInput.syscoinblockheader ||
-        this.props.getStore().syscoinblockindex !== userInput.syscoinblockindex ||
-        this.props.getStore().syscoinblocksiblings !== userInput.syscoinblocksiblings ||
-        this.props.getStore().txbytes !== userInput.txbytes ||
-        this.props.getStore().superblockhash !== userInput.superblockhash 
+        this.props.getStore().txbytes !== userInput.txbytes
         ) { // only update store of something changed
           this.props.updateStore({
             ...userInput,
@@ -81,7 +75,7 @@ class Step4 extends Component {
     let failed = false;
     this.setState({working: true});
     try {
-      let results = await axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=syscoingetspvproof&txid=' + this.props.getStore().txid.toString());
+      let results = await this.syscoinClient.callRpc("syscoingetspvproof", [this.props.getStore().txid.toString()])
       results = results.data;
       if(results.error){
         validateNewInput.buttonVal = false;
@@ -105,40 +99,10 @@ class Step4 extends Component {
       console.log("error " + e.message);
       failed = true;
     }
-    if(failed === false){
-      axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/spvproof?hash=' + (this.props.getStore().blockhash.toString()))
-      .then(response => {
-        this.setState({working: false});
-        console.log(response);
-        if(response.data.error){
-          console.log("spvproof error1 " + response.data.error);
-          validateNewInput.buttonVal = false;
-          validateNewInput.buttonValMsg = response.data.error;  
-        }
-        else{
-          validateNewInput.syscoinblockindex = response.data.index;
-          console.log("syscoinblockindex " + validateNewInput.syscoinblockindex);
-          validateNewInput.syscoinblocksiblings = response.data.merklePath;
-          console.log("syscoinblocksiblings1 " + validateNewInput.syscoinblocksiblings);
-          validateNewInput.superblockhash = response.data.superBlock;
-          console.log("superblockhash " + validateNewInput.superblockhash);
-          validateNewInput.buttonValMsg = this.props.t("step4SbStatusSuccess");
-        }
-        this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-      })
-      .catch(error => {
-        console.log("spvproof error2 " + error);
-        validateNewInput.buttonVal = false;
-        validateNewInput.buttonValMsg = error.message; 
-        this.setState({working: false});
-        this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));    
-      });   
-    }else{
+    if(failed === true){
       this.setState({working: false});
       this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
     }
-    
-
   }
   
   validationCheck() {
@@ -157,9 +121,6 @@ class Step4 extends Component {
       txindexVal: true,
       txsiblingsVal: true,
       syscoinblockheaderVal: true,
-      syscoinblockindexVal: true,
-      syscoinblocksiblingsVal: true,
-      superblockhashVal: true,
       txbytesVal: true
     }
   }
@@ -169,9 +130,6 @@ class Step4 extends Component {
       txindexValMsg: '',
       txsiblingsValMsg: '',
       syscoinblockheaderValMsg: '',
-      syscoinblockindexValMsg: '',
-      syscoinblocksiblingsValMsg: '',
-      superblockhashValMsg: '',
       txbytesValMsg: ''
     }
     return errMsgs;
@@ -182,9 +140,6 @@ class Step4 extends Component {
       txindex: this.state.txindex,
       txsiblings: this.state.txsiblings,
       syscoinblockheader: this.state.syscoinblockheader,
-      syscoinblockindex: this.state.syscoinblockindex,
-      syscoinblocksiblings: this.state.syscoinblocksiblings,
-      superblockhash: this.state.superblockhash,
       txbytes: this.state.txbytes
     };
   }
