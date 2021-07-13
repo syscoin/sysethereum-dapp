@@ -282,7 +282,6 @@ i18n.use(LanguageDetector).init({
         'step1ESButton': "Gravez le Jeton Ethereum",
         'step1ESCDescription': '<p><em>Users burning tokens on Syscoin to walk to NEVM over the bridge have 50000 blocks to complete the transfer (around 3 months).</strong></p>',
         'step1ESCSearchBox': 'Enter Ethereum transaction ID of ERC20 burn...',
-        'step1ESCSearchBox': 'Enter Ethereum transaction ID of ERC20 burn...',
         'step1ESCWrongTransaction': 'We had trouble finding the Bridge ID in this transaction please ensure the TXID represents an Ethereum Burn transaction for the Syscoin Bridge...',
         'step1ESCExists': 'The Syscoin Mint transaction associated with this Ethereum Burn already exists!',
         'step1ESCCancelButton': 'Cancel Transfer',

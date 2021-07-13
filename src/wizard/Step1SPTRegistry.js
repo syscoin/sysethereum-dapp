@@ -7,7 +7,7 @@ import erc20Managerabi from '../SyscoinERC20Manager';
 import rconfig from '../SyscoinRelayI'; 
 import CONFIGURATION from '../config';
 import { getProof } from 'bitcoin-proof'
-import * as SyscoinRpc from 'syscoin-js';
+import { SyscoinRpcClient, rpcServices } from "@syscoin/syscoin-js";
 const web3 = new Web3(Web3.givenProvider);
 class Step1Reg extends Component {
   constructor(props) {
@@ -29,13 +29,13 @@ class Step1Reg extends Component {
     this.updateRegistry = this.updateRegistry.bind(this);
     this.downloadReceipt = this.downloadReceipt.bind(this);
   }
-  componentDidMount() {
-    this.syscoinClient = new SyscoinRpc.default({baseUrl: CONFIGURATION.sysRPCURL, port: CONFIGURATION.sysRPCPort, username: CONFIGURATION.sysRPCUser, password: CONFIGURATION.sysRPCPassword});
+  async componentDidMount() {
+    this.syscoinClient = new SyscoinRpcClient({host: CONFIGURATION.sysRPCURL, rpcPort: CONFIGURATION.sysRPCPort, username: CONFIGURATION.sysRPCUser, password: CONFIGURATION.sysRPCPassword});
 
     try {
-      console.log("RESULT", (await this.syscoinClient.callRpc("getblockchaininfo", [])) );
+      console.log("RESULT", (await rpcServices(this.syscoinClient.callRpc).getBlockchainInfo().call()));
     } catch(e) {
-      console.log("ERR getblockchaininfo", e);
+      console.log("ERR getBlockchainInfo", e);
     }
   }
   componentWillUnmount() {}
@@ -98,16 +98,13 @@ class Step1Reg extends Component {
       return;
     }
     this.setState({buttonVal: true, buttonValMsg: this.props.t("step5AuthMetamask")});
-    let failed = false;
     this.setState({working: true});
-    var txbytes, syscoinblockheader, txsiblings, txindex, blockhash;
+    var txbytes, syscoinblockheader, txsiblings, txindex, blockhash, nevmblockhash;
     try {
-      let results = await this.syscoinClient.callRpc("syscoingetspvproof", [userInput]);
-      results = results.data;
+      let results = await rpcServices(this.syscoinClient.callRpc).syscoinGetSpvProof(userInput).call()
       if(results.error){
         this.setState({buttonVal: false, buttonValMsg: results.error});
         console.log("error " + results.error);
-        failed = true;
       }
       else if(results){
         txbytes = results.transaction;
@@ -120,13 +117,15 @@ class Step1Reg extends Component {
         console.log("txindexVal " + txindex);
         blockhash = results.blockhash;
         console.log("blockhash " + blockhash);
+        nevmblockhash = results.nevm_blockhash;
+        console.log("nevmblockhash " + nevmblockhash);
       }
     }catch(e) {
       this.setState({buttonVal: false, buttonValMsg: e.message});
       console.log("error " + e.message);
-      failed = true;
     } 
     if(!txsiblings){
+      this.setState({working: false});
       return;
     }
     let _txBytes = "0x" + txbytes;
@@ -139,11 +138,16 @@ class Step1Reg extends Component {
     for(let   i = 0;i<merkleProof.sibling.length;i++){
       merkleProof.sibling[i] = "0x" + merkleProof.sibling[i];
     }
-    this.setState({working: true});
     let thisObj = this;
     thisObj.state.receiptObj = null;
-
-     SyscoinRelay.methods.relayAssetTx(_txBytes, txindex, merkleProof.sibling, _syscoinBlockHeader).send({from: accounts[0], gas: 500000})
+    let nevmBlock = await web3.eth.getBlock("0x" + nevmblockhash);
+    if(!nevmBlock) {
+      this.setState({buttonVal: false, buttonValMsg: "NEVM block not found"});
+      this.setState({working: false});
+      return;
+    }
+    let _syscoinBlockHeader = "0x" + syscoinblockheader;
+     SyscoinRelay.methods.relayAssetTx(nevmBlock.number, _txBytes, txindex, merkleProof.sibling, _syscoinBlockHeader).send({from: accounts[0], gas: 400000})
       .once('transactionHash', function(hash){
         thisObj.setState({receiptTxHash: hash, buttonVal: true, buttonValMsg: thisObj.props.t("step5PleaseWait")});
       })

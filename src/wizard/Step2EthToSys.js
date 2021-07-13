@@ -15,6 +15,7 @@ class Step2ES extends Component {
     this.getMintTx = this.getMintTx.bind(this);
     this.validationCheck = this.validationCheck.bind(this);
     this.isValidated = this.isValidated.bind(this);
+    this.syscoinjs = new sjs.SyscoinJSLib(null, CONFIGURATION.blockbookAPIURL)
   }
   saveToLocalStorage() {
     if (typeof(Storage) !== "undefined") {
@@ -53,7 +54,6 @@ class Step2ES extends Component {
     return isDataValid;
   }
   async assetMintToSys(ethTXID) {
-    console.log("assetMintToSys ethTXID: " + JSON.stringify(buildEthProof));
     const feeRate = new sjs.utils.BN(10)
     const txOpts = { rbf: true }
     // web3 URL + ID and ethereum burn txid
@@ -65,12 +65,12 @@ class Step2ES extends Component {
     const assetMap = null
     // if SYS need change sent, set this address. null to let HDSigner find a new address for you
     const sysChangeAddress = null
-    const res = await sjs.assetAllocationMint(assetOpts, txOpts, assetMap, sysChangeAddress, feeRate)
-    const err = null
+    const res = await this.syscoinjs.assetAllocationMint(assetOpts, txOpts, assetMap, sysChangeAddress, feeRate)
+    let err = null
     if (!res) {
       err = 'Could not create transaction, not enough funds?'
     }
-    return {data: result.psbt, error: err}
+    return {data: res.psbt, error: err}
   }
   async getMintTx() {
     let userInput = this._grabUserInput(); // grab user entered vals
@@ -89,7 +89,7 @@ class Step2ES extends Component {
     let ethTXID = userInput.ethburntxid;
     
     try {
-      let results = await assetMintToSys(ethTXID)
+      let results = await this.assetMintToSys(ethTXID)
       if(results.error){
         validateNewInput.buttonVal = false;
         validateNewInput.buttonValMsg = results.error;
@@ -113,7 +113,6 @@ class Step2ES extends Component {
     this.setState({working: false});
   }
 
-  }
   validationCheck() {
     if (!this._validateOnDemand)
       return;

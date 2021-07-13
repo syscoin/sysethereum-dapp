@@ -1,5 +1,6 @@
 
 import React, { Component } from 'react';
+import CONFIGURATION from '../config';
 const sjs = require('syscoinjs-lib')
 class Step2 extends Component {
   constructor(props) {
@@ -18,6 +19,7 @@ class Step2 extends Component {
     this.getBurnTx = this.getBurnTx.bind(this);
     this.validationCheck = this.validationCheck.bind(this);
     this.isValidated = this.isValidated.bind(this);
+    this.syscoinjs = new sjs.SyscoinJSLib(null, CONFIGURATION.blockbookAPIURL)
   }
 
   componentDidMount() {
@@ -76,9 +78,9 @@ class Step2 extends Component {
     // if SYS need change sent, set this address. null to let HDSigner find a new address for you
     const sysChangeAddress = fundingAddress
     const sysFromXpubOrAddress = fundingAddress
-    const psbt = await sjs.assetAllocationBurn(assetOpts, txOpts, assetMap, sysChangeAddress, feeRate, sysFromXpubOrAddress)
-    const err = null
-    if (!res) {
+    const result = await this.syscoinjs.assetAllocationBurn(assetOpts, txOpts, assetMap, sysChangeAddress, feeRate, sysFromXpubOrAddress)
+    let err = null
+    if (!result) {
       err = 'Could not create transaction, not enough funds?';
     }
     return {data: result.psbt, error: err};
@@ -116,7 +118,7 @@ class Step2 extends Component {
           ethAddressStripped = ethAddressStripped.substr(2, ethAddressStripped.length);
         }
         try {
-          let results = await assetBurnToEth(assetGuid, fundingAddress, userInput.amount.toString(), ethAddressStripped);
+          let results = await this.assetBurnToEth(assetGuid, fundingAddress, userInput.amount.toString(), ethAddressStripped);
           if(results.error){
             validateNewInput.buttonVal = false;
             validateNewInput.buttonValMsg = results.error;

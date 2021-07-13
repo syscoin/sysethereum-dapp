@@ -1,7 +1,7 @@
 
 import React, { Component } from 'react';
 import CONFIGURATION from '../config';
-import * as SyscoinRpc from 'syscoin-js';
+import { SyscoinRpcClient, rpcServices } from "@syscoin/syscoin-js";
 class Step3 extends Component {
   constructor(props) {
     super(props);
@@ -19,13 +19,13 @@ class Step3 extends Component {
     this.isValidated = this.isValidated.bind(this);
   }
 
-  componentDidMount() {
-    this.syscoinClient = new SyscoinRpc.default({baseUrl: CONFIGURATION.sysRPCURL, port: CONFIGURATION.sysRPCPort, username: CONFIGURATION.sysRPCUser, password: CONFIGURATION.sysRPCPassword});
+  async componentDidMount() {
+    this.syscoinClient = new SyscoinRpcClient({host: CONFIGURATION.sysRPCURL, rpcPort: CONFIGURATION.sysRPCPort, username: CONFIGURATION.sysRPCUser, password: CONFIGURATION.sysRPCPassword});
 
     try {
-      console.log("RESULT", (await this.syscoinClient.callRpc("getblockchaininfo", [])) );
+      console.log("RESULT", (await rpcServices(this.syscoinClient.callRpc).getBlockchainInfo().call()));
     } catch(e) {
-      console.log("ERR getblockchaininfo", e);
+      console.log("ERR getBlockchainInfo", e);
     }
   }
 
@@ -79,8 +79,7 @@ class Step3 extends Component {
       this.setState({working: true});
       let txid = userInput.txid.toString();
       try {
-        let results = await this.syscoinClient.callRpc("getrawtransaction", [txid])
-        results = results.data;
+        let results = await rpcServices(this.syscoinClient.callRpc).getRawTransaction(txid).call()
         if(results.error){
           validateNewInput.buttonVal = false;
           validateNewInput.buttonValMsg = results.error;

@@ -6,7 +6,7 @@ import "react-tabs/style/react-tabs.css";
 import assetabi from '../SyscoinERC20I';
 import erc20Managerabi from '../SyscoinERC20Manager';  
 import CONFIGURATION from '../config';
-import * as SyscoinRpc from 'syscoin-js';
+import { SyscoinRpcClient, rpcServices } from "@syscoin/syscoin-js";
 const web3 = new Web3(Web3.givenProvider);
 class Step1ES extends Component {
   constructor(props) {
@@ -38,13 +38,13 @@ class Step1ES extends Component {
     this.setStateFromReceipt = this.setStateFromReceipt.bind(this);
     this.faucetURL = CONFIGURATION.faucetURL;
   }
-  componentDidMount() {
-    this.syscoinClient = new SyscoinRpc.default({baseUrl: CONFIGURATION.sysRPCURL, port: CONFIGURATION.sysRPCPort, username: CONFIGURATION.sysRPCUser, password: CONFIGURATION.sysRPCPassword});
+  async componentDidMount() {
+    this.syscoinClient = new SyscoinRpcClient({host: CONFIGURATION.sysRPCURL, rpcPort: CONFIGURATION.sysRPCPort, username: CONFIGURATION.sysRPCUser, password: CONFIGURATION.sysRPCPassword});
 
     try {
-      console.log("RESULT", (await this.syscoinClient.callRpc("getblockchaininfo", [])) );
+      console.log("RESULT", (await rpcServices(this.syscoinClient.callRpc).getBlockchainInfo().call()));
     } catch(e) {
-      console.log("ERR getblockchaininfo", e);
+      console.log("ERR getBlockchainInfo", e);
     }
   }
   isValidated() {
@@ -184,8 +184,7 @@ class Step1ES extends Component {
   async getAssetContract(guid, validateNewInput){
     if(guid.length > 0){
       try {
-        let results = await this.syscoinClient.callRpc("assetinfo", [guid])
-        results = results.data;
+        let results = await rpcServices(this.syscoinClient.callRpc).assetInfo(guid).call()
         if(results.error){
           validateNewInput.buttonVal = false;
           validateNewInput.buttonValMsg = results.error;
@@ -204,7 +203,7 @@ class Step1ES extends Component {
   }
   freezeBurnERC20(syscoinTP, validateNewInput, thisObj, amount, assetGUID, syscoinWitnessAddress, userInput, fromAccount) {
     thisObj.state.receiptObj = null;
-    syscoinTP.methods.freezeBurnERC20(amount, assetGUID, syscoinWitnessAddress).send({from: fromAccount, gas: 500000})
+    syscoinTP.methods.freezeBurnERC20(amount, assetGUID, syscoinWitnessAddress).send({from: fromAccount, gas: 400000, value: amount})
       .once('transactionHash', function(hash){
         validateNewInput.buttonVal = true;
         validateNewInput.receiptTxHash = hash;
@@ -359,29 +358,32 @@ class Step1ES extends Component {
     let syscoinERC20Manager = new web3.eth.Contract(erc20Managerabi,  CONFIGURATION.ERC20Manager);
     let contractBase = new web3.eth.Contract(assetabi, userInput.sysxContract);
     let fromAccount = userInput.sysxFromAccount;
-    let allowance = await contractBase.methods.allowance(fromAccount, CONFIGURATION.ERC20Manager).call();
-    allowance = web3.utils.toBN(allowance.toString());
-    let balance = await contractBase.methods.balanceOf(fromAccount).call();
-    balance = web3.utils.toBN(balance.toString());
-    let decimals = await contractBase.methods.decimals().call();
-    let amount = this.toBaseUnit(userInput.toSysAmount, decimals, web3.utils.BN);
     let assetGUID = userInput.toSysAssetGUID;
-    let syscoinWitnessAddress = userInput.syscoinWitnessAddress
-
-    let thisObj = this;
-    if(amount.gt(balance)){
-      // insufficient balance
-      validateNewInput.buttonVal = false;
-      validateNewInput.buttonValMsg = this.props.t("step5InsufficientTokenBalance");
-      this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-      this.setState({working: false});
-      return;
+    let syscoinWitnessAddress = userInput.syscoinWitnessAddress;
+    let allowance = web3.utils.toBN(0);
+    if (assetGUID !== CONFIGURATION.SYSXAsset) {
+      allowance = await contractBase.methods.allowance(fromAccount, CONFIGURATION.ERC20Manager).call();
+      allowance = web3.utils.toBN(allowance.toString());
+      let balance = await contractBase.methods.balanceOf(fromAccount).call();
+      balance = web3.utils.toBN(balance.toString());
+      let decimals = await contractBase.methods.decimals().call();
+      let amount = this.toBaseUnit(userInput.toSysAmount, decimals, web3.utils.BN);
+      if(amount.gt(balance)){
+        // insufficient balance
+        validateNewInput.buttonVal = false;
+        validateNewInput.buttonValMsg = this.props.t("step5InsufficientTokenBalance");
+        this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+        this.setState({working: false});
+        return;
+      }
     }
+    let amount = this.toBaseUnit(userInput.toSysAmount, 18, web3.utils.BN);
+    let thisObj = this;
     let bFirstConfirmation = true;
     // we may need to get allowance of funds
-    if(allowance.lt(amount)){
+    if(assetGUID !== CONFIGURATION.SYSXAsset && allowance.lt(amount)){
       console.log("Allowance needed.");
-      contractBase.methods.approve(CONFIGURATION.ERC20Manager, amount.toString()).send({from: fromAccount, gas: 500000})
+      contractBase.methods.approve(CONFIGURATION.ERC20Manager, amount.toString()).send({from: fromAccount, gas: 400000})
       .once('transactionHash', function(hash){
         validateNewInput.buttonVal = true;
         validateNewInput.buttonValMsg = thisObj.props.t("step5AuthAllowanceMetamask");

@@ -146,7 +146,7 @@ class Step5 extends Component {
     let thisObj = this;
     thisObj.state.receiptObj = null;
 
-     SyscoinRelay.methods.relayTx(_txBytes, this.props.getStore().txindex, merkleProof.sibling, _syscoinBlockHeader).send({from: accounts[0], gas: 500000})
+     SyscoinRelay.methods.relayTx(_txBytes, this.props.getStore().txindex, merkleProof.sibling, _syscoinBlockHeader).send({from: accounts[0], gas: 400000})
       .once('transactionHash', function(hash){
         thisObj.setState({receiptTxHash: hash, buttonVal: true, buttonValMsg: thisObj.props.t("step5PleaseWait")});
       })
