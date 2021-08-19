@@ -1,7 +1,6 @@
 
 import React, { Component } from 'react';
-import CONFIGURATION from '../config';
-import { SyscoinRpcClient, rpcServices } from "@syscoin/syscoin-js";
+const sjs = require('syscoinjs-lib')
 class Step3ES extends Component {
   constructor(props) {
     super(props);
@@ -23,13 +22,7 @@ class Step3ES extends Component {
     if(!this.props.getStore().mintsysrawtxunsigned){
       this.props.jumpToStep(1);
     }
-    this.syscoinClient = new SyscoinRpcClient({host: CONFIGURATION.sysRPCURL, rpcPort: CONFIGURATION.sysRPCPort, username: CONFIGURATION.sysRPCUser, password: CONFIGURATION.sysRPCPassword});
 
-    try {
-      console.log("RESULT", (await rpcServices(this.syscoinClient.callRpc).getBlockchainInfo().call()));
-    } catch(e) {
-      console.log("ERR getBlockchainInfo", e);
-    }
   }
 
   componentWillUnmount() {}
@@ -74,17 +67,17 @@ class Step3ES extends Component {
       this.setState({working: true});
       let minttxid = userInput.minttxid.toString();
       try {
-        let results = await rpcServices(this.syscoinClient.callRpc).getRawTransaction(minttxid).call()
+        let results = await sjs.utils.fetchBackendRawTx(CONFIGURATION.blockbookAPIURL, minttxid)
         if(results.error){
           validateNewInput.buttonVal = false;
           validateNewInput.buttonValMsg = results.error;
           this.setState({working: false});
           console.log("error " + results.error);
         }
-        else if(results && results.blockhash){
+        else if(results && results.blockHash){
           validateNewInput.mintblockhashVal = true;
-          this.refs.mintblockhash.value = results.blockhash;
-          userInput.mintblockhash = results.blockhash;
+          this.refs.mintblockhash.value = results.blockHash;
+          userInput.mintblockhash = results.blockHash;
           this.setState({working: false});
         }
       }catch(e) {

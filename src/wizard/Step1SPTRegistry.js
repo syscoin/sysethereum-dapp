@@ -7,7 +7,7 @@ import erc20Managerabi from '../SyscoinERC20Manager';
 import rconfig from '../SyscoinRelayI'; 
 import CONFIGURATION from '../config';
 import { getProof } from 'bitcoin-proof'
-import { SyscoinRpcClient, rpcServices } from "@syscoin/syscoin-js";
+const sjs = require('syscoinjs-lib')
 const web3 = new Web3(Web3.givenProvider);
 class Step1Reg extends Component {
   constructor(props) {
@@ -30,13 +30,7 @@ class Step1Reg extends Component {
     this.downloadReceipt = this.downloadReceipt.bind(this);
   }
   async componentDidMount() {
-    this.syscoinClient = new SyscoinRpcClient({host: CONFIGURATION.sysRPCURL, rpcPort: CONFIGURATION.sysRPCPort, username: CONFIGURATION.sysRPCUser, password: CONFIGURATION.sysRPCPassword});
-
-    try {
-      console.log("RESULT", (await rpcServices(this.syscoinClient.callRpc).getBlockchainInfo().call()));
-    } catch(e) {
-      console.log("ERR getBlockchainInfo", e);
-    }
+    
   }
   componentWillUnmount() {}
   downloadReceipt () {
@@ -101,7 +95,7 @@ class Step1Reg extends Component {
     this.setState({working: true});
     var txbytes, syscoinblockheader, txsiblings, txindex, blockhash, nevmblockhash;
     try {
-      let results = await rpcServices(this.syscoinClient.callRpc).syscoinGetSpvProof(userInput).call()
+      let results = await sjs.utils.fetchBackendSPVProof(CONFIGURATION.blockbookAPIURL, userInput)
       if(results.error){
         this.setState({buttonVal: false, buttonValMsg: results.error});
         console.log("error " + results.error);

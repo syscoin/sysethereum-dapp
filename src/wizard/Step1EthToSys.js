@@ -6,7 +6,7 @@ import "react-tabs/style/react-tabs.css";
 import assetabi from '../SyscoinERC20I';
 import erc20Managerabi from '../SyscoinERC20Manager';  
 import CONFIGURATION from '../config';
-import { SyscoinRpcClient, rpcServices } from "@syscoin/syscoin-js";
+const sjs = require('syscoinjs-lib')
 const web3 = new Web3(Web3.givenProvider);
 class Step1ES extends Component {
   constructor(props) {
@@ -39,13 +39,7 @@ class Step1ES extends Component {
     this.faucetURL = CONFIGURATION.faucetURL;
   }
   async componentDidMount() {
-    this.syscoinClient = new SyscoinRpcClient({host: CONFIGURATION.sysRPCURL, rpcPort: CONFIGURATION.sysRPCPort, username: CONFIGURATION.sysRPCUser, password: CONFIGURATION.sysRPCPassword});
-
-    try {
-      console.log("RESULT", (await rpcServices(this.syscoinClient.callRpc).getBlockchainInfo().call()));
-    } catch(e) {
-      console.log("ERR getBlockchainInfo", e);
-    }
+    
   }
   isValidated() {
     const userInput = this._grabUserInput(); // grab user entered vals
@@ -184,7 +178,7 @@ class Step1ES extends Component {
   async getAssetContract(guid, validateNewInput){
     if(guid.length > 0){
       try {
-        let results = await rpcServices(this.syscoinClient.callRpc).assetInfo(guid).call()
+        let results = await sjs.utils.fetchBackendAsset(CONFIGURATION.blockbookAPIURL, guid)
         if(results.error){
           validateNewInput.buttonVal = false;
           validateNewInput.buttonValMsg = results.error;

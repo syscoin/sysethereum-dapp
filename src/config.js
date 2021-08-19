@@ -1,9 +1,5 @@
   class CONFIGURATION {
     constructor() {
-      this.sysRPCURL = "127.0.0.1";
-      this.sysRPCPort = 18368;
-      this.sysRPCUser = "u";
-      this.sysRPCPassword = "p";
       this.web3URL = "http://localhost:8101";
       this.relayContract = "0xD822557aC2F2b77A1988617308e4A29A89Cb95A6";
       this.ERC20Manager = "0xA738a563F9ecb55e0b2245D1e9E380f0fE455ea1";

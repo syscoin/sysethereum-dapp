@@ -1,7 +1,6 @@
 
 import React, { Component } from 'react';
-import CONFIGURATION from '../config';
-import { SyscoinRpcClient, rpcServices } from "@syscoin/syscoin-js";
+const sjs = require('syscoinjs-lib')
 class Step4 extends Component {
   constructor(props) {
     super(props);
@@ -31,13 +30,7 @@ class Step4 extends Component {
     if(!this.props.getStore().blockhash || !this.props.getStore().txid){
       this.props.jumpToStep(2);
     }
-    this.syscoinClient = new SyscoinRpcClient({host: CONFIGURATION.sysRPCURL, rpcPort: CONFIGURATION.sysRPCPort, username: CONFIGURATION.sysRPCUser, password: CONFIGURATION.sysRPCPassword});
-
-    try {
-      console.log("RESULT", (await rpcServices(this.syscoinClient.callRpc).getBlockchainInfo().call()));
-    } catch(e) {
-      console.log("ERR getBlockchainInfo", e);
-    }
+  
   }
 
   componentWillUnmount() {}
@@ -75,7 +68,7 @@ class Step4 extends Component {
     let failed = false;
     this.setState({working: true});
     try {
-      let results = await rpcServices(this.syscoinClient.callRpc).syscoinGetSpvProof(this.props.getStore().txid.toString()).call()
+      let results = await sjs.utils.fetchBackendSPVProof(CONFIGURATION.blockbookAPIURL, this.props.getStore().txid.toString())
       if(results.error){
         validateNewInput.buttonVal = false;
         validateNewInput.buttonValMsg = results.error;
