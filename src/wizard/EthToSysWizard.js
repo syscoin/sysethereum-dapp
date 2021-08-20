@@ -5,7 +5,6 @@ import StepZilla from "react-stepzilla";
 import Step1ES from './Step1EthToSys';
 import Step2ES from './Step2EthToSys';
 import Step3ES from './Step3EthToSys';
-import Step4ES from './Step4EthToSys';
 import { withNamespaces } from 'react-i18next';
 import './css/wizard.css';
 import './css/i18n.css';
@@ -43,8 +42,7 @@ class EthToSysWizard extends Component {
     [
       {name: t("step1es"), component: <Step1ES t={t} getStore={() => (this.getStore())} updateStore={(u) => {this.updateStore(u)}} />},
       {name: t("step2es"), component: <Step2ES t={t} getStore={() => (this.getStore())} updateStore={(u) => {this.updateStore(u)}} />},
-      {name: t("step3es"), component: <Step3ES t={t} getStore={() => (this.getStore())} updateStore={(u) => {this.updateStore(u)}} />},
-      {name: t("step4es"), component: <Step4ES t={t} getStore={() => (this.getStore())} updateStore={(u) => {this.updateStore(u)}} />}
+      {name: t("step3es"), component: <Step3ES t={t} getStore={() => (this.getStore())} updateStore={(u) => {this.updateStore(u)}} />}
       
     ]
 

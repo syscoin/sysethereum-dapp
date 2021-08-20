@@ -47,13 +47,13 @@ class Step1Reg extends Component {
       return;
     }
     if(receipt.status !== undefined  && receipt.status !== "1" && receipt.status !== true && receipt.status !== "true" && receipt.status !== "0x1"){
-      errorMsg = this.props.t("step5ErrorEVMCheckLog");
+      errorMsg = this.props.t("step4ErrorEVMCheckLog");
     }
     this.setState({receiptObj: receipt, receiptStatus: receipt.status === true? "true":"false", receiptTxHash: receipt.transactionHash});
     if(errorMsg !== null){
       this.setState({buttonVal: false, buttonValMsg: errorMsg}); 
     } else {
-      this.setState({buttonVal: true, buttonValMsg: this.props.t("step5Success")}); 
+      this.setState({buttonVal: true, buttonValMsg: this.props.t("step4Success")}); 
     }
   }
   async updateRegistry() {
@@ -62,7 +62,7 @@ class Step1Reg extends Component {
       return;
     }
     if(!web3 || !web3.currentProvider || web3.currentProvider.isMetaMask === false){
-      this.setState({buttonVal: false, buttonValMsg: this.props.t("step5InstallMetamask")});
+      this.setState({buttonVal: false, buttonValMsg: this.props.t("step4InstallMetamask")});
       return;  
     }
     let chainId = await web3.eth.getChainId();
@@ -84,14 +84,14 @@ class Step1Reg extends Component {
     let accounts = await web3.eth.getAccounts();
     if(!accounts || !accounts[0] || accounts[0] === 'undefined')
     {
-      this.setState({buttonVal: false, buttonValMsg: this.props.t("step5LoginMetamask")});
+      this.setState({buttonVal: false, buttonValMsg: this.props.t("step4LoginMetamask")});
       if(window.ethereum){
         await window.ethereum.enable();
       }
      
       return;
     }
-    this.setState({buttonVal: true, buttonValMsg: this.props.t("step5AuthMetamask")});
+    this.setState({buttonVal: true, buttonValMsg: this.props.t("step4AuthMetamask")});
     this.setState({working: true});
     var txbytes, syscoinblockheader, txsiblings, txindex, blockhash, nevmblockhash;
     try {
@@ -143,7 +143,7 @@ class Step1Reg extends Component {
     let _syscoinBlockHeader = "0x" + syscoinblockheader;
      SyscoinRelay.methods.relayAssetTx(nevmBlock.number, _txBytes, txindex, merkleProof.sibling, _syscoinBlockHeader).send({from: accounts[0], gas: 400000})
       .once('transactionHash', function(hash){
-        thisObj.setState({receiptTxHash: hash, buttonVal: true, buttonValMsg: thisObj.props.t("step5PleaseWait")});
+        thisObj.setState({receiptTxHash: hash, buttonVal: true, buttonValMsg: thisObj.props.t("step4PleaseWait")});
       })
       .once('confirmation', function(confirmationNumber, receipt){ 
         if(thisObj.state.receiptObj === null){
@@ -217,7 +217,7 @@ class Step1Reg extends Component {
               <div className="row">
               <div className="col-md-12">
                 <label className="control-label col-md-4">
-                  {this.props.t("step3TxidLabel")}
+                  {this.props.t("txidLabel")}
                 </label>
                 <div>
                   <input
@@ -268,8 +268,8 @@ class Step1Reg extends Component {
                       </TabList>
                       <TabPanel>
                         <code className="block">
-                            <span className="dataname">{this.props.t("step5ReceiptStatus")}:</span> <span className="result">{this.state.receiptStatus}</span><br />
-                            <span className="dataname">{this.props.t("step5ReceiptTxHash")}:</span> <span className="result">{this.state.receiptTxHash}</span><br />
+                            <span className="dataname">{this.props.t("step4ReceiptStatus")}:</span> <span className="result">{this.state.receiptStatus}</span><br />
+                            <span className="dataname">{this.props.t("step4ReceiptTxHash")}:</span> <span className="result">{this.state.receiptTxHash}</span><br />
                             <span className="dataname">{this.props.t("step1ESCERC")}:</span> <span><a href={this.state.foundErc20URL} target="_blank" rel="noopener noreferrer">{this.state.foundErc20contract}</a></span><br />
                         </code>
                       </TabPanel>
@@ -279,9 +279,9 @@ class Step1Reg extends Component {
                 <div className="row">
                 <div className="col-md-4 col-sm-12 col-centered">
                   <div>
-                    <button type="button" disabled={!this.state.receiptObj || this.state.working} className="form-control btn btn-default formbtn" aria-label={this.props.t("step5Download")} onClick={this.downloadReceipt}>
+                    <button type="button" disabled={!this.state.receiptObj || this.state.working} className="form-control btn btn-default formbtn" aria-label={this.props.t("step4Download")} onClick={this.downloadReceipt}>
                     <span className="glyphicon glyphicon-download" aria-hidden="true">&nbsp;</span>
-                    {this.props.t("step5Download")}
+                    {this.props.t("step4Download")}
                     </button>
                   </div>
                  </div>

@@ -7,7 +7,7 @@ class Step2ES extends Component {
     super(props);
     let storageExists = typeof(Storage) !== "undefined";
     this.state = {
-      mintsysrawtxunsigned: (storageExists && localStorage.getItem("mintsysrawtxunsigned")) || props.getStore().mintsysrawtxunsigned,
+      minttxid: (storageExists && localStorage.getItem("minttxid")) || props.getStore().minttxid,
       ethburntxid: (storageExists && localStorage.getItem("receiptTxHash")) || this.props.getStore().receiptTxHash,
       working: false
     };
@@ -21,7 +21,7 @@ class Step2ES extends Component {
     if (typeof(Storage) !== "undefined") {
       // Code for localStorage/sessionStorage.
       localStorage.setItem("receiptTxHash", this.refs.ethburntxid.value);
-      localStorage.setItem("mintsysrawtxunsigned", this.refs.mintsysrawtxunsigned.value);
+      localStorage.setItem("minttxid", this.refs.minttxid.value);
     } else {
       // Sorry! No Web Storage support..
     }
@@ -37,10 +37,10 @@ class Step2ES extends Component {
 
     // if full validation passes then save to store and pass as valid
     if (Object.keys(validateNewInput).every((k) => { return validateNewInput[k] === true })) {
-        if(this.props.getStore().mintsysrawtxunsigned !== userInput.mintsysrawtxunsigned || this.props.getStore().ethburntxid !== userInput.ethburntxid) { // only update store of something changed
+        if(this.props.getStore().minttxid !== userInput.minttxid || this.props.getStore().ethburntxid !== userInput.ethburntxid) { // only update store of something changed
           this.props.updateStore({
             ...userInput,
-            savedToCloud: false // use this to notify step4 that some changes took place and prompt the user to save again
+            savedToCloud: false // use this to notify step3 that some changes took place and prompt the user to save again
           });  // Update store here (this is just an example, in reality you will do it via redux or flux)
         }
 
@@ -53,31 +53,49 @@ class Step2ES extends Component {
 
     return isDataValid;
   }
-  async assetMintToSys(ethTXID) {
+  async assetMintToSys(ethTXID, xpub, sysChangeAddress) {
     const feeRate = new sjs.utils.BN(10)
     const txOpts = { rbf: true }
-    // web3 URL + ID and ethereum burn txid
+    // web3 URL + ID and nevm burn txid
     const assetOpts = {
       web3url: CONFIGURATION.web3URL,
       ethtxid: ethTXID
     }
     // will be auto filled based on ethtxid eth-proof
     const assetMap = null
-    // if SYS need change sent, set this address. null to let HDSigner find a new address for you
-    const sysChangeAddress = null
-    const res = await this.syscoinjs.assetAllocationMint(assetOpts, txOpts, assetMap, sysChangeAddress, feeRate)
+    const res = await this.syscoinjs.assetAllocationMint(assetOpts, txOpts, assetMap, sysChangeAddress, feeRate, xpub)
     let err = null
     if (!res) {
       err = 'Could not create transaction, not enough funds?'
+      return {data: null, error: err}
     }
-    return {data: res.psbt, error: err}
+    const serializedResp = sjs.utils.exportPsbtToJson(res.psbt, res.assets);
+    await window.ConnectionsController.signTransaction(serializedResp);
+    return {data: 'success', error: null}
   }
   async getMintTx() {
+    if (window.ConnectionsController) {
+      await window.ConnectionsController.connectWallet()
+    }
+    if (!window.ConnectionsController) {
+      this.setState({buttonVal: false, buttonValMsg: this.props.t("step2InstallPali")});
+      return;  
+    }
+    const xpub = await window.ConnectionsController.getConnectedAccountXpub();
+    if(!xpub) {
+      this.setState({buttonVal: false, buttonValMsg: this.props.t("step2SelectPaliAccount")});
+      return;  
+    }
+    const sysChangeAddress = await window.ConnectionsController.getChangeAddress();
+    if(!sysChangeAddress) {
+      this.setState({buttonVal: false, buttonValMsg: this.props.t("step2SelectPaliAccount")});
+      return;  
+    }
     let userInput = this._grabUserInput(); // grab user entered vals
     let validateNewInput = this._validateData(userInput); // run the new input against the validator
     validateNewInput.buttonVal = true;
     validateNewInput.buttonValMsg = "";
-    validateNewInput.mintsysrawtxunsignedVal = true; 
+    validateNewInput.minttxidVal = true; 
     if(!userInput.ethburntxid || userInput.ethburntxid === ""){
       validateNewInput.ethburntxidVal = false;
       this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
@@ -89,7 +107,7 @@ class Step2ES extends Component {
     let ethTXID = userInput.ethburntxid;
     
     try {
-      let results = await this.assetMintToSys(ethTXID)
+      let results = await this.assetMintToSys(ethTXID, xpub, sysChangeAddress)
       if(results.error){
         validateNewInput.buttonVal = false;
         validateNewInput.buttonValMsg = results.error;
@@ -97,9 +115,9 @@ class Step2ES extends Component {
         self.setState({working: false});
       }
       else if(results.data){
-        validateNewInput.mintsysrawtxunsignedVal = true;
-        this.refs.mintsysrawtxunsigned.value = results.data.extractTransaction().getId();
-        userInput.mintsysrawtxunsigned = results.data.extractTransaction().getId();
+        validateNewInput.minttxidVal = true;
+        this.refs.minttxid.value = results.data;
+        userInput.minttxid = results.data;
         self.setState({working: false});
         self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
         this.saveToLocalStorage();
@@ -126,14 +144,14 @@ class Step2ES extends Component {
    _validateData(data) {
     return  {
       ethburntxidVal: true,
-      mintsysrawtxunsignedVal: true
+      minttxidVal: true
     }
   }
 
   _validationErrors(val) {
     const errMsgs = {
       ethburntxidValMsg: val.ethburntxidVal && val.ethburntxidVal === true ? '' : this.props.t("step2ESTxid"),
-      mintsysrawtxunsignedValMsg: val.mintsysrawtxunsignedVal ? '' : this.props.t("step2ESRawTx")
+      minttxidValMsg: val.minttxidVal ? '' : this.props.t("step2ESRawTx")
     }
     return errMsgs;
   }
@@ -141,7 +159,7 @@ class Step2ES extends Component {
   _grabUserInput() {
     return {
       ethburntxid: this.refs.ethburntxid.value,
-      mintsysrawtxunsigned: this.refs.mintsysrawtxunsigned.value
+      minttxid: this.refs.minttxid.value
     };
   }
 
@@ -156,12 +174,12 @@ class Step2ES extends Component {
       notValidClasses.ethburntxidCls = 'has-error';
       notValidClasses.ethburntxidValGrpCls = 'val-err-tooltip';
     }
-    if (typeof this.state.mintsysrawtxunsignedVal == 'undefined' || this.state.mintsysrawtxunsignedVal) {
-      notValidClasses.mintsysrawtxunsignedCls = 'no-error ';
+    if (typeof this.state.minttxidVal == 'undefined' || this.state.minttxidVal) {
+      notValidClasses.minttxidCls = 'no-error ';
     }
     else {
-      notValidClasses.mintsysrawtxunsignedCls = 'has-error';
-      notValidClasses.mintsysrawtxunsignedValGrpCls = 'val-err-tooltip';
+      notValidClasses.minttxidCls = 'has-error';
+      notValidClasses.minttxidValGrpCls = 'val-err-tooltip';
     }
     if (typeof this.state.buttonVal == 'undefined' || this.state.buttonVal) {
       notValidClasses.buttonCls = 'no-error ';
@@ -184,7 +202,7 @@ class Step2ES extends Component {
                 <div className="row">
                 <div className="col-md-12">
                     <label className="control-label col-md-4">
-                      {this.props.t("step3TxidLabel")}
+                      {this.props.t("txidLabel")}
                     </label>
                     <div className={notValidClasses.ethburntxidCls}>
                       <input
@@ -218,27 +236,23 @@ class Step2ES extends Component {
                 <div className="row">
                 <div className="col-md-12">
                   <label className="control-label col-md-4">
-                    {this.props.t("step2RawTxLabel")}
+                    {this.props.t("step2TxLabel")}
                   </label>  
-                  <div className={notValidClasses.mintsysrawtxunsignedCls}>
+                  <div className={notValidClasses.minttxidCls}>
                     <textarea
                       rows="3"
-                      ref="mintsysrawtxunsigned"
+                      ref="minttxid"
                       autoComplete="off"
                       type="text"
-                      placeholder={this.props.t("step2EnterRawTx")}
+                      placeholder={this.props.t("step2EnterTx")}
                       className="form-control"
                       required
-                      defaultValue={this.state.mintsysrawtxunsigned}
+                      defaultValue={this.state.minttxid}
                       />
-                    <div className={notValidClasses.mintsysrawtxunsignedValGrpCls}>{this.state.mintsysrawtxunsignedValMsg}</div>
+                    <div className={notValidClasses.minttxidValGrpCls}>{this.state.minttxidValMsg}</div>
                   </div>
                 </div>
                 </div>
-              
-
-              
-
             </div>
           </form>
         </div>

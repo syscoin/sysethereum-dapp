@@ -1,236 +1,255 @@
 
 import React, { Component } from 'react';
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import "react-tabs/style/react-tabs.css";
+import rconfig from '../SyscoinRelayI';
+import { getProof } from 'bitcoin-proof'
+import Web3 from 'web3';
 import CONFIGURATION from '../config';
-const sjs = require('syscoinjs-lib')
+const web3 = new Web3(Web3.givenProvider);
 class Step3 extends Component {
   constructor(props) {
     super(props);
-    let storageExists = typeof(Storage) !== "undefined";
     this.state = {
-      sysrawtxunsigned: (storageExists && localStorage.getItem("sysrawtxunsigned")) || props.getStore().sysrawtxunsigned,
-      txid: (storageExists && localStorage.getItem("txid")) || props.getStore().txid,
-      blockhash: (storageExists && localStorage.getItem("blockhash")) || props.getStore().blockhash,
+      receiptStatus: '',
+      receiptTxHash: '',
+      receiptTxIndex: '',
+      receiptFrom: '',
+      receiptTo: '',
+      receiptBlockhash: '', 
+      receiptBlocknumber: '',
+      receiptTotalGas: '',
+      receiptGas: '',
+      receiptObj: null,
       working: false
+
     };
-    
-    this._validateOnDemand = true; // this flag enables onBlur validation as user fills forms
-    this.getBlockhash = this.getBlockhash.bind(this);
-    this.validationCheck = this.validationCheck.bind(this);
+    this.submitProofs = this.submitProofs.bind(this);
+    this.downloadReceipt = this.downloadReceipt.bind(this);
+    this.setStateFromReceipt = this.setStateFromReceipt.bind(this);
     this.isValidated = this.isValidated.bind(this);
   }
-
-  async componentDidMount() {
- 
+  isValidated() {
+    if(this.state.receiptObj === null){
+      return false;
+    }
+    this.props.updateStore({
+      ...this.state,
+      savedToCloud: false // use this to notify step3 that some changes took place and prompt the user to save again
+    });
+    return true;
+  }
+  componentDidMount() {
+    if(!this.props.getStore().blockhash || !this.props.getStore().txid){
+      this.props.jumpToStep(2);
+    }
   }
 
   componentWillUnmount() {}
-  saveToLocalStorage() {
-    if (typeof(Storage) !== "undefined") {
-      // Code for localStorage/sessionStorage.
-      localStorage.setItem("txid", this.refs.txid.value);
-      localStorage.setItem("blockhash", this.refs.blockhash.value);
-    } else {
-      // Sorry! No Web Storage support..
-    }
+  downloadReceipt () {
+    const element = document.createElement("a");
+    const file = new Blob([JSON.stringify(this.state.receiptObj, null, "   ")], {type: 'text/plain'});
+    element.href = URL.createObjectURL(file);
+    element.download = "receipt.txt";
+    document.body.appendChild(element); // Required for this to work in FireFox
+    element.click();
   }
-  isValidated() {
-    const userInput = this._grabUserInput(); // grab user entered vals
-    const validateNewInput = this._validateData(userInput); // run the new input against the validator
-    let isDataValid = false;
-
-    // if full validation passes then save to store and pass as valid
-    if (Object.keys(validateNewInput).every((k) => { return validateNewInput[k] === true })) {
-        if (this.props.getStore().txid !== userInput.txid  || 
-        this.props.getStore().blockhash !== userInput.blockhash) { // only update store of something changed
-          this.props.updateStore({
-            ...userInput,
-            savedToCloud: false // use this to notify step4 that some changes took place and prompt the user to save again
-          });  // Update store here (this is just an example, in reality you will do it via redux or flux)
-        }
-
-        isDataValid = true;
-    }
-    else {
-        // if anything fails then update the UI validation state but NOT the UI Data State
-        this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-    }
-
-    return isDataValid;
-  }
-  async getBlockhash() {
-    let userInput = this._grabUserInput(); // grab user entered vals
-    let validateNewInput = this._validateData(userInput); // run the new input against the validator
-    validateNewInput.buttonVal = true;
-    validateNewInput.buttonValMsg = "";
-    validateNewInput.blockhashVal = true;
-    validateNewInput.blockhashValMsg = "";
-    let valid = true;
-    if(!userInput.txid || userInput.txid === ""){
-      validateNewInput.txidVal = false;
-      valid = false;
-    }        
-    if(valid === true){
-      this.setState({working: true});
-      let txid = userInput.txid.toString();
-      try {
-        let results = await sjs.utils.fetchBackendRawTx(CONFIGURATION.blockbookAPIURL, txid)
-        if(results.error){
-          validateNewInput.buttonVal = false;
-          validateNewInput.buttonValMsg = results.error;
-          this.setState({working: false});
-          this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-          console.log("error " + results.error);
-        }
-        else if(results && results.blockHash){
-          validateNewInput.blockhashVal = true;
-          this.refs.blockhash.value = results.blockHash;
-          this.setState({working: false});
-          this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-          this.saveToLocalStorage();
-        }
-      }catch(e) {
-        validateNewInput.buttonVal = false;
-        validateNewInput.buttonValMsg = e.message;
-        this.setState({working: false});
-        this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-        console.log("error " + e.message);
-      }
-    } 
-
-  }
-  validationCheck() {
-    if (!this._validateOnDemand)
+ 
+  setStateFromReceipt(receipt, error, confirmation) {
+    if(receipt.transactionHash && this.state.receiptTxHash !== receipt.transactionHash){
       return;
-
-    const userInput = this._grabUserInput(); // grab user entered vals
-    const validateNewInput = this._validateData(userInput); // run the new input against the validator
-
-    this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-  }
-
-   _validateData(data) {
-    return  {
-      txidVal: true,
-      blockhashVal: data.blockhash && data.blockhash !== ""? true: false,
-      buttonVal: true
     }
-  }
-
-  _validationErrors(val) {
-    const errMsgs = {
-      txidValMsg: val.txidVal && val.txidVal === true ? '' : this.props.t("step3Txid"),
-      blockhashValMsg: val.blockhashVal && val.blockhashVal === true ? '' : this.props.t("step3Blockhash")
+    var found = false;
+    if(receipt.events){
+      var TokenUnfreezeFn = '0xb925ba840e2f36bcb317f8179bd8b5ed01aba4a22abf5f169162c0894dea87ab';
+      for (var key in receipt.events) {
+        if (receipt.events.hasOwnProperty(key)) {
+          if(receipt.events[key].raw && receipt.events[key].raw.topics && receipt.events[key].raw.topics.length > 0){
+            if(receipt.events[key].raw.topics[0] === TokenUnfreezeFn){
+              found = true;
+            }
+          }
+        }
+      }
     }
-    return errMsgs;
+    if(!found){
+      error = this.props.t("step4ErrorEventCheckLog");
+    }
+    this.setState({
+      receiptObj: receipt,
+      receiptStatus: receipt.status === true? "true":"false",
+      receiptTxHash: receipt.transactionHash,
+      receiptTxIndex: receipt.transactionIndex,
+      receiptFrom: receipt.from,
+      receiptTo: receipt.to,
+      receiptBlockhash: receipt.blockHash, 
+      receiptBlocknumber: receipt.blockNumber,
+      receiptTotalGas: receipt.cumulativeGasUsed,
+      receiptGas: receipt.gasUsed,
+      receiptConf: confirmation,
+      buttonVal: error !== null? false: true, 
+      buttonValMsg:  error !== null? error: this.props.t("step4Success")}); 
   }
 
-  _grabUserInput() {
-    return {
-      txid: this.refs.txid.value,
-      blockhash: this.refs.blockhash.value
-    };
+  async submitProofs() {
+    if(!web3 || !web3.currentProvider || web3.currentProvider.isMetaMask === false){
+      this.setState({buttonVal: false, buttonValMsg: this.props.t("step4InstallMetamask")});
+      return;  
+    }
+    let chainId = await web3.eth.getChainId();
+    if(chainId !== CONFIGURATION.chainId){
+      this.setState({buttonVal: false, buttonValMsg: this.props.t("stepUseProperNetwork")});
+      return;       
+    }
+    let SyscoinRelay = new web3.eth.Contract(rconfig.data, rconfig.contract); 
+    if(!SyscoinRelay || !SyscoinRelay.methods || !SyscoinRelay.methods.relayTx){
+      this.setState({buttonVal: false, buttonValMsg: this.props.t("stepRelay")});
+      return;  
+    }
+    this.setState({
+      receiptStatus: '',
+      receiptTxHash: '',
+      receiptTxIndex: '',
+      receiptFrom: '',
+      receiptTo: '',
+      receiptBlockhash: '', 
+      receiptBlocknumber: '',
+      receiptTotalGas: '',
+      receiptGas: '',
+      receiptConf: 0,
+      receiptObj: null,
+      buttonVal: true, 
+      buttonValMsg: ""});
+    let accounts = await web3.eth.getAccounts();
+    if(!accounts || !accounts[0] || accounts[0] === 'undefined')
+    {
+      this.setState({buttonVal: false, buttonValMsg: this.props.t("step4LoginMetamask")});
+      if(window.ethereum){
+        await window.ethereum.enable();
+      }
+     
+      return;
+    }
+    this.setState({buttonVal: true, buttonValMsg: this.props.t("step4AuthMetamask")});
+    let _txBytes = "0x" + this.props.getStore().txbytes;
+    let _txSiblings = [];
+    for(let i = 0;i<this.props.getStore().txsiblings.length;i++){
+      let _txSibling = "0x" + this.props.getStore().txsiblings[i];
+      _txSiblings.push(_txSibling);
+    }
+    let _syscoinBlockHeader = "0x" + this.props.getStore().syscoinblockheader; 
+    let merkleProof = getProof(this.props.getStore().txsiblings, this.props.getStore().txindex);
+    for(let   i = 0;i<merkleProof.sibling.length;i++){
+      merkleProof.sibling[i] = "0x" + merkleProof.sibling[i];
+    }
+    this.setState({working: true});
+    let thisObj = this;
+    thisObj.state.receiptObj = null;
+
+     SyscoinRelay.methods.relayTx(_txBytes, this.props.getStore().txindex, merkleProof.sibling, _syscoinBlockHeader).send({from: accounts[0], gas: 400000})
+      .once('transactionHash', function(hash){
+        thisObj.setState({receiptTxHash: hash, buttonVal: true, buttonValMsg: thisObj.props.t("step4PleaseWait")});
+      })
+      .once('confirmation', function(confirmationNumber, receipt){ 
+        if(thisObj.state.receiptObj === null){
+          thisObj.setStateFromReceipt(receipt, null, confirmationNumber);
+          thisObj.setState({working: false});
+          
+        } else {
+          thisObj.setState({receiptConf: confirmationNumber});
+        }
+      })
+      .on('error', (error, receipt) => {
+        thisObj.setState({working: false});
+        if(error.message.length <= 512 && error.message.indexOf("{") !== -1){
+          error = JSON.parse(error.message.substring(error.message.indexOf("{")));
+        }
+        let message = error.message.toString();
+        if(receipt){
+          thisObj.setStateFromReceipt(receipt, message, 0);
+        }
+        else{
+          thisObj.setState({buttonVal: false, buttonValMsg:  message}); 
+        }
+      })
   }
+
+ 
+
 
   render() {
     // explicit class assigning based on validation
-    let notValidClasses = {};
-
-    if (typeof this.state.txidVal == 'undefined' || this.state.txidVal) {
-      notValidClasses.txidCls = 'no-error';
-    }
-    else {
-      notValidClasses.txidCls = 'has-error';
-      notValidClasses.txidValGrpCls = 'val-err-tooltip';
-    }
-
-    if (typeof this.state.blockhashVal == 'undefined' || this.state.blockhashVal) {
-        notValidClasses.blockhashCls = 'no-error';
-    }
-    else {
-       notValidClasses.blockhashCls = 'has-error';
-       notValidClasses.blockhashValGrpCls = 'val-err-tooltip';
-    }
+    let notValidClasses = {};    
     if (typeof this.state.buttonVal == 'undefined' || this.state.buttonVal) {
-      notValidClasses.buttonCls = 'no-error';
+      notValidClasses.buttonCls = 'has-success';
+      notValidClasses.buttonValGrpCls = 'val-success-tooltip';
     }
     else {
-      notValidClasses.buttonCls = 'has-error';
-      notValidClasses.buttonValGrpCls = 'val-err-tooltip';
-    }
+       notValidClasses.buttonCls = 'has-error';
+       notValidClasses.buttonValGrpCls = 'val-err-tooltip mb30';
+    }   
     return (
       <div className="step step3">
         <div className="row">
           <form id="Form" className="form-horizontal">
             <div className="form-group">
               <label className="col-md-12">
-                <h1 dangerouslySetInnerHTML={{__html: this.props.t("step3Head")}}></h1>
-                <h3 dangerouslySetInnerHTML={{__html: this.props.t("step3Description")}}></h3>
+                <h1 dangerouslySetInnerHTML={{__html: this.props.t("step4Head")}}></h1>
+                <h3 dangerouslySetInnerHTML={{__html: this.props.t("step4Description")}}></h3>
               </label>
-           
-            <div className="row">
-            <div className="col-md-12 no-error">
-                <label className="control-label col-md-4">
-                  {this.props.t("step2RawTxLabel")}
-                </label>  
-               
-                    <textarea
-                      rows="3"
-                      autoComplete="off"
-                      type="text"
-                      className="form-control"
-                      defaultValue={this.state.sysrawtxunsigned}
-                      />
-                </div>
-              
-            </div>
-            <div className="row">
-            <div className="col-md-12">
-                <label className="control-label col-md-4">
-                  {this.props.t("step3TxidLabel")}
-                </label>
-                <div className={notValidClasses.txidCls}>
-                  <input
-                    ref="txid"
-                    autoComplete="off"
-                    type="text"
-                    placeholder={this.props.t("step3EnterTxid")}
-                    className="form-control"
-                    defaultValue={this.state.txid}
-                    required
-                     />
-                  <div className={notValidClasses.txidValGrpCls}>{this.state.txidValMsg}</div>
-                </div>
-              </div>
-              </div>
               <div className="row">
-              <div className="col-md-12">
+              <div className="col-md-4 col-sm-12 col-centered">
+
                 <div className={notValidClasses.buttonCls}>
-                    <button type="button" disabled={this.state.working} className="form-control btn btn-default formbtn" aria-label={this.props.t("step3Button")} onClick={this.getBlockhash}>
-                    <span className="glyphicon glyphicon-search" aria-hidden="true">&nbsp;</span>
-                    {this.props.t("step3Button")}
+                    <button type="button" disabled={this.state.working} className="form-control btn btn-default formbtn" aria-label={this.props.t("step4Button")} onClick={this.submitProofs}>
+                    <span className="glyphicon glyphicon-send" aria-hidden="true">&nbsp;</span>
+                    {this.props.t("step4Button")}
                     </button>
                   <div className={notValidClasses.buttonValGrpCls}>{this.state.buttonValMsg}</div>
                 </div>
               </div>
               </div>
               <div className="row">
-              <div className="col-md-12">
-                <label className="control-label col-md-4">
-                  {this.props.t("step3BlockhashLabel")}
-                </label>
-                <div className={notValidClasses.blockhashCls}>
-                  <input
-                    ref="blockhash"
-                    autoComplete="off"
-                    type="text"
-                    placeholder={this.props.t("step3EnterBlockHash")}
-                    className="form-control"
-                    defaultValue={this.state.blockhash}
-                     />
-                  <div className={notValidClasses.blockhashValGrpCls}>{this.state.blockhashValMsg}</div>
+                <div className="col-md-12">
+
+                <Tabs>
+                    <TabList>
+                      <Tab>{this.props.t("tabGeneral")}</Tab>
+                      <Tab>{this.props.t("tabAdvanced")}</Tab>
+                    </TabList>
+                    <TabPanel>
+                      <code className="block">
+                          <span class="dataname">{this.props.t("step4ReceiptStatus")}:</span> <span className="result">{this.state.receiptStatus}</span><br />
+                          <span class="dataname">{this.props.t("step4ReceiptTxHash")}:</span> <span className="result">{this.state.receiptTxHash}</span><br />
+                          <span class="dataname">{this.props.t("step4ReceiptTxIndex")}:</span> <span className="result">{this.state.receiptTxIndex}</span><br />
+                          <span class="dataname">{this.props.t("step4ReceiptFrom")}:</span> <span className="result">{this.state.receiptFrom}</span><br />
+                          <span class="dataname">{this.props.t("step4ReceiptTo")}:</span><span className="result">{this.state.receiptTo}</span><br />
+                      </code>
+                    </TabPanel>
+                    <TabPanel>
+                      <code className="block">
+                      <span class="dataname">{this.props.t("step4ReceiptBlockhash")}:</span> <span className="result">{this.state.receiptBlockhash}</span><br />
+                      <span class="dataname">{this.props.t("step4ReceiptBlocknumber")}:</span> <span className="result">{this.state.receiptBlocknumber}</span><br />
+                      <span class="dataname">{this.props.t("step4ReceiptTotalGas")}:</span> <span className="result">{this.state.receiptTotalGas}</span><br />
+                      <span class="dataname">{this.props.t("step4ReceiptGas")}:</span> <span className="result">{this.state.receiptGas}</span><br />
+                      <span class="dataname">{this.props.t("step4ReceiptConfirmations")}:</span> <span className="result">{this.state.receiptConf}</span><br />
+                      </code>
+                    </TabPanel>
+                  </Tabs>
+
                 </div>
-              </div>   
-              </div>
+                </div>
+                <div className="row">
+                <div className="col-md-4 col-sm-12 col-centered">
+   
+                  <div>
+                    <button type="button" disabled={!this.state.receiptObj || this.state.working} className="form-control btn btn-default formbtn" aria-label={this.props.t("step4Download")} onClick={this.downloadReceipt}>
+                    <span className="glyphicon glyphicon-download" aria-hidden="true">&nbsp;</span>
+                    {this.props.t("step4Download")}
+                    </button>
+                  </div>
+                 </div>
+                 </div>
               </div>
           </form>
         </div>

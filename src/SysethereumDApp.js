@@ -34,6 +34,14 @@ class SysethereumDApp extends Component {
 
 
   async componentDidMount() {
+    const callback = async (event) => {
+      if (event.detail.SyscoinInstalled) {
+        console.log("Pali wallet connected")
+      }
+      window.removeEventListener('SyscoinStatus', callback);
+    }
+    console.log("Adding Pali wallet callback")
+    window.addEventListener('SyscoinStatus', callback);
   }
   onSysToEth() {
     this.setState({ introDisplay: false, ethToSysDisplay: false,  assetRegistryDisplay: false, sysToEthDisplay: true});
@@ -74,7 +82,7 @@ class SysethereumDApp extends Component {
 
             <div className="left">
               <a href="https://syscoin.org/" target="_blank" rel="noopener noreferrer" className="logo"></a>
-              <h1>Syscoin - Ethereum Bridge</h1>
+              <h1>Syscoin - NEVM Bridge</h1>
 
               <div className="bottom">
 
@@ -131,13 +139,13 @@ class SysethereumDApp extends Component {
 
                 <a className="systoeth" href="#" onClick={this.onSysToEth}>
                   <div className="mybtn mybtn-two">
-                    <span>SYS ➜ ETH</span>
+                    <span>SYS ➜ NEVM</span>
                   </div>
                 </a>
 
                 <a className="ethtosys" href="#" onClick={this.onEthToSys}>
                   <div className="mybtn mybtn-two">
-                    <span>ETH ➜ SYS</span>
+                    <span>NEVM ➜ SYS</span>
                   </div>
                 </a>
 
@@ -181,18 +189,18 @@ class SysethereumDApp extends Component {
             <div className="ornament"></div>
             <h1>How it works?</h1>
 
-            <h2>Token portability backed by cryptographic proofs.<br /> Move tokens back and forth between the Syscoin and Ethereum blockchains.</h2>
+            <h2>Token portability backed by cryptographic proofs.<br /> Move tokens back and forth between the Syscoin and NEVM blockchains.</h2>
 
             <p className="italic">
-              An industry-first, zero counterparty bridge for moving tokens back and forth between the Syscoin and Ethereum blockchains
+              An industry-first, zero counterparty bridge for moving tokens back and forth between the Syscoin and NEVM blockchains
             </p>
 
             <p>
-              <strong>Burn tokens on the Syscoin or Ethereum blockchain</strong><br />
+              <strong>Burn tokens on the Syscoin or NEVM blockchain</strong><br />
               Burning tokens provably removes them from the circulating supply on one chain. The proofs that result from this will be used to mint tokens on the adjacent chain.
             </p>
             <p>
-              <strong>Mint tokens on the Ethereum or Syscoin blockchain</strong><br />
+              <strong>Mint tokens on the NEVM or Syscoin blockchain</strong><br />
               Using the proof of burn from one chain, new tokens can be minted into the adjacent chain. This results in a 1:1 representation of the tokens on the new chain and empowers them with all the capabilities of that chain.
             </p>
             
@@ -206,15 +214,15 @@ class SysethereumDApp extends Component {
             <ol>
               <li>
                 <strong>Burn SPT</strong><br />
-                Provably burn SPT on the Syscoin blockchain. <a href="#" onClick={this.onSysToEth}>SYS ➜ ETH</a>
+                Provably burn SPT on the Syscoin blockchain. <a href="#" onClick={this.onSysToEth}>SYS ➜ NEVM</a>
               </li>
               <li>
                 <strong>Mint ERC20</strong><br />
-                Use proof-of-burn from the Syscoin blockchain to mint ERC20 tokens on the Ethereum blockchain 1:1 with burned SPTs from Syscoin.
+                Use proof-of-burn from the Syscoin blockchain to mint ERC20 tokens on the NEVM blockchain 1:1 with burned SPTs from Syscoin.
               </li>
               <li>
-                <strong>Leverage Ethereum Ecosystem</strong><br />
-                Use SPT ERC20 with Ethereum smart contracts and the plethora of existing wallets and services that support ERC20 tokens.
+                <strong>Leverage NEVM Ecosystem</strong><br />
+                Use SPT ERC20 with NEVM smart contracts and the plethora of existing wallets and services that support ERC20 tokens.
               </li>
             </ol>
      
@@ -228,11 +236,11 @@ class SysethereumDApp extends Component {
             <ol>
               <li>
                 <strong>Burn SPT ERC20</strong><br />
-                Provably burn ERC20 on the Ethereum blockchain. <a href="#" onClick={this.onEthToSys}>ETH ➜ SYS</a>
+                Provably burn ERC20 on the NEVM blockchain. <a href="#" onClick={this.onEthToSys}>NEVM ➜ SYS</a>
               </li>
               <li>
                 <strong>Mint SPT</strong><br />
-                Use proof-of-burn from the Ethereum blockchain to mint SPT tokens on the Syscoin blockchain 1:1 with burned SPT ERC20s from Ethereum.
+                Use proof-of-burn from the NEVM blockchain to mint SPT tokens on the Syscoin blockchain 1:1 with burned SPT ERC20s from NEVM.
               </li>
               <li>
                 <strong>Leverage Syscoin Ecosystem</strong><br />
@@ -250,7 +258,7 @@ class SysethereumDApp extends Component {
             </p>
 
             <p>
-              A key concept of the Syscoin Ethereum bridge is called the relay Contract. This contract takes in an SPV proof and uses a custom sysblockhash opcode as well as the proof data to facilitate the minting of new SPT ERC20 tokens and base coin.
+              A key concept of the Syscoin NEVM bridge is called the relay Contract. This contract takes in an SPV proof and uses a custom sysblockhash opcode as well as the proof data to facilitate the minting of new SPT ERC20 tokens and base coin.
             </p>
 
             <p>
@@ -284,7 +292,7 @@ class SysethereumDApp extends Component {
             What is SYSX?
             </p>
             <p>
-            SYSX is both an SPT and Ethereum ERC20 token, backed by SYS at 1:1 ratio. You can burn your SYS and mint SYSX on the Syscoin chain, allowing you to utilize high throughput ZDAG transactions. You can then burn your SYSX (SPT) and mint a SYSX (ERC20) token, allowing you to utilize all the functionalities of the Ethereum Chain, such as Smart Contracts. This mint/burn process can also be done in reverse order; it works in both directions. 
+            SYSX is both an SPT and NEVM ERC20 token, backed by SYS at 1:1 ratio. You can burn your SYS and mint SYSX on the Syscoin chain, allowing you to utilize high throughput ZDAG transactions. You can then burn your SYSX (SPT) and mint a SYSX (ERC20) token, allowing you to utilize all the functionalities of the NEVM Chain, such as Smart Contracts. This mint/burn process can also be done in reverse order; it works in both directions. 
           </p>
 
           <p className="question">
@@ -301,10 +309,10 @@ class SysethereumDApp extends Component {
           </p>
 
           <p className="question">
-          Does the EVM run on Ethereum?
+          Does the NEVM run on Ethereum?
             </p>
           <p>
-          The EVM will run on an Ethereum version that is integrated into Syscoin that leverages PoW of Bitcoin to secure its chain. EVM stands for Ethereum Virtual Machine. In Syscoin we refer to it as NEVM or Network-enhances Ethereum Virtual Machine.
+          The NEVM will run on an Ethereum version that is integrated into Syscoin that leverages PoW of Bitcoin to secure its chain. NEVM stands for Network-enhanced Ethereum Virtual Machine.
           </p>
 
           <p className="question">
@@ -476,7 +484,7 @@ class SysethereumDApp extends Component {
     
       <div className="wizardTitleCont">
         <div className="wizardTitle">
-          <span className="ethl">ETH</span>
+          <span className="ethl">NEVM</span>
           <span className="direction">➜</span>
           <span className="sysr">SYS</span>
           
@@ -507,7 +515,7 @@ class SysethereumDApp extends Component {
         <div className="wizardTitle">
           <span className="sysl">SYS</span>
           <span className="direction">➜</span>
-          <span className="ethr">ETH</span>
+          <span className="ethr">NEVM</span>
         </div> 
       </div>
 
@@ -531,7 +539,7 @@ class SysethereumDApp extends Component {
       <div className="wizardTitle">
         <span className="sysl">SYS</span>
         <span className="direction">➜</span>
-        <span className="ethr">ETH</span>
+        <span className="ethr">NEVM</span>
         
       </div> 
     </div>
