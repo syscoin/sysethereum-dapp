@@ -11,6 +11,7 @@
       this.blockbookAPIURL = "https://sys-explorer.tk/"
       this.chainId = 58; // tanenbaum 57 = mainnet
       this.SYSXAsset = "123456";
+      this.TokenUnfreezeFn = '0xb925ba840e2f36bcb317f8179bd8b5ed01aba4a22abf5f169162c0894dea87ab';
     }
   }
   export default new CONFIGURATION();
