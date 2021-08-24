@@ -18,7 +18,8 @@ class Step1 extends Component {
     this.getBurnTx = this.getBurnTx.bind(this);
     this.validationCheck = this.validationCheck.bind(this);
     this.isValidated = this.isValidated.bind(this);
-    this.syscoinjs = new sjs.SyscoinJSLib(null, CONFIGURATION.blockbookAPIURL)
+    this.syscoinjs = new sjs.SyscoinJSLib(null, CONFIGURATION.blockbookAPIURL, CONFIGURATION.sysNetwork)
+    this.faucetURL = CONFIGURATION.faucetURL;
   }
 
   componentDidMount() {
@@ -79,21 +80,23 @@ class Step1 extends Component {
       return {data: null, error: err}
     }
     const serializedResp = sjs.utils.exportPsbtToJson(res.psbt, res.assets);
-    await window.ConnectionsController.signTransaction(serializedResp);
-    return {data: 'success', error: null}
+    const signRes = await window.ConnectionsController.signTransaction(serializedResp);
+    const unserializedResp = sjs.utils.importPsbtFromJson(signRes, CONFIGURATION.sysNetwork);
+    return {txid: unserializedResp.psbt.extractTransaction().getId(), error: null}
   }
   async getBurnTx() {
-    if (window.ConnectionsController) {
-      await window.ConnectionsController.connectWallet()
-    }
     if (!window.ConnectionsController) {
       this.setState({buttonVal: false, buttonValMsg: this.props.t("step2InstallPali")});
       return;  
     }
-    const xpub = await window.ConnectionsController.getConnectedAccountXpub();
+    let xpub = await window.ConnectionsController.getConnectedAccountXpub();
     if(!xpub) {
-      this.setState({buttonVal: false, buttonValMsg: this.props.t("step2SelectPaliAccount")});
-      return;  
+      await window.ConnectionsController.connectWallet()
+      xpub = await window.ConnectionsController.getConnectedAccountXpub();
+      if(!xpub) {
+        this.setState({buttonVal: false, buttonValMsg: this.props.t("step2SelectPaliAccount")});
+        return;  
+      }
     }
     const sysChangeAddress = await window.ConnectionsController.getChangeAddress();
     if(!sysChangeAddress) {
@@ -133,16 +136,19 @@ class Step1 extends Component {
             validateNewInput.buttonValMsg = results.error;
             self.setState({working: false});      
           }
-          else if(results.data){
+          else if(results.txid){
+            validateNewInput.buttonVal = false;
             validateNewInput.txidVal = true;
-            this.refs.txid.value = results.data;
+            this.refs.txid.value = results.txid;
+            validateNewInput.buttonValMsg = "Success!";
             self.setState({working: false});
             self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
             self.saveToLocalStorage();
           }
         }catch(e) {
           validateNewInput.buttonVal = false;
-          validateNewInput.buttonValMsg = e.message;
+          validateNewInput.txidVal = false;
+          validateNewInput.buttonValMsg = e;
           self.setState({working: false});
           self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
         }
@@ -223,6 +229,10 @@ class Step1 extends Component {
     if (typeof this.state.buttonVal == 'undefined' || this.state.buttonVal) {
       notValidClasses.buttonCls = 'no-error';
     }
+    else if (this.state.txidVal) {
+      notValidClasses.buttonCls = 'has-success';
+      notValidClasses.buttonValGrpCls = 'val-success-tooltip active';
+    }
     else {
       notValidClasses.buttonCls = 'has-error';
       notValidClasses.buttonValGrpCls = 'val-err-tooltip';
@@ -235,6 +245,7 @@ class Step1 extends Component {
             <label className="col-md-12">
                 <h1 dangerouslySetInnerHTML={{__html: this.props.t("step2Head")}}></h1>
                 <h3 dangerouslySetInnerHTML={{__html: this.props.t("step2Description")}}></h3>
+                <h3><div dangerouslySetInnerHTML={{__html: this.props.t("step1Faucet")}}></div> <a href={this.faucetURL} className="vivid" target="_blank" rel="noopener noreferrer">{this.faucetURL}</a></h3>
               </label>
               <div className="row">
               <div className="col-md-12">

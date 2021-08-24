@@ -29,14 +29,13 @@ class Step1ES extends Component {
       receiptGas: props.getStore().receiptGas,
       receiptObj: props.getStore().receiptObj,
       working: false
-
     };
     this.submitProofs = this.submitProofs.bind(this);
     this.downloadReceipt = this.downloadReceipt.bind(this);
     this.validationCheck = this.validationCheck.bind(this);
     this.isValidated = this.isValidated.bind(this);
     this.setStateFromReceipt = this.setStateFromReceipt.bind(this);
-    this.faucetURL = CONFIGURATION.faucetURL;
+
   }
   async componentDidMount() {
     
@@ -466,7 +465,6 @@ class Step1ES extends Component {
               <label className="col-md-12">
                 <h1>{this.props.t("step1ESHead")}</h1>
                 <h3 dangerouslySetInnerHTML={{__html: this.props.t("step1ESDescription")}}></h3>
-                <h3><div dangerouslySetInnerHTML={{__html: this.props.t("step1Faucet")}}></div> <a href={this.faucetURL} className="vivid" target="_blank" rel="noopener noreferrer">{this.faucetURL}</a></h3>
               </label>
               <div className="row">
               <div className="col-md-12">
