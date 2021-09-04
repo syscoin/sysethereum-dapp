@@ -40,7 +40,7 @@ class Step3 extends Component {
     return true;
   }
   componentDidMount() {
-    if(!this.props.getStore().blockhash || !this.props.getStore().txid){
+    if(!this.props.getStore().nevm_blockhash || !this.props.getStore().txid){
       this.props.jumpToStep(2);
     }
   }
@@ -100,6 +100,12 @@ class Step3 extends Component {
       this.setState({buttonVal: false, buttonValMsg: this.props.t("stepUseProperNetwork")});
       return;       
     }
+    let nevmBlock = await web3.eth.getBlock("0x" + this.props.getStore().nevm_blockhash);
+    if(!nevmBlock) {
+      this.setState({buttonVal: false, buttonValMsg: "NEVM block not found"});
+      this.setState({working: false});
+      return;
+    }
     let SyscoinRelay = new web3.eth.Contract(rconfig.data, rconfig.contract); 
     if(!SyscoinRelay || !SyscoinRelay.methods || !SyscoinRelay.methods.relayTx){
       this.setState({buttonVal: false, buttonValMsg: this.props.t("stepRelay")});
@@ -145,7 +151,7 @@ class Step3 extends Component {
     let thisObj = this;
     thisObj.state.receiptObj = null;
 
-     SyscoinRelay.methods.relayTx(_txBytes, this.props.getStore().txindex, merkleProof.sibling, _syscoinBlockHeader).send({from: accounts[0], gas: 400000})
+     SyscoinRelay.methods.relayTx(nevmBlock.number, _txBytes, this.props.getStore().txindex, merkleProof.sibling, _syscoinBlockHeader).send({from: accounts[0], gas: 400000})
       .once('transactionHash', function(hash){
         thisObj.setState({receiptTxHash: hash, buttonVal: true, buttonValMsg: thisObj.props.t("step4PleaseWait")});
       })
@@ -218,20 +224,20 @@ class Step3 extends Component {
                     </TabList>
                     <TabPanel>
                       <code className="block">
-                          <span class="dataname">{this.props.t("step4ReceiptStatus")}:</span> <span className="result">{this.state.receiptStatus}</span><br />
-                          <span class="dataname">{this.props.t("step4ReceiptTxHash")}:</span> <span className="result">{this.state.receiptTxHash}</span><br />
-                          <span class="dataname">{this.props.t("step4ReceiptTxIndex")}:</span> <span className="result">{this.state.receiptTxIndex}</span><br />
-                          <span class="dataname">{this.props.t("step4ReceiptFrom")}:</span> <span className="result">{this.state.receiptFrom}</span><br />
-                          <span class="dataname">{this.props.t("step4ReceiptTo")}:</span><span className="result">{this.state.receiptTo}</span><br />
+                          <span className="dataname">{this.props.t("step4ReceiptStatus")}:</span> <span className="result">{this.state.receiptStatus}</span><br />
+                          <span className="dataname">{this.props.t("step4ReceiptTxHash")}:</span> <span className="result">{this.state.receiptTxHash}</span><br />
+                          <span className="dataname">{this.props.t("step4ReceiptTxIndex")}:</span> <span className="result">{this.state.receiptTxIndex}</span><br />
+                          <span className="dataname">{this.props.t("step4ReceiptFrom")}:</span> <span className="result">{this.state.receiptFrom}</span><br />
+                          <span className="dataname">{this.props.t("step4ReceiptTo")}:</span><span className="result">{this.state.receiptTo}</span><br />
                       </code>
                     </TabPanel>
                     <TabPanel>
                       <code className="block">
-                      <span class="dataname">{this.props.t("step4ReceiptBlockhash")}:</span> <span className="result">{this.state.receiptBlockhash}</span><br />
-                      <span class="dataname">{this.props.t("step4ReceiptBlocknumber")}:</span> <span className="result">{this.state.receiptBlocknumber}</span><br />
-                      <span class="dataname">{this.props.t("step4ReceiptTotalGas")}:</span> <span className="result">{this.state.receiptTotalGas}</span><br />
-                      <span class="dataname">{this.props.t("step4ReceiptGas")}:</span> <span className="result">{this.state.receiptGas}</span><br />
-                      <span class="dataname">{this.props.t("step4ReceiptConfirmations")}:</span> <span className="result">{this.state.receiptConf}</span><br />
+                      <span className="dataname">{this.props.t("step4ReceiptBlockhash")}:</span> <span className="result">{this.state.receiptBlockhash}</span><br />
+                      <span className="dataname">{this.props.t("step4ReceiptBlocknumber")}:</span> <span className="result">{this.state.receiptBlocknumber}</span><br />
+                      <span className="dataname">{this.props.t("step4ReceiptTotalGas")}:</span> <span className="result">{this.state.receiptTotalGas}</span><br />
+                      <span className="dataname">{this.props.t("step4ReceiptGas")}:</span> <span className="result">{this.state.receiptGas}</span><br />
+                      <span className="dataname">{this.props.t("step4ReceiptConfirmations")}:</span> <span className="result">{this.state.receiptConf}</span><br />
                       </code>
                     </TabPanel>
                   </Tabs>

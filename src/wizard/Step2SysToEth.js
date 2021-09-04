@@ -12,6 +12,7 @@ class Step2 extends Component {
       syscoinblockheader: props.getStore().syscoinblockheader,
       txbytes: props.getStore().txbytes,
       txid: (storageExists && localStorage.getItem("txid")) || props.getStore().txid,
+      nevmblockhash: props.getStore().nevmblockhash,
     };
       // INPUTS:
       // enter syscoin burn txid
@@ -48,7 +49,8 @@ class Step2 extends Component {
         if (this.props.getStore().txindex !== userInput.txindex  || 
         this.props.getStore().txsiblings !== userInput.txsiblings ||
         this.props.getStore().syscoinblockheader !== userInput.syscoinblockheader ||
-        this.props.getStore().txbytes !== userInput.txbytes
+        this.props.getStore().txbytes !== userInput.txbytes ||
+        this.props.getStore().blockhash !== userInput.blockhash
         ) { // only update store of something changed
           this.props.updateStore({
             ...userInput,
@@ -78,6 +80,7 @@ class Step2 extends Component {
         failed = true;
       }
       else if(results){
+        results = JSON.parse(results.result);
         if (!results.transaction) {
           validateNewInput.buttonVal = false;
           validateNewInput.buttonValMsg = "Failed to retrieve SPV Proof";
@@ -91,6 +94,8 @@ class Step2 extends Component {
           console.log("txsiblingsVal " + validateNewInput.txsiblings);
           validateNewInput.txindex = results.index;
           console.log("txindexVal " + validateNewInput.txindex);
+          validateNewInput.nevm_blockhash = results.nevm_blockhash;
+          console.log("nevm_blockhash " + validateNewInput.nevm_blockhash);
         }
       }
     }catch(e) {
@@ -98,10 +103,12 @@ class Step2 extends Component {
       validateNewInput.buttonValMsg = e.message;
       failed = true;
     }
-    if(failed === true){
-      this.setState({working: false});
-      this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+    this.setState({working: false});
+    validateNewInput.buttonVal = !failed;
+    if(failed === false){
+      validateNewInput.buttonValMsg = this.props.t("step3SbStatusSuccess");
     }
+    this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
   }
   
   validationCheck() {
@@ -139,7 +146,8 @@ class Step2 extends Component {
       txindex: this.state.txindex,
       txsiblings: this.state.txsiblings,
       syscoinblockheader: this.state.syscoinblockheader,
-      txbytes: this.state.txbytes
+      txbytes: this.state.txbytes,
+      nevm_blockhash: this.state.nevm_blockhash
     };
   }
   render() {

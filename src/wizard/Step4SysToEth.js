@@ -43,7 +43,7 @@ class Step4 extends Component {
             <div className="form-group">
               <label className="col-md-12 control-label">
                 <h1 dangerouslySetInnerHTML={{__html: this.props.t("step5Head")}}></h1>
-                <h3><div  dangerouslySetInnerHTML={{__html: this.props.t("step5Description")}}></div><a class="vivid" href={this.state.explorerLink} target="_blank" rel="noopener noreferrer">{this.state.explorerLink}</a></h3>
+                <h3><div  dangerouslySetInnerHTML={{__html: this.props.t("step5Description")}}></div><a className="vivid" href={this.state.explorerLink} target="_blank" rel="noopener noreferrer">{this.state.explorerLink}</a></h3>
               </label>
             </div>
           </form>
