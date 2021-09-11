@@ -32,7 +32,7 @@ class Step2 extends Component {
 
   async componentDidMount() {
     if(!this.props.getStore().txid){
-      this.props.jumpToStep(1);
+      this.props.jumpToStep(0);
     }
   
   }
@@ -112,7 +112,7 @@ class Step2 extends Component {
     this.setState({working: false});
     validateNewInput.buttonVal = !failed;
     if(failed === false){
-      validateNewInput.buttonValMsg = this.props.t("step3SbStatusSuccess");
+      validateNewInput.buttonValMsg = this.props.t("step2StatusSuccess");
     }
     this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
   }
@@ -173,14 +173,14 @@ class Step2 extends Component {
           <form id="Form" className="form-horizontal">
             <div className="form-group">
               <label className="col-md-12">
-                <h1 dangerouslySetInnerHTML={{__html: this.props.t("step3Head")}}></h1>
-                <h3 dangerouslySetInnerHTML={{__html: this.props.t("step3Description")}}></h3>
+                <h1 dangerouslySetInnerHTML={{__html: this.props.t("step2Head")}}></h1>
+                <h3 dangerouslySetInnerHTML={{__html: this.props.t("step2Description")}}></h3>
               </label>
             
             <div className="row">
               <div className="col-md-12">
                 <div className={notValidClasses.buttonCls}>
-                    <button type="button" disabled={this.state.working} className="form-control btn btn-default formbtn" aria-label={this.props.t("step3Button")} onClick={this.getProofs}>
+                    <button type="button" disabled={this.state.working} className="form-control btn btn-default formbtn" aria-label={this.props.t("step2Button")} onClick={this.getProofs}>
                     <span className="glyphicon glyphicon-search" aria-hidden="true">&nbsp;</span>
                     {this.props.t("step3Button")}
                     </button>

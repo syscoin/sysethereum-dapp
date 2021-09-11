@@ -3,9 +3,9 @@
 import React, { Component } from 'react';
 import StepZilla from "react-stepzilla";
 import Step1 from './Step1SysToEth';
-import Step2 from './Step1SysToEth';
-import Step3 from './Step2SysToEth';
-import Step4 from './Step3SysToEth';
+import Step2 from './Step2SysToEth';
+import Step3 from './Step3SysToEth';
+import Step4 from './Step4SysToEth';
 import { withNamespaces } from 'react-i18next';
 import './css/wizard.css';
 import './css/i18n.css';
@@ -47,7 +47,7 @@ class SysToEthWizard extends Component {
       {name: t("step2"), component: <Step2 t={t} getStore={() => (this.getStore())} updateStore={(u) => {this.updateStore(u)}} />},
       {name: t("step3"), component: <Step3 t={t} getStore={() => (this.getStore())} updateStore={(u) => {this.updateStore(u)}} />},
       {name: t("step4"), component: <Step4 t={t} getStore={() => (this.getStore())} updateStore={(u) => {this.updateStore(u)}} />},
-
+   
     ]
 
     return (

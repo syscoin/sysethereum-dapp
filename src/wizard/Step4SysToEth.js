@@ -22,8 +22,8 @@ class Step4 extends Component {
     
   }
   componentDidMount() {
-    if(!this.props.getStore().receiptObj){
-      this.props.jumpToStep(3);
+    if(!this.props.getStore().receiptObj || this.props.getStore().receiptStatus !== "true"){
+      this.props.jumpToStep(2);
       return;
     }
     let baseURL = CONFIGURATION.NEVMTxExplorerURL;
@@ -42,8 +42,8 @@ class Step4 extends Component {
           <form id="Form" className="form-horizontal">
             <div className="form-group">
               <label className="col-md-12 control-label">
-                <h1 dangerouslySetInnerHTML={{__html: this.props.t("step5Head")}}></h1>
-                <h3><div  dangerouslySetInnerHTML={{__html: this.props.t("step5Description")}}></div><a className="vivid" href={this.state.explorerLink} target="_blank" rel="noopener noreferrer">{this.state.explorerLink}</a></h3>
+                <h1 dangerouslySetInnerHTML={{__html: this.props.t("step4Head")}}></h1>
+                <h3><div  dangerouslySetInnerHTML={{__html: this.props.t("step4Description")}}></div><a className="vivid" href={this.state.explorerLink} target="_blank" rel="noopener noreferrer">{this.state.explorerLink}</a></h3>
               </label>
             </div>
           </form>

@@ -41,7 +41,7 @@ class Step3 extends Component {
   }
   componentDidMount() {
     if(!this.props.getStore().nevm_blockhash || !this.props.getStore().txid){
-      this.props.jumpToStep(2);
+      this.props.jumpToStep(1);
     }
   }
 
@@ -72,7 +72,7 @@ class Step3 extends Component {
       }
     }
     if(!found){
-      error = this.props.t("step4ErrorEventCheckLog");
+      error = this.props.t("step3ErrorEventCheckLog");
     }
     this.setState({
       receiptObj: receipt,
@@ -87,12 +87,12 @@ class Step3 extends Component {
       receiptGas: receipt.gasUsed,
       receiptConf: confirmation,
       buttonVal: error !== null? false: true, 
-      buttonValMsg:  error !== null? error: this.props.t("step4Success")}); 
+      buttonValMsg:  error !== null? error: this.props.t("step3Success")}); 
   }
 
   async submitProofs() {
     if(!web3 || !web3.currentProvider || web3.currentProvider.isMetaMask === false){
-      this.setState({buttonVal: false, buttonValMsg: this.props.t("step4InstallMetamask")});
+      this.setState({buttonVal: false, buttonValMsg: this.props.t("step3InstallMetamask")});
       return;  
     }
     let ChainId = await web3.eth.getChainId();
@@ -122,14 +122,14 @@ class Step3 extends Component {
     let accounts = await web3.eth.getAccounts();
     if(!accounts || !accounts[0] || accounts[0] === 'undefined')
     {
-      this.setState({buttonVal: false, buttonValMsg: this.props.t("step4LoginMetamask")});
+      this.setState({buttonVal: false, buttonValMsg: this.props.t("step3LoginMetamask")});
       if(window.ethereum){
         await window.ethereum.enable();
       }
      
       return;
     }
-    this.setState({buttonVal: true, buttonValMsg: this.props.t("step4AuthMetamask")});
+    this.setState({buttonVal: true, buttonValMsg: this.props.t("step3AuthMetamask")});
     const txsiblings = this.props.getStore().txsiblings;
     const txindex = this.props.getStore().txindex;
     const syscoinblockheader = this.props.getStore().syscoinblockheader;
@@ -162,7 +162,7 @@ class Step3 extends Component {
 
     SyscoinRelay.methods.relayTx(nevmBlock.number, _txBytes, txindex, merkleProof.sibling, _syscoinBlockHeader).send({from: accounts[0], gas: 400000})
       .once('transactionHash', function(hash){
-        thisObj.setState({receiptTxHash: hash, buttonVal: true, buttonValMsg: thisObj.props.t("step4PleaseWait")});
+        thisObj.setState({receiptTxHash: hash, buttonVal: true, buttonValMsg: thisObj.props.t("step3PleaseWait")});
       })
       .once('confirmation', function(confirmationNumber, receipt){ 
         if(thisObj.state.receiptObj === null){
@@ -208,16 +208,16 @@ class Step3 extends Component {
           <form id="Form" className="form-horizontal">
             <div className="form-group">
               <label className="col-md-12">
-                <h1 dangerouslySetInnerHTML={{__html: this.props.t("step4Head")}}></h1>
-                <h3 dangerouslySetInnerHTML={{__html: this.props.t("step4Description")}}></h3>
+                <h1 dangerouslySetInnerHTML={{__html: this.props.t("step3Head")}}></h1>
+                <h3 dangerouslySetInnerHTML={{__html: this.props.t("step3Description")}}></h3>
               </label>
               <div className="row">
               <div className="col-md-4 col-sm-12 col-centered">
 
                 <div className={notValidClasses.buttonCls}>
-                    <button type="button" disabled={this.state.working} className="form-control btn btn-default formbtn" aria-label={this.props.t("step4Button")} onClick={this.submitProofs}>
+                    <button type="button" disabled={this.state.working} className="form-control btn btn-default formbtn" aria-label={this.props.t("step3Button")} onClick={this.submitProofs}>
                     <span className="glyphicon glyphicon-send" aria-hidden="true">&nbsp;</span>
-                    {this.props.t("step4Button")}
+                    {this.props.t("step3Button")}
                     </button>
                   <div className={notValidClasses.buttonValGrpCls}>{this.state.buttonValMsg}</div>
                 </div>
@@ -233,20 +233,20 @@ class Step3 extends Component {
                     </TabList>
                     <TabPanel>
                       <code className="block">
-                          <span className="dataname">{this.props.t("step4ReceiptStatus")}:</span> <span className="result">{this.state.receiptStatus}</span><br />
-                          <span className="dataname">{this.props.t("step4ReceiptTxHash")}:</span> <span className="result">{this.state.receiptTxHash}</span><br />
-                          <span className="dataname">{this.props.t("step4ReceiptTxIndex")}:</span> <span className="result">{this.state.receiptTxIndex}</span><br />
-                          <span className="dataname">{this.props.t("step4ReceiptFrom")}:</span> <span className="result">{this.state.receiptFrom}</span><br />
-                          <span className="dataname">{this.props.t("step4ReceiptTo")}:</span><span className="result">{this.state.receiptTo}</span><br />
+                          <span className="dataname">{this.props.t("step3ReceiptStatus")}:</span> <span className="result">{this.state.receiptStatus}</span><br />
+                          <span className="dataname">{this.props.t("step3ReceiptTxHash")}:</span> <span className="result">{this.state.receiptTxHash}</span><br />
+                          <span className="dataname">{this.props.t("step3ReceiptTxIndex")}:</span> <span className="result">{this.state.receiptTxIndex}</span><br />
+                          <span className="dataname">{this.props.t("step3ReceiptFrom")}:</span> <span className="result">{this.state.receiptFrom}</span><br />
+                          <span className="dataname">{this.props.t("step3ReceiptTo")}:</span><span className="result">{this.state.receiptTo}</span><br />
                       </code>
                     </TabPanel>
                     <TabPanel>
                       <code className="block">
-                      <span className="dataname">{this.props.t("step4ReceiptBlockhash")}:</span> <span className="result">{this.state.receiptBlockhash}</span><br />
-                      <span className="dataname">{this.props.t("step4ReceiptBlocknumber")}:</span> <span className="result">{this.state.receiptBlocknumber}</span><br />
-                      <span className="dataname">{this.props.t("step4ReceiptTotalGas")}:</span> <span className="result">{this.state.receiptTotalGas}</span><br />
-                      <span className="dataname">{this.props.t("step4ReceiptGas")}:</span> <span className="result">{this.state.receiptGas}</span><br />
-                      <span className="dataname">{this.props.t("step4ReceiptConfirmations")}:</span> <span className="result">{this.state.receiptConf}</span><br />
+                      <span className="dataname">{this.props.t("step3ReceiptBlockhash")}:</span> <span className="result">{this.state.receiptBlockhash}</span><br />
+                      <span className="dataname">{this.props.t("step3ReceiptBlocknumber")}:</span> <span className="result">{this.state.receiptBlocknumber}</span><br />
+                      <span className="dataname">{this.props.t("step3ReceiptTotalGas")}:</span> <span className="result">{this.state.receiptTotalGas}</span><br />
+                      <span className="dataname">{this.props.t("step3ReceiptGas")}:</span> <span className="result">{this.state.receiptGas}</span><br />
+                      <span className="dataname">{this.props.t("step3ReceiptConfirmations")}:</span> <span className="result">{this.state.receiptConf}</span><br />
                       </code>
                     </TabPanel>
                   </Tabs>
@@ -257,9 +257,9 @@ class Step3 extends Component {
                 <div className="col-md-4 col-sm-12 col-centered">
    
                   <div>
-                    <button type="button" disabled={!this.state.receiptObj || this.state.working} className="form-control btn btn-default formbtn" aria-label={this.props.t("step4Download")} onClick={this.downloadReceipt}>
+                    <button type="button" disabled={!this.state.receiptObj || this.state.working} className="form-control btn btn-default formbtn" aria-label={this.props.t("step3Download")} onClick={this.downloadReceipt}>
                     <span className="glyphicon glyphicon-download" aria-hidden="true">&nbsp;</span>
-                    {this.props.t("step4Download")}
+                    {this.props.t("step3Download")}
                     </button>
                   </div>
                  </div>
