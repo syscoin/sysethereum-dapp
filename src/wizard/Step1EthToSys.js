@@ -177,7 +177,7 @@ class Step1ES extends Component {
   async getAssetContract(guid, validateNewInput){
     if(guid.length > 0){
       try {
-        let results = await sjs.utils.fetchBackendAsset(CONFIGURATION.blockbookAPIURL, guid)
+        let results = await sjs.utils.fetchBackendAsset(CONFIGURATION.BlockbookAPIURL, guid)
         if(results.error){
           validateNewInput.buttonVal = false;
           validateNewInput.buttonValMsg = results.error;
@@ -319,8 +319,8 @@ class Step1ES extends Component {
       this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
       return;  
     }
-    let chainId = await web3.eth.getChainId();
-    if(chainId !== CONFIGURATION.chainId){
+    let ChainId = await web3.eth.getChainId();
+    if(ChainId !== CONFIGURATION.ChainId){
       validateNewInput.buttonVal = false;
       validateNewInput.buttonValMsg = this.props.t("stepUseProperNetwork");
       this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));

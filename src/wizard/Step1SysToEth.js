@@ -18,8 +18,8 @@ class Step1 extends Component {
     this.getBurnTx = this.getBurnTx.bind(this);
     this.validationCheck = this.validationCheck.bind(this);
     this.isValidated = this.isValidated.bind(this);
-    this.syscoinjs = new sjs.SyscoinJSLib(null, CONFIGURATION.blockbookAPIURL, CONFIGURATION.sysNetwork)
-    this.faucetURL = CONFIGURATION.faucetURL;
+    this.syscoinjs = new sjs.SyscoinJSLib(null, CONFIGURATION.BlockbookAPIURL, CONFIGURATION.SysNetwork)
+    this.FaucetURL = CONFIGURATION.FaucetURL;
   }
 
   componentDidMount() {
@@ -81,7 +81,7 @@ class Step1 extends Component {
     }
     const serializedResp = sjs.utils.exportPsbtToJson(res.psbt, res.assets);
     const signRes = await window.ConnectionsController.signTransaction(serializedResp);
-    const unserializedResp = sjs.utils.importPsbtFromJson(signRes, CONFIGURATION.sysNetwork);
+    const unserializedResp = sjs.utils.importPsbtFromJson(signRes, CONFIGURATION.SysNetwork);
     return {txid: unserializedResp.psbt.extractTransaction().getId(), error: null}
   }
   async getBurnTx() {
@@ -148,7 +148,7 @@ class Step1 extends Component {
         }catch(e) {
           validateNewInput.buttonVal = false;
           validateNewInput.txidVal = false;
-          validateNewInput.buttonValMsg = e;
+          validateNewInput.buttonValMsg = e.message;
           self.setState({working: false});
           self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
         }
@@ -245,7 +245,7 @@ class Step1 extends Component {
             <label className="col-md-12">
                 <h1 dangerouslySetInnerHTML={{__html: this.props.t("step2Head")}}></h1>
                 <h3 dangerouslySetInnerHTML={{__html: this.props.t("step2Description")}}></h3>
-                <h3><div dangerouslySetInnerHTML={{__html: this.props.t("step1Faucet")}}></div> <a href={this.faucetURL} className="vivid" target="_blank" rel="noopener noreferrer">{this.faucetURL}</a></h3>
+                <h3><div dangerouslySetInnerHTML={{__html: this.props.t("step1Faucet")}}></div> <a href={this.FaucetURL} className="vivid" target="_blank" rel="noopener noreferrer">{this.FaucetURL}</a></h3>
               </label>
               <div className="row">
               <div className="col-md-12">

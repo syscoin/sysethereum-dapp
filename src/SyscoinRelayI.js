@@ -1,5 +1,5 @@
 import CONFIGURATION from './config';
-const address = CONFIGURATION.relayContract;
+const address = CONFIGURATION.RelayContract;
 const abi = [
   {
     "inputs": [

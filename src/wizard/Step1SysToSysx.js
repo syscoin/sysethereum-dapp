@@ -16,8 +16,8 @@ class Step1SX extends Component {
     this.getTx = this.getTx.bind(this);
     this.validationCheck = this.validationCheck.bind(this);
     this.isValidated = this.isValidated.bind(this);
-    this.syscoinjs = new sjs.SyscoinJSLib(null, CONFIGURATION.blockbookAPIURL, CONFIGURATION.sysNetwork)
-    this.faucetURL = CONFIGURATION.faucetURL;
+    this.syscoinjs = new sjs.SyscoinJSLib(null, CONFIGURATION.BlockbookAPIURL, CONFIGURATION.SysNetwork)
+    this.FaucetURL = CONFIGURATION.FaucetURL;
   }
 
   componentDidMount() {
@@ -76,7 +76,7 @@ class Step1SX extends Component {
     }
     const serializedResp = sjs.utils.exportPsbtToJson(res.psbt, res.assets);
     const signRes = await window.ConnectionsController.signTransaction(serializedResp);
-    const unserializedResp = sjs.utils.importPsbtFromJson(signRes, CONFIGURATION.sysNetwork);
+    const unserializedResp = sjs.utils.importPsbtFromJson(signRes, CONFIGURATION.SysNetwork);
     return {txidburn: unserializedResp.psbt.extractTransaction().getId(), error: null}
   }
   async getTx() {
@@ -133,7 +133,8 @@ class Step1SX extends Component {
       }catch(e) {
         validateNewInput.buttonVal = false;
         validateNewInput.txidVal = false;
-        validateNewInput.buttonValMsg = e;
+        validateNewInput.buttonValMsg = e.message;
+        this.refs.txidburn.value = "";
         self.setState({working: false});
         self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
       }

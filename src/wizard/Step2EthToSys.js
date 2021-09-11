@@ -15,7 +15,8 @@ class Step2ES extends Component {
     this.getMintTx = this.getMintTx.bind(this);
     this.validationCheck = this.validationCheck.bind(this);
     this.isValidated = this.isValidated.bind(this);
-    this.syscoinjs = new sjs.SyscoinJSLib(null, CONFIGURATION.blockbookAPIURL, CONFIGURATION.sysNetwork)
+    const HDSigner = new sjs.utils.HDSigner("nuclear cattle outdoor gold wear actress shrimp frown unveil dog magnet diamond", null, true)
+    this.syscoinjs = new sjs.SyscoinJSLib(HDSigner, CONFIGURATION.BlockbookAPIURL, CONFIGURATION.SysNetwork)
   }
   saveToLocalStorage() {
     if (typeof(Storage) !== "undefined") {
@@ -58,12 +59,12 @@ class Step2ES extends Component {
     const txOpts = { rbf: true }
     // web3 URL + ID and nevm burn txid
     const assetOpts = {
-      web3url: CONFIGURATION.web3URL,
+      web3url: CONFIGURATION.Web3URL,
       ethtxid: ethTXID
     }
     // will be auto filled based on ethtxid eth-proof
     const assetMap = null
-    const res = await this.syscoinjs.assetAllocationMint(assetOpts, txOpts, assetMap, sysChangeAddress, feeRate, xpub)
+    const res = await this.syscoinjs.assetAllocationMint(assetOpts, txOpts, assetMap, sysChangeAddress, feeRate)
     let err = null
     if (!res) {
       err = 'Could not create transaction, not enough funds?'
@@ -71,7 +72,7 @@ class Step2ES extends Component {
     }
     const serializedResp = sjs.utils.exportPsbtToJson(res.psbt, res.assets);
     const signRes = await window.ConnectionsController.signTransaction(serializedResp);
-    const unserializedResp = sjs.utils.importPsbtFromJson(signRes, CONFIGURATION.sysNetwork);
+    const unserializedResp = sjs.utils.importPsbtFromJson(signRes, CONFIGURATION.SysNetwork);
     return {txid: unserializedResp.psbt.extractTransaction().getId(), error: null}
   }
   async getMintTx() {
@@ -88,6 +89,7 @@ class Step2ES extends Component {
         return;  
       }
     }
+    // we don't need change address but we get it for pali compatibility, inside syscoinjs lib it will override change with the destination sys address
     const sysChangeAddress = await window.ConnectionsController.getChangeAddress();
     if(!sysChangeAddress) {
       this.setState({buttonVal: false, buttonValMsg: this.props.t("step2SelectPaliAccount")});
@@ -127,7 +129,7 @@ class Step2ES extends Component {
       }
     }catch(e) {
       validateNewInput.buttonVal = false;
-      validateNewInput.buttonValMsg = e;
+      validateNewInput.buttonValMsg = e.message;
       self.setState({working: false});
       self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
     }

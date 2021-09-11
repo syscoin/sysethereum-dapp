@@ -95,16 +95,10 @@ class Step3 extends Component {
       this.setState({buttonVal: false, buttonValMsg: this.props.t("step4InstallMetamask")});
       return;  
     }
-    let chainId = await web3.eth.getChainId();
-    if(chainId !== CONFIGURATION.chainId){
+    let ChainId = await web3.eth.getChainId();
+    if(ChainId !== CONFIGURATION.ChainId){
       this.setState({buttonVal: false, buttonValMsg: this.props.t("stepUseProperNetwork")});
       return;       
-    }
-    let nevmBlock = await web3.eth.getBlock("0x" + this.props.getStore().nevm_blockhash);
-    if(!nevmBlock) {
-      this.setState({buttonVal: false, buttonValMsg: "NEVM block not found"});
-      this.setState({working: false});
-      return;
     }
     let SyscoinRelay = new web3.eth.Contract(rconfig.data, rconfig.contract); 
     if(!SyscoinRelay || !SyscoinRelay.methods || !SyscoinRelay.methods.relayTx){
@@ -136,22 +130,37 @@ class Step3 extends Component {
       return;
     }
     this.setState({buttonVal: true, buttonValMsg: this.props.t("step4AuthMetamask")});
+    const txsiblings = this.props.getStore().txsiblings;
+    const txindex = this.props.getStore().txindex;
+    const syscoinblockheader = this.props.getStore().syscoinblockheader;
+    const nevmblockhash = this.props.getStore().nevm_blockhash;
+    if(!txsiblings){
+      this.setState({working: false});
+      return;
+    }
     let _txBytes = "0x" + this.props.getStore().txbytes;
     let _txSiblings = [];
-    for(let i = 0;i<this.props.getStore().txsiblings.length;i++){
-      let _txSibling = "0x" + this.props.getStore().txsiblings[i];
+    for(let i = 0;i<txsiblings.length;i++){
+      let _txSibling = "0x" + txsiblings[i];
       _txSiblings.push(_txSibling);
     }
-    let _syscoinBlockHeader = "0x" + this.props.getStore().syscoinblockheader; 
-    let merkleProof = getProof(this.props.getStore().txsiblings, this.props.getStore().txindex);
+    let merkleProof = getProof(txsiblings, txindex);
     for(let   i = 0;i<merkleProof.sibling.length;i++){
       merkleProof.sibling[i] = "0x" + merkleProof.sibling[i];
     }
     this.setState({working: true});
     let thisObj = this;
     thisObj.state.receiptObj = null;
+    let nevmBlock = await web3.eth.getBlock("0x" + nevmblockhash);
+    if(!nevmBlock) {
+      this.setState({buttonVal: false, buttonValMsg: "NEVM block not found"});
+      this.setState({working: false});
+      return;
+    }
+    let _syscoinBlockHeader = "0x" + syscoinblockheader;
+     
 
-     SyscoinRelay.methods.relayTx(nevmBlock.number, _txBytes, this.props.getStore().txindex, merkleProof.sibling, _syscoinBlockHeader).send({from: accounts[0], gas: 400000})
+    SyscoinRelay.methods.relayTx(nevmBlock.number, _txBytes, txindex, merkleProof.sibling, _syscoinBlockHeader).send({from: accounts[0], gas: 400000})
       .once('transactionHash', function(hash){
         thisObj.setState({receiptTxHash: hash, buttonVal: true, buttonValMsg: thisObj.props.t("step4PleaseWait")});
       })

@@ -73,29 +73,35 @@ class Step2 extends Component {
     let failed = false;
     this.setState({working: true});
     try {
-      let results = await sjs.utils.fetchBackendSPVProof(CONFIGURATION.blockbookAPIURL, this.props.getStore().txid.toString())
+      let results = await sjs.utils.fetchBackendSPVProof(CONFIGURATION.BlockbookAPIURL, this.props.getStore().txid.toString())
       if(results.error){
         validateNewInput.buttonVal = false;
         validateNewInput.buttonValMsg = results.error;
         failed = true;
       }
       else if(results){
-        results = JSON.parse(results.result);
-        if (!results.transaction) {
+        if(results.result.length === 0) {
           validateNewInput.buttonVal = false;
           validateNewInput.buttonValMsg = "Failed to retrieve SPV Proof";
           failed = true;
         } else {
-          validateNewInput.txbytes = results.transaction;
-          console.log("txbytesVal " + validateNewInput.txbytes);
-          validateNewInput.syscoinblockheader = results.header;
-          console.log("syscoinblockheaderVal " + validateNewInput.syscoinblockheader);
-          validateNewInput.txsiblings = results.siblings;
-          console.log("txsiblingsVal " + validateNewInput.txsiblings);
-          validateNewInput.txindex = results.index;
-          console.log("txindexVal " + validateNewInput.txindex);
-          validateNewInput.nevm_blockhash = results.nevm_blockhash;
-          console.log("nevm_blockhash " + validateNewInput.nevm_blockhash);
+          results = JSON.parse(results.result);
+          if (!results.transaction) {
+            validateNewInput.buttonVal = false;
+            validateNewInput.buttonValMsg = "Failed to retrieve SPV Proof";
+            failed = true;
+          } else {
+            validateNewInput.txbytes = results.transaction;
+            console.log("txbytesVal " + validateNewInput.txbytes);
+            validateNewInput.syscoinblockheader = results.header;
+            console.log("syscoinblockheaderVal " + validateNewInput.syscoinblockheader);
+            validateNewInput.txsiblings = results.siblings;
+            console.log("txsiblingsVal " + validateNewInput.txsiblings);
+            validateNewInput.txindex = results.index;
+            console.log("txindexVal " + validateNewInput.txindex);
+            validateNewInput.nevm_blockhash = results.nevm_blockhash;
+            console.log("nevm_blockhash " + validateNewInput.nevm_blockhash);
+          }
         }
       }
     }catch(e) {

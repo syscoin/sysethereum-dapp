@@ -65,8 +65,8 @@ class Step1Reg extends Component {
       this.setState({buttonVal: false, buttonValMsg: this.props.t("step4InstallMetamask")});
       return;  
     }
-    let chainId = await web3.eth.getChainId();
-    if(chainId !== CONFIGURATION.chainId){
+    let ChainId = await web3.eth.getChainId();
+    if(ChainId !== CONFIGURATION.ChainId){
       this.setState({buttonVal: false, buttonValMsg: this.props.t("stepUseProperNetwork")});
       return;       
     }
@@ -93,26 +93,33 @@ class Step1Reg extends Component {
     }
     this.setState({buttonVal: true, buttonValMsg: this.props.t("step4AuthMetamask")});
     this.setState({working: true});
-    var txbytes, syscoinblockheader, txsiblings, txindex, blockhash, nevmblockhash;
+    var txbytes, syscoinblockheader, txsiblings, txindex, nevmblockhash;
     try {
-      let results = await sjs.utils.fetchBackendSPVProof(CONFIGURATION.blockbookAPIURL, userInput)
+      let results = await sjs.utils.fetchBackendSPVProof(CONFIGURATION.BlockbookAPIURL, userInput)
       if(results.error){
         this.setState({buttonVal: false, buttonValMsg: results.error});
         console.log("error " + results.error);
       }
       else if(results){
-        txbytes = results.transaction;
-        console.log("txbytesVal " + txbytes);
-        syscoinblockheader = results.header;
-        console.log("syscoinblockheaderVal " + syscoinblockheader);
-        txsiblings = results.siblings;
-        console.log("txsiblingsVal " + txsiblings);
-        txindex = results.index;
-        console.log("txindexVal " + txindex);
-        blockhash = results.blockhash;
-        console.log("blockhash " + blockhash);
-        nevmblockhash = results.nevm_blockhash;
-        console.log("nevmblockhash " + nevmblockhash);
+        if(results.result.length === 0) {
+          this.setState({buttonVal: false, buttonValMsg: "Failed to retrieve SPV Proof"});
+        } else {
+          results = JSON.parse(results.result);
+          if (!results.transaction) {
+            this.setState({buttonVal: false, buttonValMsg: "Failed to retrieve SPV Proof"});
+          } else {
+            txbytes = results.transaction;
+            console.log("txbytesVal " + txbytes);
+            syscoinblockheader = results.header;
+            console.log("syscoinblockheaderVal " + syscoinblockheader);
+            txsiblings = results.siblings;
+            console.log("txsiblingsVal " + txsiblings);
+            txindex = results.index;
+            console.log("txindexVal " + txindex);
+            nevmblockhash = results.nevm_blockhash;
+            console.log("nevm_blockhash " + nevmblockhash);
+          }
+        }
       }
     }catch(e) {
       this.setState({buttonVal: false, buttonValMsg: e.message});

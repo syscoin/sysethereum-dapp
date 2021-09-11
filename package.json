@@ -21,7 +21,8 @@
     "react-tabs": "^3.0.0",
     "react-textarea-autosize": "^7.1.2",
     "react-validation-mixin": "^5.4.0",
-    "syscoinjs-lib": "^1.0.173",
+    "syscoinjs-lib": "^1.0.181",
+    "eth-object": "https://github.com/syscoin/eth-object.git",
     "web3": "^1.4.0"
   },
   "scripts": {
