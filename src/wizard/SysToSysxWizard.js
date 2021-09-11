@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 import StepZilla from "react-stepzilla";
 import Step1SX from './Step1SysToSysx';
-import Step2SX from './Step1SysToSysx';
+import Step2SX from './Step2SysToSysx';
 import { withNamespaces } from 'react-i18next';
 import './css/wizard.css';
 import './css/i18n.css';

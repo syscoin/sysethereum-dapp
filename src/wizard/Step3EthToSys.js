@@ -45,10 +45,8 @@ class Step3ES extends Component {
           <form id="Form" className="form-horizontal">
             <div className="form-group">
               <label className="col-md-12">
-                
                 <h1 dangerouslySetInnerHTML={{__html: this.props.t("step3ESHead")}}></h1>
-                <h3><div dangerouslySetInnerHTML={{__html: this.props.t("step3ESDescription")}}></div><a className="vivid" href={this.state.explorerLink} target="_blank" rel="noopener noreferrer">{this.state.explorerLink}</a></h3>
-                
+                <h3><div dangerouslySetInnerHTML={{__html: this.props.t("step3ESDescription")}}></div><a className="vivid" href={this.state.explorerLink} target="_blank" rel="noopener noreferrer">{this.state.explorerLink}</a></h3> 
               </label>
             </div>
           </form>

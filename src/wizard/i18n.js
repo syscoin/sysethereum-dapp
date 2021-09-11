@@ -92,6 +92,8 @@ i18n.use(LanguageDetector).init({
         'step2Button': 'Get SPV Proofs',
         'step2ButtonEnter': 'Please get SPV Proofs before proceeding',
         'step2StatusSuccess': 'SPV Proofs were sucessfully saved! Please proceed to click on the "Next" button below',
+        'step2SXHead': '<em className="step">Step 2:</em> Complete!',
+        'step2SXDescription': '<strong>Transaction was successfully completed.</strong><br/> You now can use your SYSX.<br/> You can view your transaction here: ',
         'step3ESHead': '<em className="step">Step 3:</em> Complete!',
         'step3ESDescription': '<strong>Transaction was successfully completed.</strong><br/> You now can use your Syscoin or Syscoin Asset through the Syscoin network.<br/> You can view your transaction here: ',
         'step3Head': '<em className="step">Step 3:</em> Submit SPV Proof to NEVM',
