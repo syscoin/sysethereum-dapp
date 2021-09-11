@@ -15,8 +15,7 @@ class Step2ES extends Component {
     this.getMintTx = this.getMintTx.bind(this);
     this.validationCheck = this.validationCheck.bind(this);
     this.isValidated = this.isValidated.bind(this);
-    const HDSigner = new sjs.utils.HDSigner("nuclear cattle outdoor gold wear actress shrimp frown unveil dog magnet diamond", null, true)
-    this.syscoinjs = new sjs.SyscoinJSLib(HDSigner, CONFIGURATION.BlockbookAPIURL, CONFIGURATION.SysNetwork)
+    this.syscoinjs = new sjs.SyscoinJSLib(null, CONFIGURATION.BlockbookAPIURL, CONFIGURATION.SysNetwork)
   }
   saveToLocalStorage() {
     if (typeof(Storage) !== "undefined") {
@@ -64,7 +63,7 @@ class Step2ES extends Component {
     }
     // will be auto filled based on ethtxid eth-proof
     const assetMap = null
-    const res = await this.syscoinjs.assetAllocationMint(assetOpts, txOpts, assetMap, sysChangeAddress, feeRate)
+    const res = await this.syscoinjs.assetAllocationMint(assetOpts, txOpts, assetMap, sysChangeAddress, feeRate, xpub)
     let err = null
     if (!res) {
       err = 'Could not create transaction, not enough funds?'

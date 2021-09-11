@@ -17,14 +17,15 @@ class Step3ES extends Component {
       localStorage.removeItem("toSysAmount");
       localStorage.removeItem("syscoinWitnessAddress");
       localStorage.removeItem("receiptTxHash");
+      localStorage.removeItem("minttxid");
     } else {
       // Sorry! No Web Storage support..
     }
     
   }
   componentDidMount() {
-    if(!this.props.getStore().mintblockhash || !this.props.getStore().minttxid){
-      this.props.jumpToStep(2);
+    if(!this.props.getStore().minttxid){
+      this.props.jumpToStep(1);
       return;
     }
 
