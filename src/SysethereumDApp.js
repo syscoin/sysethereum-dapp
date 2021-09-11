@@ -292,10 +292,16 @@ class SysethereumDApp extends Component {
             <h1>FAQ</h1>
 
             <p className="question">
+            What is an Syscoin?
+            </p>
+            <p>
+            Syscoin is a decentralized blockchain that offers Bitcoin security with a UTXO-based token platform aswell as an EVM tied to the main Syscoin ledger through Proof-Of-Work consensus which is merge-mmined with Bitcoin. You can think of it as Bitcoin and Ethereum combined into one system. Expressivness of the EVM powered by the security of Bitcoin we combine both gold standards into one. Our vision to scale computation is through zero-knowledge proofs, you can read more about our design here: <a href="https://jsidhu.medium.com/a-design-for-an-efficient-coordinated-financial-computing-platform-ab27e8a825a0" target="_blank" rel="noopener noreferrer">A Design For An Efficient Coordinated Financial Computing Platform.</a>
+            </p>
+            <p className="question">
             What is an SPT?
             </p>
             <p>
-            Syscoin Platform Tokens (SPT) are cryptocurrency tokens that can be created quickly and easily on Syscoin Platform by anyone. This can be done using Spark wallet (GUI) or Syscoin QT using command-line. Token creation fee is 500 SYS at present.
+            Syscoin Platform Tokens (SPT) are cryptocurrency tokens that can be created quickly and easily on Syscoin Platform by anyone. This can be done using Sysmint or Syscoin QT using command-line.
             </p>
             
             <p className="question">
@@ -361,17 +367,17 @@ class SysethereumDApp extends Component {
           </p>
 
           <p className="question">
-          Can I have SYSX in my QT/Spark wallet?
+          Can I have SYSX in my Syscoin wallet?
           </p>
           <p>
-          SYSX is an SPT and an ERC20 token, thus it will depend on which chain your tokens are on. If they are on NEVM, you will need to use the Ethereum supported wallets. If they are on Syscoin, you can use Spark. Syscoin QT can also be used if you are competent with command line interface.
+          SYSX is an SPT and an ERC20 token, thus it will depend on which chain your tokens are on. If they are on NEVM, you will need to use metamask. If they are on Syscoin, you can use Pali which is integrated into this site. Syscoin QT can also be used if you are competent with command line interface.
           </p>
 
           <p className="question">
-          Do I need Ether to execute the smart contract, and if so how much?
+          Do I need gas to execute the smart contract, and if so how much?
           </p>
           <p>
-          You will need Ether on the NEVM to cover the costs of executing Ethereum smart contracts. These costs will vary depending on the NEVM network.
+          You will need SYS gas on the NEVM to cover the costs of executing NEVM smart contracts. These costs will vary depending on the NEVM network.
           </p>
 
           <p className="question">
@@ -386,7 +392,7 @@ class SysethereumDApp extends Component {
           Why have an SPT on Syscoin if I can have an ERC20 token?
           </p>
           <p>
-          Because this delivers multiple advantages. SPTs are ZDAG enabled, which means they benefit from high-speed and high-throughput token transfers with low fees. ZDAG’s probabilistic security (offering global consensus in ten seconds or less) enables you to determine the security/speed trade-off most ideal for your particular use case. Further, each SPT transaction settles onchain with Bitcoin compliant proof of work. All of this is especially attractive for point of sale applications. You can learn more about Syscoin ZDAG here: <a href="https://syscoin.org/z-dag" target="_blank" rel="noopener noreferrer">https://syscoin.org/z-dag</a>
+          Because this delivers multiple advantages. SPTs use a UTXO storage model and so it is more efficient to do simple transfers and aswell leverage the innovations from the Bitcoin script system. SPTs are also ZDAG enabled, which means they benefit from high-speed and high-throughput token transfers with low fees. ZDAG’s probabilistic security (offering global consensus in ten seconds or less) enables you to determine the security/speed trade-off most ideal for your particular use case. Further, each SPT transaction settles onchain with Bitcoin compliant proof of work. All of this is especially attractive for point of sale applications. You can learn more about Syscoin ZDAG here: <a href="https://syscoin.org/z-dag" target="_blank" rel="noopener noreferrer">https://syscoin.org/z-dag</a>. The overall vision is to offer both UTXO and account based (ERC) representations of tokens which leverage future innovations from the Bitcoin and Ethereum ecosystems respectively. Users can choose which model they wish to hold their tokens in trustlessly.
           </p>
 
           <p className="question">
