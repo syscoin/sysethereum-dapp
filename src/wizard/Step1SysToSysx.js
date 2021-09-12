@@ -233,9 +233,9 @@ class Step1SX extends Component {
               <div className="row">
               <div className="col-md-12">
                 <div className={notValidClasses.buttonCls}>
-                    <button type="button" disabled={this.state.working} className="form-control btn btn-default formbtn" aria-label={this.props.t("step2Button")} onClick={this.getTx}>
+                    <button type="button" disabled={this.state.working} className="form-control btn btn-default formbtn" aria-label={this.props.t("step1Button")} onClick={this.getTx}>
                     <span className="glyphicon glyphicon-send" aria-hidden="true">&nbsp;</span>
-                    {this.props.t("step2Button")}
+                    {this.props.t("step1Button")}
                     </button>
                   <div className={notValidClasses.buttonValGrpCls}>{this.state.buttonValMsg}</div>
                 </div>

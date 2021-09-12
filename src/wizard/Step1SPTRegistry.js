@@ -275,8 +275,8 @@ class Step1Reg extends Component {
                       </TabList>
                       <TabPanel>
                         <code className="block">
-                            <span className="dataname">{this.props.t("step4ReceiptStatus")}:</span> <span className="result">{this.state.receiptStatus}</span><br />
-                            <span className="dataname">{this.props.t("step4ReceiptTxHash")}:</span> <span className="result">{this.state.receiptTxHash}</span><br />
+                            <span className="dataname">{this.props.t("step3ReceiptStatus")}:</span> <span className="result">{this.state.receiptStatus}</span><br />
+                            <span className="dataname">{this.props.t("step3ReceiptTxHash")}:</span> <span className="result">{this.state.receiptTxHash}</span><br />
                             <span className="dataname">{this.props.t("step1ESCERC")}:</span> <span><a href={this.state.foundErc20URL} target="_blank" rel="noopener noreferrer">{this.state.foundErc20contract}</a></span><br />
                         </code>
                       </TabPanel>

@@ -3,6 +3,7 @@ import './SysethereumDApp.css';
 import bridgeAnim from './imgs/bridge_diagram.svg';
 import SysToEthWizardi18n from './wizard/SysToEthWizard';
 import SysToSysxWizardi18n from './wizard/SysToSysxWizard';
+import SysxToSysWizardi18n from './wizard/SysxToSysWizard';
 import EthToSysWizardi18n from './wizard/EthToSysWizard';
 import SPTRegistryWizardi18n from './wizard/SPTRegistryWizard';
 import { I18nextProvider } from "react-i18next";
@@ -18,6 +19,8 @@ class SysethereumDApp extends Component {
       introDisplay: true,
       ethToSysDisplay: false,
       sysToEthDisplay: false,  
+      sysToSysxDisplay: false,  
+      sysxToSysDisplay: false,  
       emailName: '',
       emailSender: '',
       emailMessage: '',
@@ -25,6 +28,7 @@ class SysethereumDApp extends Component {
     };
       
     this.onSysToSysx = this.onSysToSysx.bind(this);
+    this.onSysxToSys = this.onSysxToSys.bind(this);
     this.onSysToEth = this.onSysToEth.bind(this);
     this.onEthToSys = this.onEthToSys.bind(this);
     this.onAssetRegistry = this.onAssetRegistry.bind(this);
@@ -46,19 +50,22 @@ class SysethereumDApp extends Component {
     window.addEventListener('SyscoinStatus', callback);
   }
   onSysToSysx() {
-    this.setState({ introDisplay: false, ethToSysDisplay: false,  assetRegistryDisplay: false, sysToEthDisplay: false, sysToSysxDisplay: true});
+    this.setState({ introDisplay: false, ethToSysDisplay: false,  assetRegistryDisplay: false, sysToEthDisplay: false, sysToSysxDisplay: true, sysxToSysDisplay: false});
+  }
+  onSysxToSys() {
+    this.setState({ introDisplay: false, ethToSysDisplay: false,  assetRegistryDisplay: false, sysToEthDisplay: false, sysToSysxDisplay: false, sysxToSysDisplay: true});
   }
   onSysToEth() {
-    this.setState({ introDisplay: false, ethToSysDisplay: false,  assetRegistryDisplay: false, sysToEthDisplay: true, sysToSysxDisplay: false});
+    this.setState({ introDisplay: false, ethToSysDisplay: false,  assetRegistryDisplay: false, sysToEthDisplay: true, sysToSysxDisplay: false, sysxToSysDisplay: false});
   }
   onEthToSys() {
-    this.setState({ introDisplay: false, ethToSysDisplay: true, assetRegistryDisplay: false, sysToEthDisplay: false, sysToSysxDisplay: false});
+    this.setState({ introDisplay: false, ethToSysDisplay: true, assetRegistryDisplay: false, sysToEthDisplay: false, sysToSysxDisplay: false, sysxToSysDisplay: false});
   }
   onAssetRegistry() {
-    this.setState({ introDisplay: false, ethToSysDisplay: false, assetRegistryDisplay: true, sysToEthDisplay: false, sysToSysxDisplay: false});
+    this.setState({ introDisplay: false, ethToSysDisplay: false, assetRegistryDisplay: true, sysToEthDisplay: false, sysToSysxDisplay: false, sysxToSysDisplay: false});
   }
   onHome() {
-    this.setState({ introDisplay: true, ethToSysDisplay: false, assetRegistryDisplay: false, sysToEthDisplay: false, sysToSysxDisplay: false});
+    this.setState({ introDisplay: true, ethToSysDisplay: false, assetRegistryDisplay: false, sysToEthDisplay: false, sysToSysxDisplay: false, sysxToSysDisplay: false});
   }
 
   handleEmailChange(evt) {
@@ -156,6 +163,12 @@ class SysethereumDApp extends Component {
                 <a className="ethtosys" href="#" onClick={this.onEthToSys}>
                   <div className="mybtn mybtn-two">
                     <span>NEVM ➜ SYSX</span>
+                  </div>
+                </a>
+
+                <a className="sysxtosys" href="#" onClick={this.onSysxToSys}>
+                  <div className="mybtn mybtn-two">
+                    <span>SYSX ➜ SYS</span>
                   </div>
                 </a>
 
@@ -594,6 +607,31 @@ class SysethereumDApp extends Component {
     <button type="button" className="close closeButton wizardCancel" aria-label="Close" onClick={this.onHome}>
     <span className="glyphicon glyphicon-remove" aria-hidden="true"></span> Close
     </button>
+
+
+    </div>
+    <div  className={(this.state.sysxToSysDisplay  ? "visible" : "hidden")}>
+
+      <div id="menu"> 
+        <div className="goHome" onClick={this.onHome}></div>
+        <div className="title">Convert SYSX to SYS</div>
+      </div>
+
+      <div className="wizardTitleCont">
+        <div className="wizardTitle">
+          <span className="sysl">SYSX</span>
+          <span className="direction">➜</span>
+          <span className="sysl">SYS</span>
+        </div> 
+      </div>
+
+      <I18nextProvider i18n={i18n}>
+        <SysxToSysWizardi18n />
+      </I18nextProvider>
+
+      <button type="button" className="close closeButton wizardCancel" aria-label="Close" onClick={this.onHome}>
+      <span className="glyphicon glyphicon-remove" aria-hidden="true">&nbsp;</span> Close
+      </button>
 
 
     </div>
