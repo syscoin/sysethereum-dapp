@@ -24,7 +24,9 @@ class SysethereumDApp extends Component {
       emailName: '',
       emailSender: '',
       emailMessage: '',
-      emailSent: false
+      emailSent: false,
+      isInstalled: false,
+      controller: null,
     };
       
     this.onSysToSysx = this.onSysToSysx.bind(this);
@@ -40,15 +42,36 @@ class SysethereumDApp extends Component {
 
 
   async componentDidMount() {
-    const callback = async (event) => {
+    const callback = (event) => {
       if (event.detail.SyscoinInstalled) {
-        console.log("Pali wallet connected")
+        this.setState({
+          ...this.state,
+          isInstalled: true,
+        });
+
+        console.log('syscoin is installed');
+
+        if (event.detail.ConnectionsController) {
+          console.log('componentDidMount: controller is set');
+          this.setState({
+            ...this.state,
+            controller: window.ConnectionsController,
+          })
+
+          return;
+        }
+
+        return;
       }
+
       window.removeEventListener('SyscoinStatus', callback);
     }
-    console.log("Adding Pali wallet callback")
+
+    console.log('checking syscoin status');
+
     window.addEventListener('SyscoinStatus', callback);
   }
+
   onSysToSysx() {
     this.setState({ introDisplay: false, ethToSysDisplay: false,  assetRegistryDisplay: false, sysToEthDisplay: false, sysToSysxDisplay: true, sysxToSysDisplay: false});
   }

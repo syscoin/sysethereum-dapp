@@ -70,7 +70,7 @@ class Step2ES extends Component {
       return {data: null, error: err}
     }
     const serializedResp = sjs.utils.exportPsbtToJson(res.psbt, res.assets);
-    const signRes = await window.ConnectionsController.signTransaction(serializedResp);
+    const signRes = await window.ConnectionsController.signAndSend(serializedResp);
     const unserializedResp = sjs.utils.importPsbtFromJson(signRes, CONFIGURATION.SysNetwork);
     return {txid: unserializedResp.psbt.extractTransaction().getId(), error: null}
   }
@@ -79,14 +79,16 @@ class Step2ES extends Component {
       this.setState({buttonVal: false, buttonValMsg: this.props.t("step2InstallPali")});
       return;  
     }
-    let xpub = await window.ConnectionsController.getConnectedAccountXpub();
-    if(!xpub) {
+    let connectedAccount = await window.ConnectionsController.getConnectedAccount()
+    if (!connectedAccount) {
       await window.ConnectionsController.connectWallet()
+    }
+    let xpub;
+    try {
       xpub = await window.ConnectionsController.getConnectedAccountXpub();
-      if(!xpub) {
-        this.setState({buttonVal: false, buttonValMsg: this.props.t("step2SelectPaliAccount")});
-        return;  
-      }
+    } catch(e){
+      this.setState({buttonVal: false, buttonValMsg: e.message});
+      return;  
     }
     // we don't need change address but we get it for pali compatibility, inside syscoinjs lib it will override change with the destination sys address
     const sysChangeAddress = await window.ConnectionsController.getChangeAddress();

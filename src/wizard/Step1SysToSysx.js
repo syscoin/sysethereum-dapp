@@ -74,7 +74,7 @@ class Step1SX extends Component {
       return {data: null, error: err}
     }
     const serializedResp = sjs.utils.exportPsbtToJson(res.psbt, res.assets);
-    const signRes = await window.ConnectionsController.signTransaction(serializedResp);
+    const signRes = await window.ConnectionsController.signAndSend(serializedResp);
     const unserializedResp = sjs.utils.importPsbtFromJson(signRes, CONFIGURATION.SysNetwork);
     return {txidburn: unserializedResp.psbt.extractTransaction().getId(), error: null}
   }
@@ -83,14 +83,16 @@ class Step1SX extends Component {
       this.setState({buttonVal: false, buttonValMsg: this.props.t("step2InstallPali")});
       return;  
     }
-    let xpub = await window.ConnectionsController.getConnectedAccountXpub();
-    if(!xpub) {
+    let connectedAccount = await window.ConnectionsController.getConnectedAccount()
+    if (!connectedAccount) {
       await window.ConnectionsController.connectWallet()
+    }
+    let xpub;
+    try {
       xpub = await window.ConnectionsController.getConnectedAccountXpub();
-      if(!xpub) {
-        this.setState({buttonVal: false, buttonValMsg: this.props.t("step2SelectPaliAccount")});
-        return;  
-      }
+    } catch(e) {
+      this.setState({buttonVal: false, buttonValMsg: e.message});
+      return;  
     }
     const sysChangeAddress = await window.ConnectionsController.getChangeAddress();
     if(!sysChangeAddress) {
