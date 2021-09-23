@@ -106,11 +106,10 @@ class Step2 extends Component {
       }
     }catch(e) {
       validateNewInput.buttonVal = false;
-      validateNewInput.buttonValMsg = e.message;
+      validateNewInput.buttonValMsg = (e && e.message)? e.message: this.props.t("genericError");
       failed = true;
     }
     this.setState({working: false});
-    validateNewInput.buttonVal = !failed;
     if(failed === false){
       validateNewInput.buttonValMsg = this.props.t("step2StatusSuccess");
     }

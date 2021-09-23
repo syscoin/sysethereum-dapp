@@ -1,6 +1,7 @@
 
 import React, { Component } from 'react';
 import CONFIGURATION from '../config';
+const satoshibitcoin = require("satoshi-bitcoin");
 const sjs = require('syscoinjs-lib')
 class Step1 extends Component {
   constructor(props) {
@@ -66,12 +67,10 @@ class Step1 extends Component {
   async assetBurnToEth (assetGuid, amount, ethAddressStripped, xpub, sysChangeAddress) {
     const feeRate = new sjs.utils.BN(10)
     const txOpts = { rbf: true }
-    const COIN = new sjs.utils.BN(100000000);
     const assetOpts = { ethaddress: Buffer.from(ethAddressStripped, 'hex') }
-    // if assets need change sent, set this address. null to let HDSigner find a new address for you
     const assetChangeAddress = sysChangeAddress
     const assetMap = new Map([
-      [assetGuid, { changeAddress: assetChangeAddress, outputs: [{ value: new sjs.utils.BN(amount).mul(COIN), address: sysChangeAddress }] }]
+      [assetGuid, { changeAddress: assetChangeAddress, outputs: [{ value: new sjs.utils.BN(satoshibitcoin.toSatoshi(amount)), address: sysChangeAddress }] }]
     ])
     const res = await this.syscoinjs.assetAllocationBurn(assetOpts, txOpts, assetMap, sysChangeAddress, feeRate, xpub)
     let err = null
@@ -146,11 +145,9 @@ class Step1 extends Component {
             self.saveToLocalStorage();
           }
         }catch(e) {
-          validateNewInput.buttonVal = false;
           validateNewInput.txidVal = false;
-          validateNewInput.buttonValMsg = e.message;
-          self.setState({working: false});
-          self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+          validateNewInput.buttonVal = false;
+          validateNewInput.buttonValMsg = (e && e.message)? e.message: this.props.t("genericError");
         }
       }
     }

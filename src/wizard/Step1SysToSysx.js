@@ -1,7 +1,8 @@
 
 import React, { Component } from 'react';
 import CONFIGURATION from '../config';
-const sjs = require('syscoinjs-lib')
+const satoshibitcoin = require("satoshi-bitcoin");
+const sjs = require('syscoinjs-lib');
 class Step1SX extends Component {
   constructor(props) {
     super(props);
@@ -61,12 +62,10 @@ class Step1SX extends Component {
   async sysToSysX (amount, xpub, sysChangeAddress) {
     const feeRate = new sjs.utils.BN(10)
     const txOpts = { rbf: true }
-    const COIN = new sjs.utils.BN(100000000);
     const assetGuid = CONFIGURATION.SYSXAsset;
-    // if assets need change sent, set this address. null to let HDSigner find a new address for you
     const assetChangeAddress = sysChangeAddress
     const assetMap = new Map([
-      [assetGuid, { changeAddress: assetChangeAddress, outputs: [{ value: new sjs.utils.BN(amount).mul(COIN), address: sysChangeAddress }] }]
+      [assetGuid, { changeAddress: assetChangeAddress, outputs: [{ value: new sjs.utils.BN(satoshibitcoin.toSatoshi(amount)), address: sysChangeAddress }] }]
     ])
     const res = await this.syscoinjs.syscoinBurnToAssetAllocation(txOpts, assetMap, sysChangeAddress, feeRate, xpub)
     let err = null
@@ -133,7 +132,7 @@ class Step1SX extends Component {
       }catch(e) {
         validateNewInput.buttonVal = false;
         validateNewInput.txidVal = false;
-        validateNewInput.buttonValMsg = e.message;
+        validateNewInput.buttonValMsg = (e && e.message)? e.message: this.props.t("genericError");
         this.refs.txidburn.value = "";
         self.setState({working: false});
         self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));

@@ -6,6 +6,7 @@ i18n.use(LanguageDetector).init({
   resources: {
     en: {
       translations: {
+        'genericError': 'Something went wrong with the request, please try again...',
         'tabGeneral':'General',
         'tabAdvanced':'Advanced',
         'introHead': 'Welcome to the official Syscoin to NEVM Bridge wizard!',
@@ -55,7 +56,7 @@ i18n.use(LanguageDetector).init({
         'step1RegUpdateButton': 'Update Registry',
         'step1RegSearchBox': 'Search Registry',
         'step2ESHead': '<em className="step">Step 2:</em> Build a Syscoin Mint transaction',
-        'step2ESDescription': 'Please enter the Transaction ID from your NEVM burn transaction below if it is not already auto-filled.<br/> Click Generate to create the raw unsigned transaction before proceeding to the next step. Note to ensure that the burn transaction on NEVM was adequately settled, you will have to wait atleast about 1 hour before you are able to proceed with this step and create the mint transaction on Syscoin.',
+        'step2ESDescription': 'Please enter the Transaction ID from your NEVM burn transaction below if it is not already auto-filled.<br/> Click Generate to create the raw unsigned transaction before proceeding to the next step. Note to ensure that the burn transaction on NEVM was adequately settled, you will have to wait atleast 1 confirmation before you are able to proceed with this step and create the mint transaction on Syscoin.',
         'step2ESEnterTxid': 'Enter NEVM Transaction Hash (Txid)...',
         'step2ESTxid': 'A valid NEVM TXID is required',
         'step2ESInvalidProof': 'Invalid Transaction Proof - Error: ',
@@ -115,6 +116,7 @@ i18n.use(LanguageDetector).init({
     },
     es: {
       translations: {
+        'genericError': 'Something went wrong with the request, please try again...',
         'tabGeneral':'General',
         'tabAdvanced':'Advanced',
         'introHead': 'Welcome to the official Syscoin to NEVM Bridge wizard!',
@@ -164,7 +166,7 @@ i18n.use(LanguageDetector).init({
         'step1RegUpdateButton': 'Update Registry',
         'step1RegSearchBox': 'Search Registry',
         'step2ESHead': '<em className="step">Step 2:</em> Build a Syscoin Mint transaction',
-        'step2ESDescription': 'Please enter the Transaction ID from your NEVM burn transaction below if it is not already auto-filled.<br/> Click Generate to create the raw unsigned transaction before proceeding to the next step. Note to ensure that the burn transaction on NEVM was adequately settled, you will have to wait atleast about 1 hour before you are able to proceed with this step and create the mint transaction on Syscoin.',
+        'step2ESDescription': 'Please enter the Transaction ID from your NEVM burn transaction below if it is not already auto-filled.<br/> Click Generate to create the raw unsigned transaction before proceeding to the next step. Note to ensure that the burn transaction on NEVM was adequately settled, you will have to wait atleast 1 confirmation before you are able to proceed with this step and create the mint transaction on Syscoin.',
         'step2ESEnterTxid': 'Enter NEVM Transaction Hash (Txid)...',
         'step2ESTxid': 'A valid NEVM TXID is required',
         'step2ESInvalidProof': 'Invalid Transaction Proof - Error: ',
@@ -224,6 +226,7 @@ i18n.use(LanguageDetector).init({
     },
     fr: {
       translations: {
+        'genericError': 'Something went wrong with the request, please try again...',
         'tabGeneral':'General',
         'tabAdvanced':'Advanced',
         'introHead': 'Welcome to the official Syscoin to NEVM Bridge wizard!',
@@ -273,7 +276,7 @@ i18n.use(LanguageDetector).init({
         'step1RegUpdateButton': 'Update Registry',
         'step1RegSearchBox': 'Search Registry',
         'step2ESHead': '<em className="step">Step 2:</em> Build a Syscoin Mint transaction',
-        'step2ESDescription': 'Please enter the Transaction ID from your NEVM burn transaction below if it is not already auto-filled.<br/> Click Generate to create the raw unsigned transaction before proceeding to the next step. Note to ensure that the burn transaction on NEVM was adequately settled, you will have to wait atleast about 1 hour before you are able to proceed with this step and create the mint transaction on Syscoin.',
+        'step2ESDescription': 'Please enter the Transaction ID from your NEVM burn transaction below if it is not already auto-filled.<br/> Click Generate to create the raw unsigned transaction before proceeding to the next step. Note to ensure that the burn transaction on NEVM was adequately settled, you will have to wait atleast 1 confirmation before you are able to proceed with this step and create the mint transaction on Syscoin.',
         'step2ESEnterTxid': 'Enter NEVM Transaction Hash (Txid)...',
         'step2ESTxid': 'A valid NEVM TXID is required',
         'step2ESInvalidProof': 'Invalid Transaction Proof - Error: ',

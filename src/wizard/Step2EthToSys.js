@@ -98,13 +98,12 @@ class Step2ES extends Component {
     let validateNewInput = this._validateData(userInput); // run the new input against the validator
     validateNewInput.buttonVal = true;
     validateNewInput.buttonValMsg = "";
-    validateNewInput.minttxidVal = true; 
+    validateNewInput.minttxidVal = true;  
     if(!userInput.ethburntxid || userInput.ethburntxid === ""){
       validateNewInput.ethburntxidVal = false;
       this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
       return;
-    } 
-       
+    }  
     let self = this;
     this.setState({working: true});
     let ethTXID = userInput.ethburntxid;
@@ -118,6 +117,7 @@ class Step2ES extends Component {
         self.setState({working: false});
       }
       else if(results.txid){
+        validateNewInput.buttonVal = false;
         validateNewInput.minttxidVal = true;
         this.refs.minttxid.value = results.txid;
         userInput.minttxid = results.txid;
@@ -127,8 +127,9 @@ class Step2ES extends Component {
         this.saveToLocalStorage();
       }
     }catch(e) {
+      validateNewInput.minttxidVal = false;  
       validateNewInput.buttonVal = false;
-      validateNewInput.buttonValMsg = e.message;
+      validateNewInput.buttonValMsg = (e && e.message)? e.message: this.props.t("genericError");
       self.setState({working: false});
       self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
     }
@@ -155,7 +156,7 @@ class Step2ES extends Component {
   _validationErrors(val) {
     const errMsgs = {
       ethburntxidValMsg: val.ethburntxidVal && val.ethburntxidVal === true ? '' : this.props.t("step2ESTxid"),
-      minttxidValMsg: val.minttxidVal ? '' : this.props.t("step2ESRawTx")
+      minttxidValMsg: val.minttxidVal ? '' : this.props.t("step2RawTx")
     }
     return errMsgs;
   }
@@ -186,14 +187,14 @@ class Step2ES extends Component {
       notValidClasses.minttxidValGrpCls = 'val-err-tooltip';
     }
     if (typeof this.state.buttonVal == 'undefined' || this.state.buttonVal) {
-      notValidClasses.buttonCls = 'no-error ';
+      notValidClasses.buttonCls = 'no-error';
     }
-    else if (this.state.minttxidValMsg === '') {
+    else if (this.state.minttxidVal) {
       notValidClasses.buttonCls = 'has-success';
       notValidClasses.buttonValGrpCls = 'val-success-tooltip active';
     }
     else {
-      notValidClasses.buttonCls = 'has-error ';
+      notValidClasses.buttonCls = 'has-error';
       notValidClasses.buttonValGrpCls = 'val-err-tooltip';
     }
     return (

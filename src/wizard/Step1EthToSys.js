@@ -151,7 +151,7 @@ class Step1ES extends Component {
       return;
     }
     if(receipt.status !== undefined && receipt.status !== "1" && receipt.status !== true && receipt.status !== "true" && receipt.status !== "0x1"){
-      error = this.props.t("step4ErrorEVMCheckLog");
+      error = this.props.t("step3ErrorEVMCheckLog");
     }
     
     validateNewInput.receiptObj = receipt;
@@ -166,7 +166,7 @@ class Step1ES extends Component {
     validateNewInput.receiptGas = receipt.gasUsed;
     validateNewInput.receiptConf = confirmation;
     validateNewInput.buttonVal = error !== null? false: true;
-    validateNewInput.buttonValMsg =  error !== null? error: this.props.t("step4Success");
+    validateNewInput.buttonValMsg =  error !== null? error: this.props.t("step3Success");
   }
   
 
@@ -188,7 +188,7 @@ class Step1ES extends Component {
         }
       }catch(e) {
         validateNewInput.buttonVal = false;
-        validateNewInput.buttonValMsg = e.message;
+        validateNewInput.buttonValMsg = (e && e.message)? e.message: this.props.t("genericError");
         return "";
       }
     }
@@ -200,7 +200,7 @@ class Step1ES extends Component {
       .once('transactionHash', function(hash){
         validateNewInput.buttonVal = true;
         validateNewInput.receiptTxHash = hash;
-        validateNewInput.buttonValMsg = thisObj.props.t("step4AuthMetamask");
+        validateNewInput.buttonValMsg = thisObj.props.t("step3AuthMetamask");
         thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
         thisObj.setState({working: true});
       })
@@ -315,7 +315,7 @@ class Step1ES extends Component {
     }
     if(!web3 || !web3.currentProvider || web3.currentProvider.isMetaMask === false){
       validateNewInput.buttonVal = false;
-      validateNewInput.buttonValMsg = this.props.t("step4InstallMetamask");
+      validateNewInput.buttonValMsg = this.props.t("step3InstallMetamask");
       this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
       return;  
     }
@@ -330,7 +330,7 @@ class Step1ES extends Component {
     if(!accounts || !accounts[0] || accounts[0] === 'undefined')
     {
       validateNewInput.buttonVal = false;
-      validateNewInput.buttonValMsg = this.props.t("step4LoginMetamask");
+      validateNewInput.buttonValMsg = this.props.t("step3LoginMetamask");
       this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
       if(window.ethereum){
         await window.ethereum.enable();
@@ -346,7 +346,7 @@ class Step1ES extends Component {
       return;
     }
     validateNewInput.buttonVal = true;
-    validateNewInput.buttonValMsg = this.props.t("step4AuthMetamask");
+    validateNewInput.buttonValMsg = this.props.t("step3AuthMetamask");
     this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
     let syscoinERC20Manager = new web3.eth.Contract(erc20Managerabi,  CONFIGURATION.ERC20Manager);
     let contractBase = new web3.eth.Contract(assetabi, userInput.sysxContract);
@@ -364,7 +364,7 @@ class Step1ES extends Component {
       if(amount.gt(balance)){
         // insufficient balance
         validateNewInput.buttonVal = false;
-        validateNewInput.buttonValMsg = this.props.t("step4InsufficientTokenBalance");
+        validateNewInput.buttonValMsg = this.props.t("step3InsufficientTokenBalance");
         this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
         this.setState({working: false});
         return;
@@ -379,7 +379,7 @@ class Step1ES extends Component {
       contractBase.methods.approve(CONFIGURATION.ERC20Manager, amount.toString()).send({from: fromAccount, gas: 400000})
       .once('transactionHash', function(hash){
         validateNewInput.buttonVal = true;
-        validateNewInput.buttonValMsg = thisObj.props.t("step4AuthAllowanceMetamask");
+        validateNewInput.buttonValMsg = thisObj.props.t("step3AuthAllowanceMetamask");
         thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
       })
       .once('confirmation', function(confirmationNumber, receipt){

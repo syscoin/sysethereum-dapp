@@ -47,13 +47,13 @@ class Step1Reg extends Component {
       return;
     }
     if(receipt.status !== undefined  && receipt.status !== "1" && receipt.status !== true && receipt.status !== "true" && receipt.status !== "0x1"){
-      errorMsg = this.props.t("step4ErrorEVMCheckLog");
+      errorMsg = this.props.t("step3ErrorEVMCheckLog");
     }
     this.setState({receiptObj: receipt, receiptStatus: receipt.status === true? "true":"false", receiptTxHash: receipt.transactionHash});
     if(errorMsg !== null){
       this.setState({buttonVal: false, buttonValMsg: errorMsg}); 
     } else {
-      this.setState({buttonVal: true, buttonValMsg: this.props.t("step4Success")}); 
+      this.setState({buttonVal: true, buttonValMsg: this.props.t("step3Success")}); 
     }
   }
   async updateRegistry() {
@@ -62,7 +62,7 @@ class Step1Reg extends Component {
       return;
     }
     if(!web3 || !web3.currentProvider || web3.currentProvider.isMetaMask === false){
-      this.setState({buttonVal: false, buttonValMsg: this.props.t("step4InstallMetamask")});
+      this.setState({buttonVal: false, buttonValMsg: this.props.t("step3InstallMetamask")});
       return;  
     }
     let ChainId = await web3.eth.getChainId();
@@ -84,14 +84,14 @@ class Step1Reg extends Component {
     let accounts = await web3.eth.getAccounts();
     if(!accounts || !accounts[0] || accounts[0] === 'undefined')
     {
-      this.setState({buttonVal: false, buttonValMsg: this.props.t("step4LoginMetamask")});
+      this.setState({buttonVal: false, buttonValMsg: this.props.t("step3LoginMetamask")});
       if(window.ethereum){
         await window.ethereum.enable();
       }
      
       return;
     }
-    this.setState({buttonVal: true, buttonValMsg: this.props.t("step4AuthMetamask")});
+    this.setState({buttonVal: true, buttonValMsg: this.props.t("step3AuthMetamask")});
     this.setState({working: true});
     var txbytes, syscoinblockheader, txsiblings, txindex, nevmblockhash;
     try {
@@ -150,7 +150,7 @@ class Step1Reg extends Component {
     let _syscoinBlockHeader = "0x" + syscoinblockheader;
      SyscoinRelay.methods.relayAssetTx(nevmBlock.number, _txBytes, txindex, merkleProof.sibling, _syscoinBlockHeader).send({from: accounts[0], gas: 400000})
       .once('transactionHash', function(hash){
-        thisObj.setState({receiptTxHash: hash, buttonVal: true, buttonValMsg: thisObj.props.t("step4PleaseWait")});
+        thisObj.setState({receiptTxHash: hash, buttonVal: true, buttonValMsg: thisObj.props.t("step3PleaseWait")});
       })
       .once('confirmation', function(confirmationNumber, receipt){ 
         if(thisObj.state.receiptObj === null){

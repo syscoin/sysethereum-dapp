@@ -5,6 +5,7 @@
   "dependencies": {
     "axios": "^0.18.1",
     "bitcoin-proof": "^2.0.0",
+    "eth-object": "https://github.com/syscoin/eth-object.git",
     "eth-proof": "^2.1.4",
     "i18next": "^12.0.0",
     "i18next-browser-languagedetector": "^2.2.3",
@@ -21,9 +22,9 @@
     "react-tabs": "^3.0.0",
     "react-textarea-autosize": "^7.1.2",
     "react-validation-mixin": "^5.4.0",
-    "syscoinjs-lib": "^1.0.184",
-    "eth-object": "https://github.com/syscoin/eth-object.git",
-    "web3": "^1.4.0"
+    "satoshi-bitcoin": "^1.0.5",
+    "syscoinjs-lib": "^1.0.185",
+    "web3": "^1.5.2"
   },
   "scripts": {
     "start": "react-scripts start",
