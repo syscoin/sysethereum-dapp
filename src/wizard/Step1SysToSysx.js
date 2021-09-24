@@ -91,7 +91,7 @@ class Step1SX extends Component {
     try {
       xpub = await window.ConnectionsController.getConnectedAccountXpub();
     } catch(e) {
-      this.setState({buttonVal: false, buttonValMsg: e.message});
+      this.setState({buttonVal: false, buttonValMsg: e});
       return;  
     }
     const sysChangeAddress = await window.ConnectionsController.getChangeAddress();

@@ -87,7 +87,7 @@ class Step2ES extends Component {
     try {
       xpub = await window.ConnectionsController.getConnectedAccountXpub();
     } catch(e){
-      this.setState({buttonVal: false, buttonValMsg: e.message});
+      this.setState({buttonVal: false, buttonValMsg: e});
       return;  
     }
     // we don't need change address but we get it for pali compatibility, inside syscoinjs lib it will override change with the destination sys address
