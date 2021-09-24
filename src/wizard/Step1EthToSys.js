@@ -196,7 +196,7 @@ class Step1ES extends Component {
   }
   freezeBurnERC20(syscoinTP, validateNewInput, thisObj, amount, assetGUID, syscoinWitnessAddress, userInput, fromAccount) {
     thisObj.state.receiptObj = null;
-    syscoinTP.methods.freezeBurnERC20(amount, assetGUID, syscoinWitnessAddress).send({from: fromAccount, gas: 400000, value: amount})
+    syscoinTP.methods.freezeBurnERC20(amount, assetGUID, syscoinWitnessAddress).send({from: fromAccount, gas: 400000, value: assetGUID === CONFIGURATION.SYSXAsset? amount: undefined})
       .once('transactionHash', function(hash){
         validateNewInput.buttonVal = true;
         validateNewInput.receiptTxHash = hash;
