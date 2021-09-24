@@ -7,7 +7,7 @@ On the way back to Syscoin. An SPV proof of the NEVM transaction is created usin
 Syscoin itself enforces the SPV proof by running Geth in light mode to sync up to the last few weeks of headers on NEVM. Syscoin nodes run a custom version of Geth which validates NEVM blocks and speaks to Syscoin over ZMQ socket transport layer. The Transaction root is queried for when a Syscoin mint transaction is created (when NEVM contract burns Syscoin tokens on the ERC contract). The calculated Transaction Root must match the Transaction Root saved in the database which validates that the NEVM transaction was valid and subsequently minting new Syscoin or Syscoin assets into existence. The total supply of Syscoin/Syscoin assets should remain constant throughout the process as the bridge represents a zero-sum game.
 ## Dependencies
 
-1) You should be running [Syscoin Core](https://github.com/syscoin/syscoin). You should configure the RPC parameters for the dapp to talk to Syscoin Core. This is done via the syscoin.conf file in your Syscoin data directory.
+1) Just Pali chrome extension wallet and Metamask!
 2) You should configure `config.js` to point to Syscoin core authentication, URL, and ports as well as Web3 setup and explorer links.
 
 ## Available Scripts
