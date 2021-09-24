@@ -8,7 +8,7 @@ Syscoin itself enforces the SPV proof by running Geth in light mode to sync up t
 ## Dependencies
 
 1) Just Pali chrome extension wallet and Metamask!
-2) You should configure `config.js` to point to Syscoin core authentication, URL, and ports as well as Web3 setup and explorer links.
+2) You should configure `config.js` to point to your Web3 setup and explorer links if you are testing on a different network.
 
 ## Available Scripts
 
