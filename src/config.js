@@ -5,10 +5,10 @@ class CONFIGURATION {
     this.RelayContract = "0xD822557aC2F2b77A1988617308e4A29A89Cb95A6";
     this.ERC20Manager = "0xA738a563F9ecb55e0b2245D1e9E380f0fE455ea1";
     this.TokenFreezeFunction = "0x7ca654cf9212e4c3cf0164a529dd6159fc71113f867d0b09fdeb10aa65780732";
-    this.NEVMAddressExplorerURL = "http://tanenbaum.io/address/";
+    this.NEVMAddressExplorerURL = "https://tanenbaum.io/address/";
     this.SyscoinTxExplorerURL = "https://sys-explorer.tk/tx/";
-    this.NEVMTxExplorerURL = "http://tanenbaum.io/tx/";
-    this.FaucetURL = "http://faucet.tanenbaum.io/"
+    this.NEVMTxExplorerURL = "https://tanenbaum.io/tx/";
+    this.FaucetURL = "https://faucet.tanenbaum.io/"
     this.BlockbookAPIURL = "https://sys-explorer.tk/"
     this.ChainId = 5700; // tanenbaum 57 is mainnet
     this.SYSXAsset = "123456";
