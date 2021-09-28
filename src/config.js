@@ -1,7 +1,7 @@
 const sjs = require('syscoinjs-lib')
 class CONFIGURATION {
   constructor() {
-    this.Web3URL = "http://localhost:8101";
+    this.Web3URL = "http://rpc.tanenbaum.io";
     this.RelayContract = "0xD822557aC2F2b77A1988617308e4A29A89Cb95A6";
     this.ERC20Manager = "0xA738a563F9ecb55e0b2245D1e9E380f0fE455ea1";
     this.TokenFreezeFunction = "0x7ca654cf9212e4c3cf0164a529dd6159fc71113f867d0b09fdeb10aa65780732";
