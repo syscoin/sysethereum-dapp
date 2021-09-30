@@ -385,7 +385,7 @@ class SysethereumDApp extends Component {
           Syscoin supply will remain the same?
           </p>
           <p>
-          Yes. SYS + SYSX (SPT) + SYSX (NEVM) = Total Circulating Supply.  This supply is maintained via mint/burn as tokens move across the bridge in either direction.
+          Yes. SYS + SYSX (SPT) + SYS (NEVM) = Total Circulating Supply.  This supply is maintained via mint/burn as tokens move across the bridge in either direction.
           </p>
 
           <p className="question">
@@ -406,7 +406,7 @@ class SysethereumDApp extends Component {
           Can I have SYSX in my Syscoin wallet?
           </p>
           <p>
-          SYSX is an SPT and an ERC20 token, thus it will depend on which chain your tokens are on. If they are on NEVM, you will need to use metamask. If they are on Syscoin, you can use Pali which is integrated into this site. Syscoin QT can also be used if you are competent with command line interface.
+          SYSX is an SPT. You can use Pali which is integrated into this site. Syscoin QT can also be used if you are competent with command line interface.
           </p>
 
           <p className="question">
