@@ -6,14 +6,14 @@ class CONFIGURATION {
     this.ERC20Manager = "0xA738a563F9ecb55e0b2245D1e9E380f0fE455ea1";
     this.TokenFreezeFunction = "0x7ca654cf9212e4c3cf0164a529dd6159fc71113f867d0b09fdeb10aa65780732";
     this.NEVMAddressExplorerURL = "https://tanenbaum.io/address/";
-    this.SyscoinTxExplorerURL = "https://sys-explorer.tk/tx/";
+    this.SyscoinTxExplorerURL = "https://blockbook-dev.elint.services/tx/";
     this.NEVMTxExplorerURL = "https://tanenbaum.io/tx/";
-    this.FaucetURL = "https://faucet.tanenbaum.io/"
-    this.BlockbookAPIURL = "https://sys-explorer.tk/"
+    this.FaucetURL = "https://faucet.tanenbaum.io/";
+    this.BlockbookAPIURL = "https://blockbook-dev.elint.services/";
     this.ChainId = 5700; // tanenbaum 57 is mainnet
     this.SYSXAsset = "123456";
     this.TokenUnfreezeFn = '0x8561b3bd1c885cb9cea8df62881a35fe7335336cd5450fd96d14176100c4657d';
-    this.SysNetwork = sjs.utils.syscoinNetworks.testnet
+    this.SysNetwork = sjs.utils.syscoinNetworks.testnet;
   }
 }
 export default new CONFIGURATION();
