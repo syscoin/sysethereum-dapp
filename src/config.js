@@ -8,7 +8,7 @@ class CONFIGURATION {
     this.NEVMExplorerURL = "https://tanenbaum.io/";
     this.NEVMAddressExplorerURL = this.NEVMExplorerURL + "address/";
     this.SyscoinTxExplorerURL = "https://blockbook-dev.elint.services/tx/";
-    this.NEVMTxExplorerURL = this.NEVMExplorerURL + "tz/";
+    this.NEVMTxExplorerURL = this.NEVMExplorerURL + "tx/";
     this.FaucetURL = "https://faucet.tanenbaum.io/";
     this.BlockbookAPIURL = "https://blockbook-dev.elint.services/";
     this.ChainId = "0x1644"; // 5700 testnet, 57 mainnet
