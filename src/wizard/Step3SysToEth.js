@@ -129,13 +129,18 @@ class Step3 extends Component {
               }],
           });
         } catch (addError) {
-          this.setState({buttonVal: false, buttonValMsg: "Could not add network: " + JSON.stringify(addError)});
+          this.setState({buttonVal: false, buttonValMsg: addError.message});
           return;
         }
       } else {
-        this.setState({buttonVal: false, buttonValMsg: "Could not switch network: " + JSON.stringify(switchError)});
+        this.setState({buttonVal: false, buttonValMsg: switchError.message});
         return;
       }
+    }
+    let ChainId = await web3.eth.getChainId();
+    if(ChainId !== parseInt(CONFIGURATION.ChainId, 16)){
+      this.setState({buttonVal: false, buttonValMsg: "Invalid network"});
+      return; 
     }
     let SyscoinRelay = new web3.eth.Contract(rconfig.data, rconfig.contract); 
     if(!SyscoinRelay || !SyscoinRelay.methods || !SyscoinRelay.methods.relayTx){

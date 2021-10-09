@@ -356,18 +356,24 @@ class Step1ES extends Component {
           });
         } catch (addError) {
           validateNewInput.buttonVal = false;
-          validateNewInput.buttonValMsg = "Could not add network: " + JSON.stringify(addError);
+          validateNewInput.buttonValMsg = addError.message;
           this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
           return;
         }
       } else {
         validateNewInput.buttonVal = false;
-        validateNewInput.buttonValMsg = "Could not switch network: " + JSON.stringify(switchError);
+        validateNewInput.buttonValMsg = switchError.message;
         this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
         return;
       }
     }
-    
+    let ChainId = await web3.eth.getChainId();
+    if(ChainId !== parseInt(CONFIGURATION.ChainId, 16)){
+      validateNewInput.buttonVal = false;
+      validateNewInput.buttonValMsg = "Invalid network";
+      this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+      return;        
+    } 
     this.setState({working: true});
     userInput.sysxContract = await this.getAssetContract(userInput.toSysAssetGUID, validateNewInput);
     if(userInput.sysxContract === ""){
