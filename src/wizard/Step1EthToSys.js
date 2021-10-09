@@ -6,6 +6,8 @@ import "react-tabs/style/react-tabs.css";
 import assetabi from '../SyscoinERC20I';
 import erc20Managerabi from '../SyscoinERC20Manager';  
 import CONFIGURATION from '../config';
+// This function detects most providers injected at window.ethereum
+import detectEthereumProvider from '@metamask/detect-provider';
 const sjs = require('syscoinjs-lib')
 const web3 = new Web3(Web3.givenProvider);
 class Step1ES extends Component {
@@ -313,29 +315,57 @@ class Step1ES extends Component {
       this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
       return;
     }
-    if(!web3 || !web3.currentProvider || web3.currentProvider.isMetaMask === false){
+    const provider = await detectEthereumProvider();
+    if(!provider){
       validateNewInput.buttonVal = false;
       validateNewInput.buttonValMsg = this.props.t("step3InstallMetamask");
       this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
       return;  
     }
-    let ChainId = await web3.eth.getChainId();
-    if(ChainId !== CONFIGURATION.ChainId){
-      validateNewInput.buttonVal = false;
-      validateNewInput.buttonValMsg = this.props.t("stepUseProperNetwork");
-      this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-      return;        
-    } 
     let accounts = await web3.eth.getAccounts();
     if(!accounts || !accounts[0] || accounts[0] === 'undefined')
     {
       validateNewInput.buttonVal = false;
       validateNewInput.buttonValMsg = this.props.t("step3LoginMetamask");
       this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-      if(window.ethereum){
-        await window.ethereum.enable();
-      }
+      await window.ethereum.request({ method: 'eth_requestAccounts' });
       return;
+    }
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: CONFIGURATION.ChainId }],
+      });
+    } catch (switchError) {
+      // This error code indicates that the chain has not been added to MetaMask.
+      if (switchError.code === 4902) {
+        try {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: CONFIGURATION.ChainId,
+              chainName: CONFIGURATION.ChainName,
+              nativeCurrency: {
+                  name: CONFIGURATION.NativeCurrencyName,
+                  symbol: CONFIGURATION.NativeCurrencySymbol,
+                  decimals: 18
+              },
+              rpcUrls: [CONFIGURATION.Web3URL],
+              blockExplorerUrls: [CONFIGURATION.NEVMExplorerURL]
+              }],
+          });
+        } catch (addError) {
+          validateNewInput.buttonVal = false;
+          validateNewInput.buttonValMsg = "Could not add network: " + JSON.stringify(addError);
+          this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+          return;
+        }
+      } else {
+        validateNewInput.buttonVal = false;
+        validateNewInput.buttonValMsg = "Could not switch network: " + JSON.stringify(switchError);
+        this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+        return;
+      }
     }
     
     this.setState({working: true});

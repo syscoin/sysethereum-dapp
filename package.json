@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@metamask/detect-provider": "^1.2.0",
     "axios": "^0.18.1",
     "bitcoin-proof": "^2.0.0",
     "eth-object": "https://github.com/syscoin/eth-object.git",

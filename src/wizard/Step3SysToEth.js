@@ -6,6 +6,8 @@ import rconfig from '../SyscoinRelayI';
 import { getProof } from 'bitcoin-proof'
 import Web3 from 'web3';
 import CONFIGURATION from '../config';
+// This function detects most providers injected at window.ethereum
+import detectEthereumProvider from '@metamask/detect-provider';
 const web3 = new Web3(Web3.givenProvider);
 class Step3 extends Component {
   constructor(props) {
@@ -91,14 +93,49 @@ class Step3 extends Component {
   }
 
   async submitProofs() {
-    if(!web3 || !web3.currentProvider || web3.currentProvider.isMetaMask === false){
+    const provider = await detectEthereumProvider();
+    if(!provider){
       this.setState({buttonVal: false, buttonValMsg: this.props.t("step3InstallMetamask")});
       return;  
     }
-    let ChainId = await web3.eth.getChainId();
-    if(ChainId !== CONFIGURATION.ChainId){
-      this.setState({buttonVal: false, buttonValMsg: this.props.t("stepUseProperNetwork")});
-      return;       
+    let accounts = await web3.eth.getAccounts();
+    if(!accounts || !accounts[0] || accounts[0] === 'undefined')
+    {
+      this.setState({buttonVal: false, buttonValMsg: this.props.t("step3LoginMetamask")});
+      await window.ethereum.request({ method: 'eth_requestAccounts' });
+      return;
+    }
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: CONFIGURATION.ChainId }],
+      });
+    } catch (switchError) {
+      // This error code indicates that the chain has not been added to MetaMask.
+      if (switchError.code === 4902) {
+        try {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: CONFIGURATION.ChainId,
+              chainName: CONFIGURATION.ChainName,
+              nativeCurrency: {
+                  name: CONFIGURATION.NativeCurrencyName,
+                  symbol: CONFIGURATION.NativeCurrencySymbol,
+                  decimals: 18
+              },
+              rpcUrls: [CONFIGURATION.Web3URL],
+              blockExplorerUrls: [CONFIGURATION.NEVMExplorerURL]
+              }],
+          });
+        } catch (addError) {
+          this.setState({buttonVal: false, buttonValMsg: "Could not add network: " + JSON.stringify(addError)});
+          return;
+        }
+      } else {
+        this.setState({buttonVal: false, buttonValMsg: "Could not switch network: " + JSON.stringify(switchError)});
+        return;
+      }
     }
     let SyscoinRelay = new web3.eth.Contract(rconfig.data, rconfig.contract); 
     if(!SyscoinRelay || !SyscoinRelay.methods || !SyscoinRelay.methods.relayTx){
@@ -119,16 +156,6 @@ class Step3 extends Component {
       receiptObj: null,
       buttonVal: true, 
       buttonValMsg: ""});
-    let accounts = await web3.eth.getAccounts();
-    if(!accounts || !accounts[0] || accounts[0] === 'undefined')
-    {
-      this.setState({buttonVal: false, buttonValMsg: this.props.t("step3LoginMetamask")});
-      if(window.ethereum){
-        await window.ethereum.enable();
-      }
-     
-      return;
-    }
     this.setState({buttonVal: true, buttonValMsg: this.props.t("step3AuthMetamask")});
     const txsiblings = this.props.getStore().txsiblings;
     const txindex = this.props.getStore().txindex;
