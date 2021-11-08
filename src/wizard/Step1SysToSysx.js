@@ -83,7 +83,13 @@ class Step1SX extends Component {
       this.setState({buttonVal: false, buttonValMsg: this.props.t("step2InstallPali")});
       return;  
     }
-    let connectedAccount = await window.ConnectionsController.getConnectedAccount()
+    let connectedAccount;
+    try {
+      connectedAccount = await window.ConnectionsController.getConnectedAccount();
+    } catch(e) {
+      this.setState({buttonVal: false, buttonValMsg: e});
+      return;  
+    }
     if (!connectedAccount) {
       await window.ConnectionsController.connectWallet()
     }
