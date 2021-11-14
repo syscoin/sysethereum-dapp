@@ -121,8 +121,8 @@ class Step2ES extends Component {
       if(results.error){
         validateNewInput.buttonVal = false;
         validateNewInput.buttonValMsg = results.error;
-        console.log("error " + results.error);
         self.setState({working: false});
+        self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
       }
       else if(results.txid){
         validateNewInput.buttonVal = false;

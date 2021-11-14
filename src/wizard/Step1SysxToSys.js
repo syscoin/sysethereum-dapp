@@ -127,7 +127,8 @@ class Step1XS extends Component {
         if(results.error){
           validateNewInput.buttonVal = false;
           validateNewInput.buttonValMsg = results.error;
-          self.setState({working: false});      
+          self.setState({working: false});    
+          self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));  
         }
         else if(results.txidburn){
           validateNewInput.buttonVal = false;
