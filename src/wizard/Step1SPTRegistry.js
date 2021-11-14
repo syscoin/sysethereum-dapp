@@ -154,8 +154,7 @@ class Step1Reg extends Component {
         }
       }
     }catch(e) {
-      this.setState({buttonVal: false, buttonValMsg: e.message});
-      console.log("error " + e.message);
+      this.setState({buttonVal: false, buttonValMsg:  (e && e.message)? e.message: this.props.t("genericError")});
     } 
     if(!txsiblings){
       this.setState({working: false});
@@ -226,7 +225,7 @@ class Step1Reg extends Component {
       this.setState({foundErc20contract: _foundErc20contract, foundErc20URL: baseEthURL});
       this.setState({foundContract: true});
     } catch(e){
-      this.setState({foundContract: false, searchError: e.message});
+      this.setState({foundContract: false, searchError:  (e && e.message)? e.message: this.props.t("genericError")});
       return;
     }
     

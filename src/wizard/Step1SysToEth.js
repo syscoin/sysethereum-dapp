@@ -92,7 +92,7 @@ class Step1 extends Component {
     try {
       connectedAccount = await window.ConnectionsController.getConnectedAccount();
     } catch(e) {
-      this.setState({buttonVal: false, buttonValMsg: e});
+      this.setState({buttonVal: false, buttonValMsg: e.message || e});
       return;  
     }
     if (!connectedAccount) {
@@ -102,7 +102,7 @@ class Step1 extends Component {
     try {
       xpub = await window.ConnectionsController.getConnectedAccountXpub();
     } catch(e) {
-      this.setState({buttonVal: false, buttonValMsg: e});
+      this.setState({buttonVal: false, buttonValMsg: e.message || e});
       return;  
     }
     const sysChangeAddress = await window.ConnectionsController.getChangeAddress();
