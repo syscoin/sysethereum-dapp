@@ -1,22 +1,21 @@
 {
   "name": "sysethereum-dapp",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
+    "@metamask/detect-provider": "^1.2.0",
     "axios": "^0.18.1",
     "bitcoin-proof": "^2.0.0",
-    "eth-proof": "git+https://github.com/syscoin/eth-proof.git",
+    "eth-object": "https://github.com/syscoin/eth-object.git",
+    "eth-proof": "^2.1.4",
     "i18next": "^12.0.0",
     "i18next-browser-languagedetector": "^2.2.3",
     "joi": "^10.2.2",
     "joi-validation-strategy": "^0.3.3",
     "material-icons-react": "^1.0.4",
-    "node-bitcoin-rpc": "^1.1.3",
-    "node-gyp": "^6.1.0",
     "react": "^16.11.0",
     "react-beforeunload": "^2.1.0",
     "react-dom": "^16.11.0",
-    "react-gtm-module": "^2.0.8",
     "react-i18next": "^8.1.0",
     "react-scripts": "2.1.8",
     "react-search-field": "^1.0.0",
@@ -24,8 +23,9 @@
     "react-tabs": "^3.0.0",
     "react-textarea-autosize": "^7.1.2",
     "react-validation-mixin": "^5.4.0",
-    "rlp": "^2.2.4",
-    "web3": "^1.2.2"
+    "satoshi-bitcoin": "^1.0.5",
+    "syscoinjs-lib": "^1.0.195",
+    "web3": "^1.5.2"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -41,5 +41,10 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "devDependencies": {
+    "gulp": "^4.0.2",
+    "gulp-sass": "^5.0.0",
+    "sass": "^1.38.2"
+  }
 }

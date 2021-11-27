@@ -2,14 +2,15 @@
 
 import React, { Component } from 'react';
 import StepZilla from "react-stepzilla";
-import Step1ES from './Step1EthToSys';
-import Step2ES from './Step2EthToSys';
-import Step3ES from './Step3EthToSys';
+import Step1XS from './Step1SysxToSys';
+import Step2XS from './Step2SysxToSys';
 import { withNamespaces } from 'react-i18next';
 import './css/wizard.css';
 import './css/i18n.css';
 
-class EthToSysWizard extends Component {
+import { Beforeunload } from 'react-beforeunload';
+
+class SysxToSysWizard extends Component {
   constructor(props) {
     super(props);
     this.state = {};
@@ -40,26 +41,26 @@ class EthToSysWizard extends Component {
 
     const steps =
     [
-      {name: t("step1es"), component: <Step1ES t={t} getStore={() => (this.getStore())} updateStore={(u) => {this.updateStore(u)}} />},
-      {name: t("step2es"), component: <Step2ES t={t} getStore={() => (this.getStore())} updateStore={(u) => {this.updateStore(u)}} />},
-      {name: t("step3es"), component: <Step3ES t={t} getStore={() => (this.getStore())} updateStore={(u) => {this.updateStore(u)}} />}
-      
+      {name: t("step1xs"), component: <Step1XS t={t} getStore={() => (this.getStore())} updateStore={(u) => {this.updateStore(u)}} />},
+      {name: t("step2xs"), component: <Step2XS t={t} getStore={() => (this.getStore())} updateStore={(u) => {this.updateStore(u)}} />},
+
     ]
 
     return (
-      <div className='EthToSysWizard'>
+      <div className='SysxToSysWizard'>
+        <Beforeunload onBeforeunload={() => "Do you want to leave this page? You'll lose your data!"} />
         <div className='step-progress'>
-         
-        <div className='languageButtons'>
-          <div className="dropdown">
-            <button className="dropbtn"><i className="glyphicon glyphicon-globe"></i><span className="selectedLang">{ i18n.language }</span></button>
-            <div className="dropdown-content">
+
+          <div className='languageButtons'>
+            <div className="dropdown">
+              <button className="dropbtn"><i className="glyphicon glyphicon-globe"></i><span className="selectedLang">{ i18n.language }</span></button>
+              <div className="dropdown-content">
               <button onClick={() =>  i18n.changeLanguage("en")}>EN</button>
               <button onClick={() =>  i18n.changeLanguage("es")}>ES</button>
               <button onClick={() =>  i18n.changeLanguage("fr")}>FR</button>
+              </div>
             </div>
           </div>
-        </div>
 
           <StepZilla
             steps={steps}
@@ -67,8 +68,8 @@ class EthToSysWizard extends Component {
             nextTextOnFinalActionStep={t("nextTextOnFinalActionStep")}
             nextButtonText={t("nextButtonText")}
             backButtonText={t("backButtonText")}
-            startAtStep={window.sessionStorage.getItem('stepes') ? parseFloat(window.sessionStorage.getItem('stepes')) : 0}
-            onStepChange={(step) => window.sessionStorage.setItem('stepes', step)}
+            startAtStep={window.sessionStorage.getItem('stepsx') ? parseFloat(window.sessionStorage.getItem('stepsx')) : 0}
+            onStepChange={(step) => window.sessionStorage.setItem('stepsx', step)}
            />
         </div>
       </div>
@@ -76,4 +77,4 @@ class EthToSysWizard extends Component {
   }
 }
 
-export default withNamespaces("translations")(EthToSysWizard);
+export default withNamespaces("translations")(SysxToSysWizard);

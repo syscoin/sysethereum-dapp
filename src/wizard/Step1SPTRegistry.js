@@ -4,10 +4,12 @@ import Web3 from 'web3';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import "react-tabs/style/react-tabs.css";
 import erc20Managerabi from '../SyscoinERC20Manager'; 
-import sbconfig from '../SyscoinSuperblocksI'; 
+import rconfig from '../SyscoinRelayI'; 
 import CONFIGURATION from '../config';
-import { getProof } from 'bitcoin-proof'
-const axios = require('axios');
+import { getProof } from 'bitcoin-proof';
+// This function detects most providers injected at window.ethereum
+import detectEthereumProvider from '@metamask/detect-provider';
+const sjs = require('syscoinjs-lib');
 const web3 = new Web3(Web3.givenProvider);
 class Step1Reg extends Component {
   constructor(props) {
@@ -29,8 +31,8 @@ class Step1Reg extends Component {
     this.updateRegistry = this.updateRegistry.bind(this);
     this.downloadReceipt = this.downloadReceipt.bind(this);
   }
-  componentDidMount() {
-   
+  async componentDidMount() {
+    
   }
   componentWillUnmount() {}
   downloadReceipt () {
@@ -47,13 +49,13 @@ class Step1Reg extends Component {
       return;
     }
     if(receipt.status !== undefined  && receipt.status !== "1" && receipt.status !== true && receipt.status !== "true" && receipt.status !== "0x1"){
-      errorMsg = this.props.t("step5ErrorEVMCheckLog");
+      errorMsg = this.props.t("step3ErrorEVMCheckLog");
     }
     this.setState({receiptObj: receipt, receiptStatus: receipt.status === true? "true":"false", receiptTxHash: receipt.transactionHash});
     if(errorMsg !== null){
       this.setState({buttonVal: false, buttonValMsg: errorMsg}); 
     } else {
-      this.setState({buttonVal: true, buttonValMsg: this.props.t("step5Success")}); 
+      this.setState({buttonVal: true, buttonValMsg: this.props.t("step3Success")}); 
     }
   }
   async updateRegistry() {
@@ -61,22 +63,58 @@ class Step1Reg extends Component {
     if(!userInput){
       return;
     }
-    if(!web3 || !web3.currentProvider || web3.currentProvider.isMetaMask === false){
-      this.setState({buttonVal: false, buttonValMsg: this.props.t("step5InstallMetamask")});
+    const provider = await detectEthereumProvider();
+    if(!provider){
+      this.setState({buttonVal: false, buttonValMsg: this.props.t("step3InstallMetamask")});
       return;  
     }
-    let chainId = await web3.eth.getChainId();
-    if(CONFIGURATION.testnet && chainId !== 4){
-      this.setState({buttonVal: false, buttonValMsg: this.props.t("stepUseTestnet")});
-      return;       
+    let accounts = await web3.eth.getAccounts();
+    if(!accounts || !accounts[0] || accounts[0] === 'undefined')
+    {
+      this.setState({buttonVal: false, buttonValMsg: this.props.t("step3LoginMetamask")});
+      await window.ethereum.request({ method: 'eth_requestAccounts' });
+      return;
     }
-    else if(!CONFIGURATION.testnet && chainId !== 1){
-      this.setState({buttonVal: false, buttonValMsg: this.props.t("stepUseMainnet")});
-      return;       
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: CONFIGURATION.ChainId }],
+      });
+    } catch (switchError) {
+      // This error code indicates that the chain has not been added to MetaMask.
+      if (switchError.code === 4902) {
+        try {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: CONFIGURATION.ChainId,
+              chainName: CONFIGURATION.ChainName,
+              nativeCurrency: {
+                  name: CONFIGURATION.NativeCurrencyName,
+                  symbol: CONFIGURATION.NativeCurrencySymbol,
+                  decimals: 18
+              },
+              rpcUrls: [CONFIGURATION.Web3URL],
+              blockExplorerUrls: [CONFIGURATION.NEVMExplorerURL]
+              }],
+          });
+        } catch (addError) {
+          this.setState({buttonVal: false, buttonValMsg: addError.message});
+          return;
+        }
+      } else {
+        this.setState({buttonVal: false, buttonValMsg: switchError.message});
+        return;
+      }
     }
-    let SyscoinSuperblocks = new web3.eth.Contract(sbconfig.data, sbconfig.contract); 
-    if(!SyscoinSuperblocks || !SyscoinSuperblocks.methods || !SyscoinSuperblocks.methods.relayAssetTx){
-      this.setState({buttonVal: false, buttonValMsg: this.props.t("stepSuperblock")});
+    let ChainId = await web3.eth.getChainId();
+    if(ChainId !== parseInt(CONFIGURATION.ChainId, 16)){
+      this.setState({buttonVal: false, buttonValMsg: "Invalid network"});
+      return; 
+    }
+    let SyscoinRelay = new web3.eth.Contract(rconfig.data, rconfig.contract); 
+    if(!SyscoinRelay || !SyscoinRelay.methods || !SyscoinRelay.methods.relayAssetTx){
+      this.setState({buttonVal: false, buttonValMsg: this.props.t("stepRelay")});
       return;  
     }
     this.setState({
@@ -85,71 +123,41 @@ class Step1Reg extends Component {
       receiptObj: null,
       buttonVal: true, 
       buttonValMsg: ""});
-    let accounts = await web3.eth.getAccounts();
-    if(!accounts || !accounts[0] || accounts[0] === 'undefined')
-    {
-      this.setState({buttonVal: false, buttonValMsg: this.props.t("step5LoginMetamask")});
-      if(window.ethereum){
-        await window.ethereum.enable();
-      }
-     
-      return;
-    }
-    this.setState({buttonVal: true, buttonValMsg: this.props.t("step5AuthMetamask")});
-    let failed = false;
+    this.setState({buttonVal: true, buttonValMsg: this.props.t("step3AuthMetamask")});
     this.setState({working: true});
-    var txbytes, syscoinblockheader, txsiblings, txindex, syscoinblockindex, syscoinblocksiblings, superblockhash, blockhash;
+    var txbytes, syscoinblockheader, txsiblings, txindex, nevmblockhash;
     try {
-      let results = await axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=syscoingetspvproof&txid=' + userInput);
-      results = results.data;
+      let results = await sjs.utils.fetchBackendSPVProof(CONFIGURATION.BlockbookAPIURL, userInput)
       if(results.error){
         this.setState({buttonVal: false, buttonValMsg: results.error});
         console.log("error " + results.error);
-        failed = true;
       }
       else if(results){
-        txbytes = results.transaction;
-        console.log("txbytesVal " + txbytes);
-        syscoinblockheader = results.header;
-        console.log("syscoinblockheaderVal " + syscoinblockheader);
-        txsiblings = results.siblings;
-        console.log("txsiblingsVal " + txsiblings);
-        txindex = results.index;
-        console.log("txindexVal " + txindex);
-        blockhash = results.blockhash;
-        console.log("blockhash " + blockhash);
+        if(results.result.length === 0) {
+          this.setState({buttonVal: false, buttonValMsg: "Failed to retrieve SPV Proof"});
+        } else {
+          results = JSON.parse(results.result);
+          if (!results.transaction) {
+            this.setState({buttonVal: false, buttonValMsg: "Failed to retrieve SPV Proof"});
+          } else {
+            txbytes = results.transaction;
+            console.log("txbytesVal " + txbytes);
+            syscoinblockheader = results.header;
+            console.log("syscoinblockheaderVal " + syscoinblockheader);
+            txsiblings = results.siblings;
+            console.log("txsiblingsVal " + txsiblings);
+            txindex = results.index;
+            console.log("txindexVal " + txindex);
+            nevmblockhash = results.nevm_blockhash;
+            console.log("nevm_blockhash " + nevmblockhash);
+          }
+        }
       }
     }catch(e) {
-      this.setState({buttonVal: false, buttonValMsg: e.message});
-      console.log("error " + e.message);
-      failed = true;
-    }
-    if(failed === false){
-      try {
-        let results = await axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/spvproof?hash=' + blockhash)
-        results = results.data;
-
-        this.setState({working: false});
-        if(results.error){
-          console.log("spvproof error1 " + results.error);
-          this.setState({buttonVal: false, buttonValMsg: results.error});
-        }
-        else{
-          syscoinblockindex = results.index;
-          console.log("syscoinblockindex " + syscoinblockindex);
-          syscoinblocksiblings = results.merklePath;
-          console.log("syscoinblocksiblings1 " + syscoinblocksiblings);
-          superblockhash = results.superBlock;
-          console.log("superblockhash " + superblockhash);
-          this.setState({buttonVal: true, buttonValMsg:  this.props.t("step1RegStatusSuccess")}); 
-        }
-      }catch(e) {
-          console.log("spvproof error2 " + e);
-          this.setState({buttonVal: false, buttonValMsg: e.message});
-          this.setState({working: false});  
-      }
-    }   
+      this.setState({buttonVal: false, buttonValMsg:  (e && e.message)? e.message: this.props.t("genericError")});
+    } 
     if(!txsiblings){
+      this.setState({working: false});
       return;
     }
     let _txBytes = "0x" + txbytes;
@@ -158,25 +166,22 @@ class Step1Reg extends Component {
       let _txSibling = "0x" + txsiblings[i];
       _txSiblings.push(_txSibling);
     }
-    let _syscoinBlockHeader = "0x" + syscoinblockheader;
-    let _syscoinBlockSiblings = [];
-    for(let i = 0;i<syscoinblocksiblings.length;i++){
-      let _blockSibling = "0x" + syscoinblocksiblings[i];
-      _syscoinBlockSiblings.push(_blockSibling);
-    }  
-    let _superblockHash = "0x" + superblockhash;
     let merkleProof = getProof(txsiblings, txindex);
     for(let   i = 0;i<merkleProof.sibling.length;i++){
       merkleProof.sibling[i] = "0x" + merkleProof.sibling[i];
     }
-    this.setState({working: true});
     let thisObj = this;
     thisObj.state.receiptObj = null;
-
-     SyscoinSuperblocks.methods.relayAssetTx(_txBytes, txindex, merkleProof.sibling, _syscoinBlockHeader, 
-      syscoinblockindex, _syscoinBlockSiblings, _superblockHash).send({from: accounts[0], gas: 500000})
+    let nevmBlock = await web3.eth.getBlock("0x" + nevmblockhash);
+    if(!nevmBlock) {
+      this.setState({buttonVal: false, buttonValMsg: "NEVM block not found"});
+      this.setState({working: false});
+      return;
+    }
+    let _syscoinBlockHeader = "0x" + syscoinblockheader;
+     SyscoinRelay.methods.relayAssetTx(nevmBlock.number, _txBytes, txindex, merkleProof.sibling, _syscoinBlockHeader).send({from: accounts[0], gas: 400000})
       .once('transactionHash', function(hash){
-        thisObj.setState({receiptTxHash: hash, buttonVal: true, buttonValMsg: thisObj.props.t("step5PleaseWait")});
+        thisObj.setState({receiptTxHash: hash, buttonVal: true, buttonValMsg: thisObj.props.t("step3PleaseWait")});
       })
       .once('confirmation', function(confirmationNumber, receipt){ 
         if(thisObj.state.receiptObj === null){
@@ -216,15 +221,11 @@ class Step1Reg extends Component {
         return;
       }
       let _foundErc20contract = assetRegistry.erc20ContractAddress;
-      let baseEthURL = "https://";
-      if(CONFIGURATION.testnet){
-        baseEthURL += "rinkeby."
-      }
-      baseEthURL += "etherscan.io/address/" + _foundErc20contract;
+      let baseEthURL = CONFIGURATION.NEVMAddressExplorerURL + _foundErc20contract;
       this.setState({foundErc20contract: _foundErc20contract, foundErc20URL: baseEthURL});
       this.setState({foundContract: true});
     } catch(e){
-      this.setState({foundContract: false, searchError: e.message});
+      this.setState({foundContract: false, searchError:  (e && e.message)? e.message: this.props.t("genericError")});
       return;
     }
     
@@ -254,7 +255,7 @@ class Step1Reg extends Component {
               <div className="row">
               <div className="col-md-12">
                 <label className="control-label col-md-4">
-                  {this.props.t("step3TxidLabel")}
+                  {this.props.t("txidLabel")}
                 </label>
                 <div>
                   <input
@@ -293,7 +294,7 @@ class Step1Reg extends Component {
                         <button className="btn btn-default formbtnmini" type="button" onClick={this.searchRegistry}><i className="glyphicon glyphicon-search"></i></button>
                       </div>
                     </div>
-                    <div className="superblocksearcherror">{this.state.searchError}</div>
+                    <div className="relaysearcherror">{this.state.searchError}</div>
                   </div>
                 </div>
               </div>
@@ -305,8 +306,8 @@ class Step1Reg extends Component {
                       </TabList>
                       <TabPanel>
                         <code className="block">
-                            <span className="dataname">{this.props.t("step5ReceiptStatus")}:</span> <span className="result">{this.state.receiptStatus}</span><br />
-                            <span className="dataname">{this.props.t("step5ReceiptTxHash")}:</span> <span className="result">{this.state.receiptTxHash}</span><br />
+                            <span className="dataname">{this.props.t("step3ReceiptStatus")}:</span> <span className="result">{this.state.receiptStatus}</span><br />
+                            <span className="dataname">{this.props.t("step3ReceiptTxHash")}:</span> <span className="result">{this.state.receiptTxHash}</span><br />
                             <span className="dataname">{this.props.t("step1ESCERC")}:</span> <span><a href={this.state.foundErc20URL} target="_blank" rel="noopener noreferrer">{this.state.foundErc20contract}</a></span><br />
                         </code>
                       </TabPanel>
@@ -316,9 +317,9 @@ class Step1Reg extends Component {
                 <div className="row">
                 <div className="col-md-4 col-sm-12 col-centered">
                   <div>
-                    <button type="button" disabled={!this.state.receiptObj || this.state.working} className="form-control btn btn-default formbtn" aria-label={this.props.t("step5Download")} onClick={this.downloadReceipt}>
+                    <button type="button" disabled={!this.state.receiptObj || this.state.working} className="form-control btn btn-default formbtn" aria-label={this.props.t("step3Download")} onClick={this.downloadReceipt}>
                     <span className="glyphicon glyphicon-download" aria-hidden="true">&nbsp;</span>
-                    {this.props.t("step5Download")}
+                    {this.props.t("step3Download")}
                     </button>
                   </div>
                  </div>

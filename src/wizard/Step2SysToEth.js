@@ -1,41 +1,44 @@
 
 import React, { Component } from 'react';
 import CONFIGURATION from '../config';
-const axios = require('axios');
+const sjs = require('syscoinjs-lib')
 class Step2 extends Component {
   constructor(props) {
     super(props);
     let storageExists = typeof(Storage) !== "undefined";
     this.state = {
-      asset: (storageExists && localStorage.getItem("asset")) || props.getStore().asset,
-      fundingaddress: (storageExists && localStorage.getItem("fundingaddress")) || props.getStore().fundingaddress,
-      amount: (storageExists && localStorage.getItem("amount")) || props.getStore().amount,
-      ethaddress: (storageExists && localStorage.getItem("ethaddress")) || props.getStore().ethaddress,
-      sysrawtxunsigned: (storageExists && localStorage.getItem("sysrawtxunsigned")) || props.getStore().sysrawtxunsigned,
-      working: false
+      txindex: props.getStore().txindex,
+      txsiblings: props.getStore().txsiblings,
+      syscoinblockheader: props.getStore().syscoinblockheader,
+      txbytes: props.getStore().txbytes,
+      txid: (storageExists && localStorage.getItem("txid")) || props.getStore().txid,
+      nevmblockhash: props.getStore().nevmblockhash,
     };
-    
+      // INPUTS:
+      // enter syscoin burn txid
+      // enter block hash 
+      // OUTPUTS:
+      // _txIndex - transaction's index within the block
+      // _txSiblings - transaction's Merkle siblings
+      // _syscoinBlockHeader - block header containing transaction
+    // step 4: 
+      // INPUTS:
+      // _txBytes - transaction bytes (autofilled with getrawtransaction)
     this._validateOnDemand = true; // this flag enables onBlur validation as user fills forms
-    this.getBurnTx = this.getBurnTx.bind(this);
+    this.getProofs = this.getProofs.bind(this);
     this.validationCheck = this.validationCheck.bind(this);
     this.isValidated = this.isValidated.bind(this);
   }
 
-  componentDidMount() {}
+  async componentDidMount() {
+    if(!this.props.getStore().txid){
+      this.props.jumpToStep(0);
+    }
+  
+  }
 
   componentWillUnmount() {}
-  saveToLocalStorage() {
-    if (typeof(Storage) !== "undefined") {
-      // Code for localStorage/sessionStorage.
-      localStorage.setItem("asset", this.refs.asset.value);
-      localStorage.setItem("amount", this.refs.amount.value);
-      localStorage.setItem("fundingaddress", this.refs.fundingaddress.value);
-      localStorage.setItem("ethaddress", this.refs.ethaddress.value);
-      localStorage.setItem("sysrawtxunsigned", this.refs.sysrawtxunsigned.value);
-    } else {
-      // Sorry! No Web Storage support..
-    }
-  }
+
   isValidated() {
     const userInput = this._grabUserInput(); // grab user entered vals
     const validateNewInput = this._validateData(userInput); // run the new input against the validator
@@ -43,12 +46,15 @@ class Step2 extends Component {
 
     // if full validation passes then save to store and pass as valid
     if (Object.keys(validateNewInput).every((k) => { return validateNewInput[k] === true })) {
-        if (this.props.getStore().asset !== userInput.asset || this.props.getStore().fundingaddress !== userInput.fundingaddress  || 
-        this.props.getStore().amount !== userInput.amount || this.props.getStore().ethaddress !== userInput.ethaddress
-        || this.props.getStore().sysrawtxunsigned !== userInput.sysrawtxunsigned) { // only update store of something changed
+        if (this.props.getStore().txindex !== userInput.txindex  || 
+        this.props.getStore().txsiblings !== userInput.txsiblings ||
+        this.props.getStore().syscoinblockheader !== userInput.syscoinblockheader ||
+        this.props.getStore().txbytes !== userInput.txbytes ||
+        this.props.getStore().blockhash !== userInput.blockhash
+        ) { // only update store of something changed
           this.props.updateStore({
             ...userInput,
-            savedToCloud: false // use this to notify step4 that some changes took place and prompt the user to save again
+            savedToCloud: false // use this to notify step3 that some changes took place and prompt the user to save again
           });  // Update store here (this is just an example, in reality you will do it via redux or flux)
         }
 
@@ -61,63 +67,55 @@ class Step2 extends Component {
 
     return isDataValid;
   }
-  async getBurnTx() {
-    let userInput = this._grabUserInput(); // grab user entered vals
+  async getProofs() {
+    let userInput = this._grabUserInput(); 
     let validateNewInput = this._validateData(userInput); // run the new input against the validator
-    validateNewInput.buttonVal = true;
-    validateNewInput.buttonValMsg = "";
-    validateNewInput.sysrawtxunsignedVal = true;
-    validateNewInput.sysrawtxunsignedValMsg = "";
-    let valid = true;
-    if(!userInput.fundingaddress || userInput.fundingaddress === ""){
-      validateNewInput.fundingaddressVal = false;
-      valid = false;
-    }
-    if(!userInput.amount || userInput.amount === ""){
-      validateNewInput.amountVal = false;
-      valid = false;
-    }  
-    if(!userInput.ethaddress || userInput.ethaddress === ""){
-      validateNewInput.ethaddressVal = false;
-      valid = false;
-    }         
-    let self = this;
-    
-    if(valid === true){
-      this.setState({working: true});
-      let fundingAddress = userInput.fundingaddress.toString();
-      if(userInput.asset.length > 0 && userInput.asset !== 0 && userInput.asset !== "0"){
-        let assetGuid = userInput.asset.toString();
-        
-        let ethAddressStripped = userInput.ethaddress.toString();
-        if(ethAddressStripped && ethAddressStripped.startsWith("0x")){
-          ethAddressStripped = ethAddressStripped.substr(2, ethAddressStripped.length);
-        }
-        try {
-          let results = await axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=assetallocationburn&asset_guid=' + assetGuid + '&address=' + fundingAddress + '&amount=' + userInput.amount.toString() + '&ethereum_destination_address=' + ethAddressStripped);
-          results = results.data;
-          if(results.error){
-            validateNewInput.buttonVal = false;
-            validateNewInput.buttonValMsg = results.error;
-            self.setState({working: false});      
-          }
-          else if(results && results.hex){
-            validateNewInput.sysrawtxunsignedVal = true;
-            this.refs.sysrawtxunsigned.value = results.hex;
-            self.setState({working: false});
-            self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-            self.saveToLocalStorage();
-          }
-        }catch(e) {
+    let failed = false;
+    this.setState({working: true});
+    try {
+      let results = await sjs.utils.fetchBackendSPVProof(CONFIGURATION.BlockbookAPIURL, this.props.getStore().txid.toString())
+      if(results.error){
+        validateNewInput.buttonVal = false;
+        validateNewInput.buttonValMsg = results.error;
+        failed = true;
+      }
+      else if(results){
+        if(results.result.length === 0) {
           validateNewInput.buttonVal = false;
-          validateNewInput.buttonValMsg = e.message;
-          self.setState({working: false});
-          self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+          validateNewInput.buttonValMsg = "Failed to retrieve SPV Proof";
+          failed = true;
+        } else {
+          results = JSON.parse(results.result);
+          if (!results.transaction) {
+            validateNewInput.buttonVal = false;
+            validateNewInput.buttonValMsg = "Failed to retrieve SPV Proof";
+            failed = true;
+          } else {
+            validateNewInput.txbytes = results.transaction;
+            console.log("txbytesVal " + validateNewInput.txbytes);
+            validateNewInput.syscoinblockheader = results.header;
+            console.log("syscoinblockheaderVal " + validateNewInput.syscoinblockheader);
+            validateNewInput.txsiblings = results.siblings;
+            console.log("txsiblingsVal " + validateNewInput.txsiblings);
+            validateNewInput.txindex = results.index;
+            console.log("txindexVal " + validateNewInput.txindex);
+            validateNewInput.nevm_blockhash = results.nevm_blockhash;
+            console.log("nevm_blockhash " + validateNewInput.nevm_blockhash);
+          }
         }
       }
-    } 
-
+    }catch(e) {
+      validateNewInput.buttonVal = false;
+      validateNewInput.buttonValMsg = (e && e.message)? e.message: this.props.t("genericError");
+      failed = true;
+    }
+    this.setState({working: false});
+    if(failed === false){
+      validateNewInput.buttonValMsg = this.props.t("step2StatusSuccess");
+    }
+    this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
   }
+  
   validationCheck() {
     if (!this._validateOnDemand)
       return;
@@ -130,197 +128,65 @@ class Step2 extends Component {
 
    _validateData(data) {
     return  {
-      assetVal: true,
-      fundingaddressVal: true,
-      amountVal: true,
-      ethaddressVal: true, 
-      sysrawtxunsignedVal: true
+      buttonVal: true,
+      txindexVal: true,
+      txsiblingsVal: true,
+      syscoinblockheaderVal: true,
+      txbytesVal: true
     }
   }
 
   _validationErrors(val) {
     const errMsgs = {
-      assetValMsg: val.assetVal ? '' : this.props.t("step2Asset"),
-      fundingaddressValMsg: val.fundingaddressVal && val.fundingaddressVal === true ? '' : this.props.t("step2FundingAddress"),
-      amountValMsg: val.amountVal && val.amountVal === true ? '' : this.props.t("step2Amount"),
-      ethaddressValMsg: val.ethaddressVal ? '' : this.props.t("step2EthAddress"),
-      sysrawtxunsignedValMsg: val.sysrawtxunsignedVal ? '' : this.props.t("step2RawTx")
+      txindexValMsg: '',
+      txsiblingsValMsg: '',
+      syscoinblockheaderValMsg: '',
+      txbytesValMsg: ''
     }
     return errMsgs;
   }
 
   _grabUserInput() {
     return {
-      asset: this.refs.asset.value,
-      fundingaddress: this.refs.fundingaddress.value,
-      amount: this.refs.amount.value,
-      ethaddress: this.refs.ethaddress.value,
-      sysrawtxunsigned: this.refs.sysrawtxunsigned.value
+      txindex: this.state.txindex,
+      txsiblings: this.state.txsiblings,
+      syscoinblockheader: this.state.syscoinblockheader,
+      txbytes: this.state.txbytes,
+      nevm_blockhash: this.state.nevm_blockhash
     };
   }
-
   render() {
     // explicit class assigning based on validation
-    let notValidClasses = {};
-
-    if (typeof this.state.assetVal == 'undefined' || this.state.assetVal) {
-      notValidClasses.assetCls = 'no-error';
-    }
-    else {
-       notValidClasses.assetCls = 'has-error';
-       notValidClasses.assetValGrpCls = 'val-err-tooltip';
-    }
-    if (typeof this.state.fundingaddressVal == 'undefined' || this.state.fundingaddressVal) {
-      notValidClasses.fundingaddressCls = 'no-error';
-    }
-    else {
-      notValidClasses.fundingaddressCls = 'has-error';
-      notValidClasses.fundingaddressValGrpCls = 'val-err-tooltip';
-    }
-
-    if (typeof this.state.amountVal == 'undefined' || this.state.amountVal) {
-        notValidClasses.amountCls = 'no-error';
-    }
-    else {
-       notValidClasses.amountCls = 'has-error';
-       notValidClasses.amountValGrpCls = 'val-err-tooltip';
-    }
-    if (typeof this.state.ethaddressVal == 'undefined' || this.state.ethaddressVal) {
-      notValidClasses.ethaddressCls = 'no-error';
-    }
-    else {
-      notValidClasses.ethaddressCls = 'has-error';
-      notValidClasses.ethaddressValGrpCls = 'val-err-tooltip';
-    }
-    if (typeof this.state.sysrawtxunsignedVal == 'undefined' || this.state.sysrawtxunsignedVal) {
-      notValidClasses.sysrawtxunsignedCls = 'no-error';
-    }
-    else {
-      notValidClasses.sysrawtxunsignedCls = 'has-error';
-      notValidClasses.sysrawtxunsignedValGrpCls = 'val-err-tooltip';
-    }
+    let notValidClasses = {};    
     if (typeof this.state.buttonVal == 'undefined' || this.state.buttonVal) {
-      notValidClasses.buttonCls = 'no-error';
+      notValidClasses.buttonCls = 'has-success';
+      notValidClasses.buttonValGrpCls = 'val-success-tooltip';
     }
     else {
-      notValidClasses.buttonCls = 'has-error';
-      notValidClasses.buttonValGrpCls = 'val-err-tooltip';
-    }
+       notValidClasses.buttonCls = 'has-error';
+       notValidClasses.buttonValGrpCls = 'val-err-tooltip';
+    }   
     return (
       <div className="step step2">
         <div className="row">
           <form id="Form" className="form-horizontal">
             <div className="form-group">
-            <label className="col-md-12">
+              <label className="col-md-12">
                 <h1 dangerouslySetInnerHTML={{__html: this.props.t("step2Head")}}></h1>
                 <h3 dangerouslySetInnerHTML={{__html: this.props.t("step2Description")}}></h3>
               </label>
-              <div className="row">
-              <div className="col-md-12">
-                <label className="control-label col-md-4">
-                  {this.props.t("step2AssetLabel")}
-                </label>
-                <div className={notValidClasses.assetCls}>
-                  <input
-                    ref="asset"
-                    autoComplete="off"
-                    type="number"
-                    placeholder={this.props.t("step2EnterAsset")}
-                    className="form-control"
-                    defaultValue={this.state.asset}
-                     />
-                  <div className={notValidClasses.assetValGrpCls}>{this.state.assetValMsg}</div>
-                </div>
-              </div>
-              </div>
-              <div className="row">
-              <div className="col-md-12">
-                <label className="control-label col-md-4">
-                  {this.props.t("step2FundingAddressLabel")}
-                </label>
-                <div className={notValidClasses.fundingaddressCls}>
-                  <input
-                    ref="fundingaddress"
-                    autoComplete="off"
-                    type="text"
-                    placeholder={this.props.t("step2EnterFundingAddress")}
-                    className="form-control"
-                    defaultValue={this.state.fundingaddress}
-                     />
-                  <div className={notValidClasses.fundingaddressValGrpCls}>{this.state.fundingaddressValMsg}</div>
-                </div>
-              </div>
-              </div>
-              <div className="row">
-              <div className="col-md-12">
-                <label className="control-label col-md-4">
-                  {this.props.t("step2AmountLabel")}
-                </label>
-                <div className={notValidClasses.amountCls}>
-                  <input
-                    ref="amount"
-                    autoComplete="off"
-                    type="number"
-                    placeholder={this.props.t("step2EnterAmount")}
-                    className="form-control"
-                    required
-                    defaultValue={this.state.amount}
-                     />
-                  <div className={notValidClasses.amountValGrpCls}>{this.state.amountValMsg}</div>
-                </div>
-              </div>
-              </div>
-              <div className="row">
-              <div className="col-md-12">
-                <label className="control-label col-md-4">
-                  {this.props.t("step2EthAddressLabel")}
-                </label>
-                <div className={notValidClasses.ethaddressCls}>
-                  <input
-                    ref="ethaddress"
-                    autoComplete="off"
-                    type="text"
-                    placeholder={this.props.t("step2EnterEthAddress")}
-                    className="form-control"
-                    required
-                    defaultValue={this.state.ethaddress}
-                     />
-                  <div className={notValidClasses.ethaddressValGrpCls}>{this.state.ethaddressValMsg}</div>
-                </div>
-              </div>
-              </div>
-              <div className="row">
+            
+            <div className="row">
               <div className="col-md-12">
                 <div className={notValidClasses.buttonCls}>
-                    <button type="button" disabled={this.state.working} className="form-control btn btn-default formbtn" aria-label={this.props.t("step2Button")} onClick={this.getBurnTx}>
-                    <span className="glyphicon glyphicon-send" aria-hidden="true">&nbsp;</span>
-                    {this.props.t("step2Button")}
+                    <button type="button" disabled={this.state.working} className="form-control btn btn-default formbtn" aria-label={this.props.t("step2Button")} onClick={this.getProofs}>
+                    <span className="glyphicon glyphicon-search" aria-hidden="true">&nbsp;</span>
+                    {this.props.t("step3Button")}
                     </button>
                   <div className={notValidClasses.buttonValGrpCls}>{this.state.buttonValMsg}</div>
                 </div>
               </div>
-              </div>
-
-              <div className="row">
-              <div className="col-md-12">
-                <label className="control-label col-md-4">
-                  {this.props.t("step2RawTxLabel")}
-                </label>  
-                <div className={notValidClasses.sysrawtxunsignedCls}>
-                  <textarea
-                    rows="3"
-                    ref="sysrawtxunsigned"
-                    autoComplete="off"
-                    type="text"
-                    placeholder={this.props.t("step2EnterRawTx")}
-                    className="form-control"
-                    required
-                    defaultValue={this.state.sysrawtxunsigned}
-                     />
-                  <div className={notValidClasses.sysrawtxunsignedValGrpCls}>{this.state.sysrawtxunsignedValMsg}</div>
-                </div>
-              </div>
-              </div>
+            </div>
             </div>
           </form>
         </div>

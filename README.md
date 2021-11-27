@@ -1,16 +1,14 @@
 ![Preview](./home.png)
 ## Sysethereum DAPP
-This is a reference implementation of a user interface showcasing the Syscoin <=> Ethereum bridge. It will create a SPV proof of Syscoin burn transactions as well as a SPV proof of a Superblock and post to the Superblock smart contract which will validate and call a Token contract which uses ERC20Manager to transfer from and to.
+This is a reference implementation of a user interface showcasing the Syscoin <=> NEVM bridge. It will create a SPV proof of Syscoin burn transactions post to the relay smart contract which will validate and call a Token contract which uses ERC20Manager to transfer from and to.
 
-On the way back to Syscoin. An SPV proof of the Ethereum transaction is created using [eth-proof](http://github.com/syscoin/eth-proof) and will call a burn function from the ERC20Manager base of the Syscoin Token contract that holds the tokens. It's purpose is to store and transfer tokens and the function parameters are used via ABI data to detect the value of the burn once Syscoin consensus reads the transaction data.
+On the way back to Syscoin. An SPV proof of the NEVM transaction is created using [eth-proof](http://github.com/syscoin/eth-proof) and will call a burn function from the ERC20Manager base of the Syscoin Token contract that holds the tokens. It's purpose is to store and transfer tokens and the function parameters are used via ABI data to detect the value of the burn once Syscoin consensus reads the transaction data.
 
-Syscoin itself enforces the SPV proof by running Geth in light mode to sync up to the last few weeks of headers on Ethereum. It uses a NodeJS relayer which is compiled as a binary and launched when Syscoind is run. The relayer connects to Ethereum using a websocket connection and pushes Transaction Roots of Ethereum headers to Syscoin core which saves a tuple of Ethereum Blockheight, Transaction Roots into a database. The Transaction root is queried for when a Syscoin mint transaction is created (when Ethereum contract burns Syscoin tokens on the ERC contract). The calculated Transaction Root must match the Transaction Root saved in the database which validates that the Ethereum transaction was valid and subsequently minting new Syscoin or Syscoin assets into existence. The total supply of Syscoin/Syscoin assets should remain constant throughout the process as the bridge represents a zero-sum game.
-![Superblock Explorer](./superblockexplorer.png)
+Syscoin itself enforces the SPV proof by running Geth in light mode to sync up to the last few weeks of headers on NEVM. Syscoin nodes run a custom version of Geth which validates NEVM blocks and speaks to Syscoin over ZMQ socket transport layer. The Transaction root is queried for when a Syscoin mint transaction is created (when NEVM contract burns Syscoin tokens on the ERC contract). The calculated Transaction Root must match the Transaction Root saved in the database which validates that the NEVM transaction was valid and subsequently minting new Syscoin or Syscoin assets into existence. The total supply of Syscoin/Syscoin assets should remain constant throughout the process as the bridge represents a zero-sum game.
 ## Dependencies
 
-1) You should be running a [Syscoin Agent](https://github.com/syscoin/sysethereum-agents) which is used to get SPV Superblock proofs aswell as query for Superblocks in general. 
-2) You should be running [Syscoin Core](https://github.com/syscoin/syscoin). You should configure the RPC parameters for the dapp to talk to Syscoin Core. This is done via the syscoin.conf file in your Syscoin data directory.
-3) You should configure `config.js` to point to the Agent and Syscoin core authentication, URL, and ports.
+1) Just Pali chrome extension wallet and Metamask!
+2) You should configure `config.js` to point to your Web3 setup and explorer links if you are testing on a different network.
 
 ## Available Scripts
 

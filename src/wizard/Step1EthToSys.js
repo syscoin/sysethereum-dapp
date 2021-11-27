@@ -6,7 +6,9 @@ import "react-tabs/style/react-tabs.css";
 import assetabi from '../SyscoinERC20I';
 import erc20Managerabi from '../SyscoinERC20Manager';  
 import CONFIGURATION from '../config';
-const axios = require('axios');
+// This function detects most providers injected at window.ethereum
+import detectEthereumProvider from '@metamask/detect-provider';
+const sjs = require('syscoinjs-lib')
 const web3 = new Web3(Web3.givenProvider);
 class Step1ES extends Component {
   constructor(props) {
@@ -29,20 +31,15 @@ class Step1ES extends Component {
       receiptGas: props.getStore().receiptGas,
       receiptObj: props.getStore().receiptObj,
       working: false
-
     };
     this.submitProofs = this.submitProofs.bind(this);
     this.downloadReceipt = this.downloadReceipt.bind(this);
     this.validationCheck = this.validationCheck.bind(this);
     this.isValidated = this.isValidated.bind(this);
     this.setStateFromReceipt = this.setStateFromReceipt.bind(this);
-    this.faucetURL = "https://faucet";
-    if(CONFIGURATION.testnet){
-      this.faucetURL += "-testnet";
-    }
-    this.faucetURL += ".syscoin.org";
+
   }
-  componentDidMount() {
+  async componentDidMount() {
     
   }
   isValidated() {
@@ -56,7 +53,7 @@ class Step1ES extends Component {
         this.props.getStore().sysxFromAccount !== userInput.sysxFromAccount || this.props.getStore().syscoinWitnessAddress !== userInput.syscoinWitnessAddress) { // only update store of something changed
           this.props.updateStore({
             ...userInput,
-            savedToCloud: false // use this to notify step4 that some changes took place and prompt the user to save again
+            savedToCloud: false // use this to notify step3 that some changes took place and prompt the user to save again
           });  // Update store here (this is just an example, in reality you will do it via redux or flux)
         }
 
@@ -156,7 +153,7 @@ class Step1ES extends Component {
       return;
     }
     if(receipt.status !== undefined && receipt.status !== "1" && receipt.status !== true && receipt.status !== "true" && receipt.status !== "0x1"){
-      error = this.props.t("step5ErrorEVMCheckLog");
+      error = this.props.t("step3ErrorEVMCheckLog");
     }
     
     validateNewInput.receiptObj = receipt;
@@ -171,7 +168,7 @@ class Step1ES extends Component {
     validateNewInput.receiptGas = receipt.gasUsed;
     validateNewInput.receiptConf = confirmation;
     validateNewInput.buttonVal = error !== null? false: true;
-    validateNewInput.buttonValMsg =  error !== null? error: this.props.t("step5Success");
+    validateNewInput.buttonValMsg =  error !== null? error: this.props.t("step3Success");
   }
   
 
@@ -179,33 +176,10 @@ class Step1ES extends Component {
     var hexChar = ["0", "1", "2", "3", "4", "5", "6", "7","8", "9", "A", "B", "C", "D", "E", "F"];
     return hexChar[(b >> 4) & 0x0f] + hexChar[b & 0x0f];
   }
-  async getWitnessProgram(address, validateNewInput){
-    if(address.length > 0){
-      try {
-        let results = await axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=getaddressinfo&address=' + address);
-        results = results.data;
-        if(results.error){
-          validateNewInput.buttonVal = false;
-          validateNewInput.buttonValMsg = results.error;
-          return "";
-        }
-        else if(results){
-          let version = this.byteToHex(results.witness_version);
-          return "0x" + version + results.witness_program;
-        }
-      }catch(e) {
-        validateNewInput.buttonVal = false;
-        validateNewInput.buttonValMsg = e.message;
-        return "";
-      }
-    }
-    return "";
-  }
   async getAssetContract(guid, validateNewInput){
     if(guid.length > 0){
       try {
-        let results = await axios.get('https://' + CONFIGURATION.agentURL + ':' + CONFIGURATION.agentPort + '/syscoinrpc?method=assetinfo&asset_guid=' + guid);
-        results = results.data;
+        let results = await sjs.utils.fetchBackendAsset(CONFIGURATION.BlockbookAPIURL, guid)
         if(results.error){
           validateNewInput.buttonVal = false;
           validateNewInput.buttonValMsg = results.error;
@@ -216,19 +190,19 @@ class Step1ES extends Component {
         }
       }catch(e) {
         validateNewInput.buttonVal = false;
-        validateNewInput.buttonValMsg = e.message;
+        validateNewInput.buttonValMsg = (e && e.message)? e.message: this.props.t("genericError");
         return "";
       }
     }
     return "";
   }
-  freezeBurnERC20(syscoinTP, validateNewInput, thisObj, amount, assetGUID, decimals, syscoinWitnessProgram, userInput, fromAccount) {
+  freezeBurnERC20(syscoinTP, validateNewInput, thisObj, amount, assetGUID, syscoinWitnessAddress, userInput, fromAccount) {
     thisObj.state.receiptObj = null;
-    syscoinTP.methods.freezeBurnERC20(amount, assetGUID, userInput.sysxContract, decimals, syscoinWitnessProgram).send({from: fromAccount, gas: 500000})
+    syscoinTP.methods.freezeBurnERC20(amount, assetGUID, syscoinWitnessAddress).send({from: fromAccount, gas: 400000, value: assetGUID === CONFIGURATION.SYSXAsset? amount: undefined})
       .once('transactionHash', function(hash){
         validateNewInput.buttonVal = true;
         validateNewInput.receiptTxHash = hash;
-        validateNewInput.buttonValMsg = thisObj.props.t("step5AuthMetamask");
+        validateNewInput.buttonValMsg = thisObj.props.t("step3AuthMetamask");
         thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
         thisObj.setState({working: true});
       })
@@ -341,43 +315,66 @@ class Step1ES extends Component {
       this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
       return;
     }
-    if(!web3 || !web3.currentProvider || web3.currentProvider.isMetaMask === false){
+    const provider = await detectEthereumProvider();
+    if(!provider){
       validateNewInput.buttonVal = false;
-      validateNewInput.buttonValMsg = this.props.t("step5InstallMetamask");
+      validateNewInput.buttonValMsg = this.props.t("step3InstallMetamask");
       this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
       return;  
-    }
-    let chainId = await web3.eth.getChainId();
-    if(CONFIGURATION.testnet && chainId !== 4){
-      validateNewInput.buttonVal = false;
-      validateNewInput.buttonValMsg = this.props.t("stepUseTestnet");
-      this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-      return;        
-    } else if(!CONFIGURATION.testnet && chainId !== 1){
-      validateNewInput.buttonVal = false;
-      validateNewInput.buttonValMsg = this.props.t("stepUseMainnet");
-      this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-      return;        
     }
     let accounts = await web3.eth.getAccounts();
     if(!accounts || !accounts[0] || accounts[0] === 'undefined')
     {
       validateNewInput.buttonVal = false;
-      validateNewInput.buttonValMsg = this.props.t("step5LoginMetamask");
+      validateNewInput.buttonValMsg = this.props.t("step3LoginMetamask");
       this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-      if(window.ethereum){
-        await window.ethereum.enable();
+      await window.ethereum.request({ method: 'eth_requestAccounts' });
+      return;
+    }
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: CONFIGURATION.ChainId }],
+      });
+    } catch (switchError) {
+      // This error code indicates that the chain has not been added to MetaMask.
+      if (switchError.code === 4902) {
+        try {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: CONFIGURATION.ChainId,
+              chainName: CONFIGURATION.ChainName,
+              nativeCurrency: {
+                  name: CONFIGURATION.NativeCurrencyName,
+                  symbol: CONFIGURATION.NativeCurrencySymbol,
+                  decimals: 18
+              },
+              rpcUrls: [CONFIGURATION.Web3URL],
+              blockExplorerUrls: [CONFIGURATION.NEVMExplorerURL]
+              }],
+          });
+        } catch (addError) {
+          validateNewInput.buttonVal = false;
+          validateNewInput.buttonValMsg = addError.message;
+          this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+          return;
+        }
+      } else {
+        validateNewInput.buttonVal = false;
+        validateNewInput.buttonValMsg = switchError.message;
+        this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+        return;
       }
-      return;
     }
-    
-    this.setState({working: true});
-    let syscoinWitnessProgram = await this.getWitnessProgram(userInput.syscoinWitnessAddress, validateNewInput);
-    if(syscoinWitnessProgram === ""){
+    let ChainId = await web3.eth.getChainId();
+    if(ChainId !== parseInt(CONFIGURATION.ChainId, 16)){
+      validateNewInput.buttonVal = false;
+      validateNewInput.buttonValMsg = "Invalid network";
       this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-      this.setState({working: false});
-      return;
-    }
+      return;        
+    } 
+    this.setState({working: true});
     userInput.sysxContract = await this.getAssetContract(userInput.toSysAssetGUID, validateNewInput);
     if(userInput.sysxContract === ""){
       this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
@@ -385,43 +382,46 @@ class Step1ES extends Component {
       return;
     }
     validateNewInput.buttonVal = true;
-    validateNewInput.buttonValMsg = this.props.t("step5AuthMetamask");
+    validateNewInput.buttonValMsg = this.props.t("step3AuthMetamask");
     this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
     let syscoinERC20Manager = new web3.eth.Contract(erc20Managerabi,  CONFIGURATION.ERC20Manager);
     let contractBase = new web3.eth.Contract(assetabi, userInput.sysxContract);
     let fromAccount = userInput.sysxFromAccount;
-    let allowance = await contractBase.methods.allowance(fromAccount, CONFIGURATION.ERC20Manager).call();
-    allowance = web3.utils.toBN(allowance.toString());
-    let balance = await contractBase.methods.balanceOf(fromAccount).call();
-    balance = web3.utils.toBN(balance.toString());
-    let decimals = await contractBase.methods.decimals().call();
-    let amount = this.toBaseUnit(userInput.toSysAmount, decimals, web3.utils.BN);
     let assetGUID = userInput.toSysAssetGUID;
-    
-
-    let thisObj = this;
-    if(amount.gt(balance)){
-      // insufficient balance
-      validateNewInput.buttonVal = false;
-      validateNewInput.buttonValMsg = this.props.t("step5InsufficientTokenBalance");
-      this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
-      this.setState({working: false});
-      return;
+    let syscoinWitnessAddress = userInput.syscoinWitnessAddress;
+    let allowance = web3.utils.toBN(0);
+    if (assetGUID !== CONFIGURATION.SYSXAsset) {
+      allowance = await contractBase.methods.allowance(fromAccount, CONFIGURATION.ERC20Manager).call();
+      allowance = web3.utils.toBN(allowance.toString());
+      let balance = await contractBase.methods.balanceOf(fromAccount).call();
+      balance = web3.utils.toBN(balance.toString());
+      let decimals = await contractBase.methods.decimals().call();
+      let amount = this.toBaseUnit(userInput.toSysAmount, decimals, web3.utils.BN);
+      if(amount.gt(balance)){
+        // insufficient balance
+        validateNewInput.buttonVal = false;
+        validateNewInput.buttonValMsg = this.props.t("step3InsufficientTokenBalance");
+        this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+        this.setState({working: false});
+        return;
+      }
     }
+    let amount = this.toBaseUnit(userInput.toSysAmount, 18, web3.utils.BN);
+    let thisObj = this;
     let bFirstConfirmation = true;
     // we may need to get allowance of funds
-    if(allowance.lt(amount)){
+    if(assetGUID !== CONFIGURATION.SYSXAsset && allowance.lt(amount)){
       console.log("Allowance needed.");
-      contractBase.methods.approve(CONFIGURATION.ERC20Manager, amount.toString()).send({from: fromAccount, gas: 500000})
+      contractBase.methods.approve(CONFIGURATION.ERC20Manager, amount.toString()).send({from: fromAccount, gas: 400000})
       .once('transactionHash', function(hash){
         validateNewInput.buttonVal = true;
-        validateNewInput.buttonValMsg = thisObj.props.t("step5AuthAllowanceMetamask");
+        validateNewInput.buttonValMsg = thisObj.props.t("step3AuthAllowanceMetamask");
         thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
       })
       .once('confirmation', function(confirmationNumber, receipt){
         if(bFirstConfirmation){
           bFirstConfirmation = false; 
-          thisObj.freezeBurnERC20(syscoinERC20Manager, validateNewInput, thisObj, amount.toString(), assetGUID, decimals, syscoinWitnessProgram, userInput, fromAccount);
+          thisObj.freezeBurnERC20(syscoinERC20Manager, validateNewInput, thisObj, amount.toString(), assetGUID, syscoinWitnessAddress, userInput, fromAccount);
         }
       })
       .on('error', (error, receipt) => {
@@ -429,7 +429,7 @@ class Step1ES extends Component {
         if(error.message.length <= 512 && error.message.indexOf("{") !== -1){
           error = JSON.parse(error.message.substring(error.message.indexOf("{")));
         }
-        let message = error.message.toString();
+        let message = error.message? error.message.toString(): "Unknown error";
         if(receipt){
           thisObj.setStateFromReceipt(receipt, message, 0, validateNewInput);
           thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
@@ -442,7 +442,7 @@ class Step1ES extends Component {
       })
     }
     else{
-      thisObj.freezeBurnERC20(syscoinERC20Manager, validateNewInput, thisObj, amount.toString(), assetGUID, decimals, syscoinWitnessProgram, userInput, fromAccount);
+      thisObj.freezeBurnERC20(syscoinERC20Manager, validateNewInput, thisObj, amount.toString(), assetGUID, syscoinWitnessAddress, userInput, fromAccount);
     }
   }
 
@@ -501,7 +501,6 @@ class Step1ES extends Component {
               <label className="col-md-12">
                 <h1>{this.props.t("step1ESHead")}</h1>
                 <h3 dangerouslySetInnerHTML={{__html: this.props.t("step1ESDescription")}}></h3>
-                <h3><div dangerouslySetInnerHTML={{__html: this.props.t("step1Faucet")}}></div> <a href={this.faucetURL} className="vivid" target="_blank" rel="noopener noreferrer">{this.faucetURL}</a></h3>
               </label>
               <div className="row">
               <div className="col-md-12">
@@ -600,20 +599,20 @@ class Step1ES extends Component {
                       </TabList>
                       <TabPanel>
                         <code className="block">
-                            <span className="dataname">{this.props.t("step5ReceiptStatus")}:</span> <span className="result">{this.state.receiptStatus}</span><br />
-                            <span className="dataname">{this.props.t("step5ReceiptTxHash")}:</span> <span className="result">{this.state.receiptTxHash}</span><br />
-                            <span className="dataname">{this.props.t("step5ReceiptTxIndex")}:</span> <span className="result">{this.state.receiptTxIndex}</span><br />
-                            <span className="dataname">{this.props.t("step5ReceiptFrom")}:</span> <span className="result">{this.state.receiptFrom}</span><br />
-                            <span className="dataname">{this.props.t("step5ReceiptTo")}:</span><span className="result">{this.state.receiptTo}</span><br />
+                            <span className="dataname">{this.props.t("step3ReceiptStatus")}:</span> <span className="result">{this.state.receiptStatus}</span><br />
+                            <span className="dataname">{this.props.t("step3ReceiptTxHash")}:</span> <span className="result">{this.state.receiptTxHash}</span><br />
+                            <span className="dataname">{this.props.t("step3ReceiptTxIndex")}:</span> <span className="result">{this.state.receiptTxIndex}</span><br />
+                            <span className="dataname">{this.props.t("step3ReceiptFrom")}:</span> <span className="result">{this.state.receiptFrom}</span><br />
+                            <span className="dataname">{this.props.t("step3ReceiptTo")}:</span><span className="result">{this.state.receiptTo}</span><br />
                         </code>
                       </TabPanel>
                       <TabPanel>
                         <code className="block">
-                        <span className="dataname">{this.props.t("step5ReceiptBlockhash")}:</span> <span className="result">{this.state.receiptBlockhash}</span><br />
-                        <span className="dataname">{this.props.t("step5ReceiptBlocknumber")}:</span> <span className="result">{this.state.receiptBlocknumber}</span><br />
-                        <span className="dataname">{this.props.t("step5ReceiptTotalGas")}:</span> <span className="result">{this.state.receiptTotalGas}</span><br />
-                        <span className="dataname">{this.props.t("step5ReceiptGas")}:</span> <span className="result">{this.state.receiptGas}</span><br />
-                        <span className="dataname">{this.props.t("step5ReceiptConfirmations")}:</span> <span className="result">{this.state.receiptConf}</span><br />
+                        <span className="dataname">{this.props.t("step3ReceiptBlockhash")}:</span> <span className="result">{this.state.receiptBlockhash}</span><br />
+                        <span className="dataname">{this.props.t("step3ReceiptBlocknumber")}:</span> <span className="result">{this.state.receiptBlocknumber}</span><br />
+                        <span className="dataname">{this.props.t("step3ReceiptTotalGas")}:</span> <span className="result">{this.state.receiptTotalGas}</span><br />
+                        <span className="dataname">{this.props.t("step3ReceiptGas")}:</span> <span className="result">{this.state.receiptGas}</span><br />
+                        <span className="dataname">{this.props.t("step3ReceiptConfirmations")}:</span> <span className="result">{this.state.receiptConf}</span><br />
                         </code>
                       </TabPanel>
                     </Tabs>
@@ -624,9 +623,9 @@ class Step1ES extends Component {
                 <div className="row">
                 <div className="col-md-4 col-sm-12 col-centered">
                   <div>
-                    <button type="button" disabled={!this.state.receiptObj || this.state.working} className="form-control btn btn-default formbtn" aria-label={this.props.t("step5Download")} onClick={this.downloadReceipt}>
+                    <button type="button" disabled={!this.state.receiptObj || this.state.working} className="form-control btn btn-default formbtn" aria-label={this.props.t("step3Download")} onClick={this.downloadReceipt}>
                     <span className="glyphicon glyphicon-download" aria-hidden="true">&nbsp;</span>
-                    {this.props.t("step5Download")}
+                    {this.props.t("step3Download")}
                     </button>
                   </div>
                  </div>
