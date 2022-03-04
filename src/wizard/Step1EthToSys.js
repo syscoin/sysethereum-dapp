@@ -172,10 +172,6 @@ class Step1ES extends Component {
   }
   
 
-  byteToHex(b) {
-    var hexChar = ["0", "1", "2", "3", "4", "5", "6", "7","8", "9", "A", "B", "C", "D", "E", "F"];
-    return hexChar[(b >> 4) & 0x0f] + hexChar[b & 0x0f];
-  }
   async getAssetContract(guid, validateNewInput){
     if(guid.length > 0){
       try {
@@ -223,14 +219,16 @@ class Step1ES extends Component {
           error = JSON.parse(error.message.substring(error.message.indexOf("{")));
         }
         let message = error.message.toString();
-        if(receipt){
-          thisObj.setStateFromReceipt(receipt, message, 0, validateNewInput);
-          thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
-        }
-        else{
-          validateNewInput.buttonVal = false;
-          validateNewInput.buttonValMsg = message;
-          thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
+        if(message.indexOf("might still be mined") === -1) {
+          if(receipt){
+            thisObj.setStateFromReceipt(receipt, message, 0, validateNewInput);
+            thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
+          }
+          else{
+            validateNewInput.buttonVal = false;
+            validateNewInput.buttonValMsg = message;
+            thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
+          }
         }
       })
   }
@@ -430,14 +428,16 @@ class Step1ES extends Component {
           error = JSON.parse(error.message.substring(error.message.indexOf("{")));
         }
         let message = error.message? error.message.toString(): "Unknown error";
-        if(receipt){
-          thisObj.setStateFromReceipt(receipt, message, 0, validateNewInput);
-          thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
-        }
-        else{
-          validateNewInput.buttonVal = false;
-          validateNewInput.buttonValMsg = message;
-          thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
+        if(message.indexOf("might still be mined") === -1) {
+          if(receipt){
+            thisObj.setStateFromReceipt(receipt, message, 0, validateNewInput);
+            thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
+          }
+          else{
+            validateNewInput.buttonVal = false;
+            validateNewInput.buttonValMsg = message;
+            thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
+          }
         }
       })
     }

@@ -84,9 +84,22 @@ class Step1XS extends Component {
       this.setState({buttonVal: false, buttonValMsg: this.props.t("step2InstallPali")});
       return;  
     }
+    try {
+      if(await window.ConnectionsController.isLocked()) {
+        this.setState({buttonVal: false, buttonValMsg: this.props.t("step2UnlockPali")});
+        return; 
+      }
+    } catch(e) {
+      this.setState({buttonVal: false, buttonValMsg: e.message || e});
+      return;  
+    }
     let connectedAccount;
     try {
-      connectedAccount = await window.ConnectionsController.getConnectedAccount();
+      connectedAccount = await window.ConnectionsController.getConnectedAccount()
+      .catch(function(rejected){
+        this.setState({buttonValMsg: false, buttonValMsg: rejected});
+        return;  
+      });
     } catch(e) {
       this.setState({buttonVal: false, buttonValMsg: e.message || e});
       return;  
@@ -96,7 +109,11 @@ class Step1XS extends Component {
     }
     let xpub;
     try {
-      xpub = await window.ConnectionsController.getConnectedAccountXpub();
+      xpub = await window.ConnectionsController.getConnectedAccountXpub()
+      .catch(function(rejected){
+        this.setState({buttonValMsg: false, buttonValMsg: rejected});
+        return;  
+      });
     } catch(e) {
       this.setState({buttonVal: false, buttonValMsg: e.message || e});
       return;  

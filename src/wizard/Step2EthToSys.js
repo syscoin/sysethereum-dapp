@@ -63,6 +63,7 @@ class Step2ES extends Component {
     }
     // will be auto filled based on ethtxid eth-proof
     const assetMap = null
+    console.log("assetOpts " + JSON.stringify(assetOpts))
     const res = await this.syscoinjs.assetAllocationMint(assetOpts, txOpts, assetMap, sysChangeAddress, feeRate, xpub)
     let err = null
     if (!res) {
@@ -79,9 +80,22 @@ class Step2ES extends Component {
       this.setState({buttonVal: false, buttonValMsg: this.props.t("step2InstallPali")});
       return;  
     }
+    try {
+      if(await window.ConnectionsController.isLocked()) {
+        this.setState({buttonVal: false, buttonValMsg: this.props.t("step2UnlockPali")});
+        return; 
+      }
+    } catch(e) {
+      this.setState({buttonVal: false, buttonValMsg: e.message || e});
+      return;  
+    }
     let connectedAccount;
     try {
-      connectedAccount = await window.ConnectionsController.getConnectedAccount();
+      connectedAccount = await window.ConnectionsController.getConnectedAccount()
+      .catch(function(rejected){
+        this.setState({buttonValMsg: false, buttonValMsg: rejected});
+        return;  
+      });
     } catch(e) {
       this.setState({buttonVal: false, buttonValMsg: e.message || e});
       return;  
@@ -91,7 +105,11 @@ class Step2ES extends Component {
     }
     let xpub;
     try {
-      xpub = await window.ConnectionsController.getConnectedAccountXpub();
+      xpub = await window.ConnectionsController.getConnectedAccountXpub()
+      .catch(function(rejected){
+        this.setState({buttonValMsg: false, buttonValMsg: rejected});
+        return;  
+      });
     } catch(e){
       this.setState({buttonVal: false, buttonValMsg: e.message || e});
       return;  
