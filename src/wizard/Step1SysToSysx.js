@@ -87,7 +87,7 @@ class Step1SX extends Component {
     try {
       connectedAccount = await window.ConnectionsController.getConnectedAccount()
       .catch(function(rejected){
-        this.setState({buttonValMsg: false, buttonValMsg: rejected});
+        this.setState({buttonVal: false, buttonValMsg: rejected});
         return;  
       });
     } catch(e) {
@@ -97,6 +97,7 @@ class Step1SX extends Component {
     const locked = await window.ConnectionsController.isLocked()
     if(locked) {
       this.setState({buttonVal: true, buttonValMsg: this.props.t("step2UnlockPali")});
+      return;
     }
     if (!connectedAccount || locked) {
       await window.ConnectionsController.connectWallet()
@@ -105,7 +106,7 @@ class Step1SX extends Component {
     try {
       xpub = await window.ConnectionsController.getConnectedAccountXpub()
       .catch(function(rejected){
-        this.setState({buttonValMsg: false, buttonValMsg: rejected});
+        this.setState({buttonVal: false, buttonValMsg: rejected});
         return;  
       });
     } catch(e) {

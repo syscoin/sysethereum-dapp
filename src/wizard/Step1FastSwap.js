@@ -152,6 +152,7 @@ class Step1FS extends Component {
     const locked = await window.ConnectionsController.isLocked()
     if(locked) {
       this.setState({buttonVal1: true, buttonValMsg1: this.props.t("step2UnlockPali")});
+      return
     }
     if (!connectedAccount || locked) {
       await window.ConnectionsController.connectWallet()
