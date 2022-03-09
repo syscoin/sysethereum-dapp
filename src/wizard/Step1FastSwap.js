@@ -184,11 +184,16 @@ class Step1FS extends Component {
       validateNewInput.buttonValMsg1 = this.props.t("step1FSInputMissing");
       valid = false;
     } else {
+      const minamount = web3.utils.toBN(web3.utils.toWei('1', 'ether'));
       amount = web3.utils.toWei(userInput.amount.toString(), 'ether');
       if(web3.utils.toBN(amount).gt(web3.utils.toBN(web3.utils.toWei(this.state.NEVMBALANCE, 'ether')))) {
         validateNewInput.buttonVal1 = false;
         validateNewInput.buttonValMsg1 = this.props.t("step1FSInsufficientBalanceNEVM");
         valid = false;
+      } else if(web3.utils.toBN(amount).lt(minamount)) {
+        validateNewInput.buttonVal1 = false;
+        validateNewInput.buttonValMsg1 = this.props.t("step1FSMinAmount");
+        valid = false;     
       }
       if (!web3.utils.isAddress(userInput.destinationAddress)) {
         validateNewInput.buttonVal1 = false;
@@ -241,11 +246,16 @@ class Step1FS extends Component {
       validateNewInput.buttonValMsg2 = this.props.t("step1FSInputMissing");
       valid = false;
     } else {
+      const minamount = web3.utils.toBN(web3.utils.toWei('1', 'ether'));
       amount = web3.utils.toWei(userInput.amount.toString(), 'ether');
       if(web3.utils.toBN(amount).gt(web3.utils.toBN(web3.utils.toWei(this.state.SYSBALANCE, 'ether')))) {
         validateNewInput.buttonVal2 = false;
         validateNewInput.buttonValMsg2 = this.props.t("step1FSInsufficientBalanceSYS");
         valid = false;
+      } else if(web3.utils.toBN(amount).lt(minamount)) {
+        validateNewInput.buttonVal2 = false;
+        validateNewInput.buttonValMsg2 = this.props.t("step1FSMinAmount");
+        valid = false;     
       }
       try {
         sjs.utils.bitcoinjs.address.toOutputScript(userInput.destinationAddress, CONFIGURATION.SysNetwork)
