@@ -209,7 +209,7 @@ class SysethereumDApp extends Component {
                 </a>
                 <a className="fastswap" href="#" onClick={this.onFastSwap}>
                   <div className="mybtn mybtn-two">
-                    <span>FastSwap</span>
+                    <span>EasySwap</span>
                   </div>
                 </a>
                 <object className="animation" type="image/svg+xml" data={bridgeAnim}></object>
@@ -546,7 +546,7 @@ class SysethereumDApp extends Component {
 
       <div className="wizardTitleCont">
         <div className="wizardTitle">
-          FastSwap
+          EasySwap
         </div> 
       </div>
 
