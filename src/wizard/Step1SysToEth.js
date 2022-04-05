@@ -1,8 +1,10 @@
 
 import React, { Component } from 'react';
 import CONFIGURATION from '../config';
+import Web3 from 'web3';
 const satoshibitcoin = require("satoshi-bitcoin");
-const sjs = require('syscoinjs-lib')
+const sjs = require('syscoinjs-lib');
+const web3 = new Web3(Web3.givenProvider);
 class Step1 extends Component {
   constructor(props) {
     super(props);
@@ -137,14 +139,20 @@ class Step1 extends Component {
     if(!userInput.ethaddress || userInput.ethaddress === ""){
       validateNewInput.ethaddressVal = false;
       valid = false;
-    }         
+    }
+    if (!web3.utils.isAddress(userInput.ethaddress)) {
+      validateNewInput.buttonVal = false;
+      validateNewInput.buttonValMsg = this.props.t("step1FSInvalidDestination");
+      self.setState({working: false});
+      self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));  
+      return;
+    }  
     let self = this;
     
     if(valid === true){
       this.setState({working: true});
       if(userInput.asset.length > 0 && userInput.asset !== 0 && userInput.asset !== "0"){
         let assetGuid = userInput.asset.toString();
-        
         let ethAddressStripped = userInput.ethaddress.toString();
         if(ethAddressStripped && ethAddressStripped.startsWith("0x")){
           ethAddressStripped = ethAddressStripped.substr(2, ethAddressStripped.length);

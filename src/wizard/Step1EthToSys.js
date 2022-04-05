@@ -387,6 +387,16 @@ class Step1ES extends Component {
     let fromAccount = userInput.sysxFromAccount;
     let assetGUID = userInput.toSysAssetGUID;
     let syscoinWitnessAddress = userInput.syscoinWitnessAddress;
+    try {
+      sjs.utils.bitcoinjs.address.toOutputScript(syscoinWitnessAddress, CONFIGURATION.SysNetwork)
+    } catch (e) {
+      console.log('e ' + e.message, " address " + syscoinWitnessAddress)
+      validateNewInput.buttonVal = false;
+      validateNewInput.buttonValMsg = this.props.t("step1FSInvalidDestination");
+      this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+      this.setState({working: false});
+      return;
+    } 
     let allowance = web3.utils.toBN(0);
     if (assetGUID !== CONFIGURATION.SYSXAsset) {
       allowance = await contractBase.methods.allowance(fromAccount, CONFIGURATION.ERC20Manager).call();
