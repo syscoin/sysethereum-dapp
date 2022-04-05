@@ -384,7 +384,14 @@ class Step1ES extends Component {
     this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
     let syscoinERC20Manager = new web3.eth.Contract(erc20Managerabi,  CONFIGURATION.ERC20Manager);
     let contractBase = new web3.eth.Contract(assetabi, userInput.sysxContract);
-    let fromAccount = userInput.sysxFromAccount;
+    if (!web3.utils.isAddress(userInput.sysxFromAccount)) {
+      validateNewInput.buttonVal = false;
+      validateNewInput.buttonValMsg = this.props.t("step1InvalidNEVM");
+      this.setState({working: false});
+      this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));  
+      return;
+    }
+    let fromAccount = userInput.sysxFromAccount; 
     let assetGUID = userInput.toSysAssetGUID;
     let syscoinWitnessAddress = userInput.syscoinWitnessAddress;
     try {

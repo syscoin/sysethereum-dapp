@@ -143,8 +143,8 @@ class Step1 extends Component {
     if (!web3.utils.isAddress(userInput.ethaddress)) {
       validateNewInput.buttonVal = false;
       validateNewInput.buttonValMsg = this.props.t("step1FSInvalidDestination");
-      self.setState({working: false});
-      self.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));  
+      this.setState({working: false});
+      this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));  
       return;
     }  
     let self = this;
