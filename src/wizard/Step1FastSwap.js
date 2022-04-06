@@ -11,7 +11,7 @@ const satoshibitcoin = require("satoshi-bitcoin");
 const sjs = require('syscoinjs-lib');
 const web3 = new Web3(Web3.givenProvider);
 async function balanceTimerCallback (thisObj) {
-  await axios.get(CONFIGURATION.FastSwapAPI + "balances")
+  await axios.get(CONFIGURATION.EasySwapAPI + "balances")
   .then(function (response) {
       if(response.data.status === "success") {
         thisObj.state.SYSBALANCE = web3.utils.fromWei(response.data.data.sysbalance, 'ether')
@@ -32,7 +32,7 @@ async function balanceTimerCallback (thisObj) {
       }
   })
   .catch(error => {
-    console.error('Fast Swap balance fetch error:', error);
+    console.error('Easy Swap balance fetch error:', error);
   });
   thisObj.balanceTimer = setTimeout(balanceTimerCallback, 10000, thisObj)
 }
@@ -79,7 +79,7 @@ class Step1FS extends Component {
   }
   async componentDidMount() {
     var thisObj = this
-    await axios.get(CONFIGURATION.FastSwapAPI + "settings")
+    await axios.get(CONFIGURATION.EasySwapAPI + "settings")
     .then(function (response) {
         if(response.data.status === "success") {
           thisObj.state.NEVMADDRESS = response.data.data.NEVMADDRESS
@@ -97,7 +97,7 @@ class Step1FS extends Component {
         
     })
     .catch(error => {
-      console.error('Fast Swap settings fetch error:', error);
+      console.error('Easy Swap settings fetch error:', error);
       thisObj.setState({working: true, buttonVal1: false, buttonValMsg1: thisObj.props.t("step1FSNoSettings"),buttonVal2: false, buttonValMsg2: thisObj.props.t("step1FSNoSettings")});
     });
   }
@@ -387,7 +387,7 @@ class Step1FS extends Component {
       return;  
     }   
     let thisObj = this; 
-    await axios.post(CONFIGURATION.FastSwapAPI + "/fastswap/" + txid, {txid: txid})
+    await axios.post(CONFIGURATION.EasySwapAPI + "/fastswap/" + txid, {txid: txid})
     .then(function (response) {
         if(response.data.status === "success") {
           thisObj.state.fsStatus = thisObj.statusToDisplay(response.data.data.status)
@@ -424,7 +424,7 @@ class Step1FS extends Component {
         
     })
     .catch(error => {
-      console.error('Fast Swap error:', error);
+      console.error('Easy Swap error:', error);
       if(error.message.length <= 512 && error.message.indexOf("{") !== -1){
         error = JSON.parse(error.message.substring(error.message.indexOf("{")));
       }

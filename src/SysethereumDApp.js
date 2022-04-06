@@ -36,7 +36,7 @@ class SysethereumDApp extends Component {
     this.onSysToEth = this.onSysToEth.bind(this);
     this.onEthToSys = this.onEthToSys.bind(this);
     this.onAssetRegistry = this.onAssetRegistry.bind(this);
-    this.onFastSwap = this.onFastSwap.bind(this);
+    this.onEasySwap = this.onEasySwap.bind(this);
     this.onHome = this.onHome.bind(this);
     this.handleEmailChange = this.handleEmailChange.bind(this);
     this.handleEmailSubmit = this.handleEmailSubmit.bind(this);
@@ -90,7 +90,7 @@ class SysethereumDApp extends Component {
   onAssetRegistry() {
     this.setState({ introDisplay: false, ethToSysDisplay: false, assetRegistryDisplay: true, sysToEthDisplay: false, sysToSysxDisplay: false, sysxToSysDisplay: false, fastSwapDisplay: false});
   }
-  onFastSwap() {
+  onEasySwap() {
     this.setState({ introDisplay: false, ethToSysDisplay: false, assetRegistryDisplay: false, sysToEthDisplay: false, sysToSysxDisplay: false, sysxToSysDisplay: false, fastSwapDisplay: true});
   }
   onHome() {
@@ -207,7 +207,7 @@ class SysethereumDApp extends Component {
                     <span>Asset Registry</span>
                   </div>
                 </a>
-                <a className="fastswap" href="#" onClick={this.onFastSwap}>
+                <a className="fastswap" href="#" onClick={this.onEasySwap}>
                   <div className="mybtn mybtn-two">
                     <span>EasySwap</span>
                   </div>
