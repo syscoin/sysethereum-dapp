@@ -86,17 +86,30 @@ class Step1XS extends Component {
     }
     let connectedAccount;
     try {
-      connectedAccount = await window.ConnectionsController.getConnectedAccount();
+      connectedAccount = await window.ConnectionsController.getConnectedAccount()
+      .catch(function(rejected){
+        this.setState({buttonVal: false, buttonValMsg: rejected});
+        return;  
+      });
     } catch(e) {
       this.setState({buttonVal: false, buttonValMsg: e.message || e});
       return;  
     }
-    if (!connectedAccount) {
+    const locked = await window.ConnectionsController.isLocked()
+    if(locked) {
+      this.setState({buttonVal: true, buttonValMsg: this.props.t("step2UnlockPali")});
+      return;
+    }
+    if (!connectedAccount || locked) {
       await window.ConnectionsController.connectWallet()
     }
     let xpub;
     try {
-      xpub = await window.ConnectionsController.getConnectedAccountXpub();
+      xpub = await window.ConnectionsController.getConnectedAccountXpub()
+      .catch(function(rejected){
+        this.setState({buttonVal: false, buttonValMsg: rejected});
+        return;  
+      });
     } catch(e) {
       this.setState({buttonVal: false, buttonValMsg: e.message || e});
       return;  

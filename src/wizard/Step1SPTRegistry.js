@@ -198,11 +198,13 @@ class Step1Reg extends Component {
           error = JSON.parse(error.message.substring(error.message.indexOf("{")));
         }
         let message = error.message.toString();
-        if(receipt){
-          thisObj.setStateFromReceipt(receipt, message, 0);
-        }
-        else{
-          thisObj.setState({buttonVal: false, buttonValMsg:  message}); 
+        if(message.indexOf("might still be mined") === -1) {
+          if(receipt){
+            thisObj.setStateFromReceipt(receipt, message, 0);
+          }
+          else{
+            thisObj.setState({buttonVal: false, buttonValMsg:  message}); 
+          }
         }
       })
 

@@ -1,8 +1,10 @@
 
 import React, { Component } from 'react';
 import CONFIGURATION from '../config';
+import Web3 from 'web3';
 const satoshibitcoin = require("satoshi-bitcoin");
-const sjs = require('syscoinjs-lib')
+const sjs = require('syscoinjs-lib');
+const web3 = new Web3(Web3.givenProvider);
 class Step1 extends Component {
   constructor(props) {
     super(props);
@@ -90,17 +92,30 @@ class Step1 extends Component {
     }
     let connectedAccount;
     try {
-      connectedAccount = await window.ConnectionsController.getConnectedAccount();
+      connectedAccount = await window.ConnectionsController.getConnectedAccount()
+      .catch(function(rejected){
+        this.setState({buttonVal: false, buttonValMsg: rejected});
+        return;  
+      });
     } catch(e) {
       this.setState({buttonVal: false, buttonValMsg: e.message || e});
       return;  
     }
-    if (!connectedAccount) {
+    const locked = await window.ConnectionsController.isLocked()
+    if(locked) {
+      this.setState({buttonVal: true, buttonValMsg: this.props.t("step2UnlockPali")});
+      return;
+    }
+    if (!connectedAccount || locked) {
       await window.ConnectionsController.connectWallet()
     }
     let xpub;
     try {
-      xpub = await window.ConnectionsController.getConnectedAccountXpub();
+      xpub = await window.ConnectionsController.getConnectedAccountXpub()
+      .catch(function(rejected){
+        this.setState({buttonVal: false, buttonValMsg: rejected});
+        return;  
+      });
     } catch(e) {
       this.setState({buttonVal: false, buttonValMsg: e.message || e});
       return;  
@@ -124,14 +139,20 @@ class Step1 extends Component {
     if(!userInput.ethaddress || userInput.ethaddress === ""){
       validateNewInput.ethaddressVal = false;
       valid = false;
-    }         
+    }
+    if (!web3.utils.isAddress(userInput.ethaddress)) {
+      validateNewInput.buttonVal = false;
+      validateNewInput.buttonValMsg = this.props.t("step1FSInvalidDestination");
+      this.setState({working: false});
+      this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));  
+      return;
+    }  
     let self = this;
     
     if(valid === true){
       this.setState({working: true});
       if(userInput.asset.length > 0 && userInput.asset !== 0 && userInput.asset !== "0"){
         let assetGuid = userInput.asset.toString();
-        
         let ethAddressStripped = userInput.ethaddress.toString();
         if(ethAddressStripped && ethAddressStripped.startsWith("0x")){
           ethAddressStripped = ethAddressStripped.substr(2, ethAddressStripped.length);
@@ -253,6 +274,7 @@ class Step1 extends Component {
             <label className="col-md-12">
                 <h1 dangerouslySetInnerHTML={{__html: this.props.t("step1Head")}}></h1>
                 <h3 dangerouslySetInnerHTML={{__html: this.props.t("step1Description")}}></h3>
+                <h3><div dangerouslySetInnerHTML={{__html: this.props.t("step1Faucet")}}></div> <a href={this.FaucetURL} className="vivid" target="_blank" rel="noopener noreferrer">{this.FaucetURL}</a></h3>
               </label>
               <div className="row">
               <div className="col-md-12">

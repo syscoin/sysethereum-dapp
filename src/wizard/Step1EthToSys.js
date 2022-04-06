@@ -172,10 +172,6 @@ class Step1ES extends Component {
   }
   
 
-  byteToHex(b) {
-    var hexChar = ["0", "1", "2", "3", "4", "5", "6", "7","8", "9", "A", "B", "C", "D", "E", "F"];
-    return hexChar[(b >> 4) & 0x0f] + hexChar[b & 0x0f];
-  }
   async getAssetContract(guid, validateNewInput){
     if(guid.length > 0){
       try {
@@ -223,14 +219,16 @@ class Step1ES extends Component {
           error = JSON.parse(error.message.substring(error.message.indexOf("{")));
         }
         let message = error.message.toString();
-        if(receipt){
-          thisObj.setStateFromReceipt(receipt, message, 0, validateNewInput);
-          thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
-        }
-        else{
-          validateNewInput.buttonVal = false;
-          validateNewInput.buttonValMsg = message;
-          thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
+        if(message.indexOf("might still be mined") === -1) {
+          if(receipt){
+            thisObj.setStateFromReceipt(receipt, message, 0, validateNewInput);
+            thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
+          }
+          else{
+            validateNewInput.buttonVal = false;
+            validateNewInput.buttonValMsg = message;
+            thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
+          }
         }
       })
   }
@@ -386,9 +384,26 @@ class Step1ES extends Component {
     this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
     let syscoinERC20Manager = new web3.eth.Contract(erc20Managerabi,  CONFIGURATION.ERC20Manager);
     let contractBase = new web3.eth.Contract(assetabi, userInput.sysxContract);
-    let fromAccount = userInput.sysxFromAccount;
+    if (!web3.utils.isAddress(userInput.sysxFromAccount)) {
+      validateNewInput.buttonVal = false;
+      validateNewInput.buttonValMsg = this.props.t("step1InvalidNEVM");
+      this.setState({working: false});
+      this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));  
+      return;
+    }
+    let fromAccount = userInput.sysxFromAccount; 
     let assetGUID = userInput.toSysAssetGUID;
     let syscoinWitnessAddress = userInput.syscoinWitnessAddress;
+    try {
+      sjs.utils.bitcoinjs.address.toOutputScript(syscoinWitnessAddress, CONFIGURATION.SysNetwork)
+    } catch (e) {
+      console.log('e ' + e.message, " address " + syscoinWitnessAddress)
+      validateNewInput.buttonVal = false;
+      validateNewInput.buttonValMsg = this.props.t("step1FSInvalidDestination");
+      this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
+      this.setState({working: false});
+      return;
+    } 
     let allowance = web3.utils.toBN(0);
     if (assetGUID !== CONFIGURATION.SYSXAsset) {
       allowance = await contractBase.methods.allowance(fromAccount, CONFIGURATION.ERC20Manager).call();
@@ -430,14 +445,16 @@ class Step1ES extends Component {
           error = JSON.parse(error.message.substring(error.message.indexOf("{")));
         }
         let message = error.message? error.message.toString(): "Unknown error";
-        if(receipt){
-          thisObj.setStateFromReceipt(receipt, message, 0, validateNewInput);
-          thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
-        }
-        else{
-          validateNewInput.buttonVal = false;
-          validateNewInput.buttonValMsg = message;
-          thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
+        if(message.indexOf("might still be mined") === -1) {
+          if(receipt){
+            thisObj.setStateFromReceipt(receipt, message, 0, validateNewInput);
+            thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
+          }
+          else{
+            validateNewInput.buttonVal = false;
+            validateNewInput.buttonValMsg = message;
+            thisObj.setState(Object.assign(userInput, validateNewInput, thisObj._validationErrors(validateNewInput)));
+          }
         }
       })
     }
