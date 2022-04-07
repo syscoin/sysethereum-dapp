@@ -48,8 +48,6 @@ class Step1FS extends Component {
       buttonValMsg1: "",
       buttonVal2: true,
       buttonValMsg2: "",
-      buttonVal3: true,
-      buttonValMsg3: "",
       working: false,
       fsDestinationAddress: "",
       fsStatus: "",
@@ -70,10 +68,15 @@ class Step1FS extends Component {
     this.fastSwap = this.fastSwap.bind(this);
     this.sendUTXO = this.sendUTXO.bind(this);
     this.sendNEVM = this.sendNEVM.bind(this);
+    this.swap = this.swap.bind(this);
     this.syscoinjs = new sjs.SyscoinJSLib(null, CONFIGURATION.BlockbookAPIURL, CONFIGURATION.SysNetwork)
     if(this.balanceTimer){
       clearTimeout(this.balanceTimer)
       this.balanceTimer = null
+    }
+    if(this.fastSwapTimer){
+      clearInterval(this.fastSwapTimer)
+      this.fastSwapTimer = null
     }
     balanceTimerCallback(this)
   }
@@ -179,28 +182,23 @@ class Step1FS extends Component {
     validateNewInput.buttonValMsg1 = "";
     let valid = true;
     var amount
-    if(!userInput.amount || userInput.amount.toString() === "" || !userInput.destinationAddress || userInput.userInput === ""){
+    const minamount = web3.utils.toBN(web3.utils.toWei('1', 'ether'));
+    amount = web3.utils.toWei(userInput.amount.toString(), 'ether');
+    if(web3.utils.toBN(amount).gt(web3.utils.toBN(web3.utils.toWei(this.state.NEVMBALANCE, 'ether')))) {
       validateNewInput.buttonVal1 = false;
-      validateNewInput.buttonValMsg1 = this.props.t("step1FSInputMissing");
+      validateNewInput.buttonValMsg1 = this.props.t("step1FSInsufficientBalanceNEVM");
       valid = false;
-    } else {
-      const minamount = web3.utils.toBN(web3.utils.toWei('1', 'ether'));
-      amount = web3.utils.toWei(userInput.amount.toString(), 'ether');
-      if(web3.utils.toBN(amount).gt(web3.utils.toBN(web3.utils.toWei(this.state.NEVMBALANCE, 'ether')))) {
-        validateNewInput.buttonVal1 = false;
-        validateNewInput.buttonValMsg1 = this.props.t("step1FSInsufficientBalanceNEVM");
-        valid = false;
-      } else if(web3.utils.toBN(amount).lt(minamount)) {
-        validateNewInput.buttonVal1 = false;
-        validateNewInput.buttonValMsg1 = this.props.t("step1FSMinAmount");
-        valid = false;     
-      }
-      if (!web3.utils.isAddress(userInput.destinationAddress)) {
-        validateNewInput.buttonVal1 = false;
-        validateNewInput.buttonValMsg1 = this.props.t("step1FSInvalidDestination");
-        valid = false;
-      }
+    } else if(web3.utils.toBN(amount).lt(minamount)) {
+      validateNewInput.buttonVal1 = false;
+      validateNewInput.buttonValMsg1 = this.props.t("step1FSMinAmount");
+      valid = false;     
     }
+    if (!web3.utils.isAddress(userInput.destinationAddress)) {
+      validateNewInput.buttonVal1 = false;
+      validateNewInput.buttonValMsg1 = this.props.t("step1FSInvalidDestination");
+      valid = false;
+    }
+    
     if(valid === false){
       this.setState({buttonVal1: validateNewInput.buttonVal1, buttonValMsg1: validateNewInput.buttonValMsg1});
       return;
@@ -224,6 +222,7 @@ class Step1FS extends Component {
           validateNewInput.buttonValMsg1 = this.props.t("step3Success");
           this.setState({working: false});
           this.saveToLocalStorage();
+          setTimeout(this.fastSwap, 5000, this);
         }
       }catch(e) {
         validateNewInput.buttonVal1 = false;
@@ -234,55 +233,89 @@ class Step1FS extends Component {
     }
     this.setState({buttonVal1: validateNewInput.buttonVal1, buttonValMsg1: validateNewInput.buttonValMsg1}); 
   }
+  async swap() {
+    let valid = true;
+    let userInput = this._grabUserInput(); // grab user entered vals
+    let validateNewInput = userInput;
+    if(!userInput.amount || userInput.amount.toString() === "" || !userInput.destinationAddress || userInput.userInput === ""){
+      validateNewInput.buttonVal1 = false;
+      validateNewInput.buttonValMsg1 = this.props.t("step1FSInputMissing");
+      valid = false;
+    }
+    let sendNEVMFlag = false
+    let sendUTXOFlag = false
+    if(valid) {
+      try {
+        sjs.utils.bitcoinjs.address.toOutputScript(userInput.destinationAddress, CONFIGURATION.SysNetwork)
+        sendNEVMFlag = true
+      } catch (e) {
+        sendNEVMFlag = false
+      }  
+      if(!sendNEVMFlag) {
+        if (!web3.utils.isAddress(userInput.destinationAddress)) {
+          validateNewInput.buttonVal1 = false;
+          validateNewInput.buttonValMsg1 = this.props.t("step1FSInvalidDestination");
+          valid = false;
+        } else {
+          sendUTXOFlag = true
+        }
+      }
+    }
+    if(valid === false){
+      this.setState({buttonVal1: validateNewInput.buttonVal1, buttonValMsg1: validateNewInput.buttonValMsg1}); 
+      return;
+    }
+    if(sendUTXOFlag) {
+      await this.sendUTXO();
+    } else if(sendNEVMFlag) {
+      await this.sendNEVM();
+    }
+  }
   async sendNEVM() {
     let userInput = this._grabUserInput(); // grab user entered vals
     let validateNewInput = userInput;
-    validateNewInput.buttonVal2 = true;
-    validateNewInput.buttonValMsg2 = "";
+    validateNewInput.buttonVal1 = true;
+    validateNewInput.buttonValMsg1 = "";
     let valid = true;
     var amount
-    if(!userInput.amount || userInput.amount.toString() === "" || !userInput.destinationAddress || userInput.userInput === ""){
-      validateNewInput.buttonVal2 = false;
-      validateNewInput.buttonValMsg2 = this.props.t("step1FSInputMissing");
+     
+    const minamount = web3.utils.toBN(web3.utils.toWei('1', 'ether'));
+    amount = web3.utils.toWei(userInput.amount.toString(), 'ether');
+    if(web3.utils.toBN(amount).gt(web3.utils.toBN(web3.utils.toWei(this.state.SYSBALANCE, 'ether')))) {
+      validateNewInput.buttonVal1 = false;
+      validateNewInput.buttonValMsg1 = this.props.t("step1FSInsufficientBalanceSYS");
       valid = false;
-    } else {
-      const minamount = web3.utils.toBN(web3.utils.toWei('1', 'ether'));
-      amount = web3.utils.toWei(userInput.amount.toString(), 'ether');
-      if(web3.utils.toBN(amount).gt(web3.utils.toBN(web3.utils.toWei(this.state.SYSBALANCE, 'ether')))) {
-        validateNewInput.buttonVal2 = false;
-        validateNewInput.buttonValMsg2 = this.props.t("step1FSInsufficientBalanceSYS");
-        valid = false;
-      } else if(web3.utils.toBN(amount).lt(minamount)) {
-        validateNewInput.buttonVal2 = false;
-        validateNewInput.buttonValMsg2 = this.props.t("step1FSMinAmount");
-        valid = false;     
-      }
-      try {
-        sjs.utils.bitcoinjs.address.toOutputScript(userInput.destinationAddress, CONFIGURATION.SysNetwork)
-      } catch (e) {
-        console.log('e ' + e.message, " address " + userInput.destinationAddress)
-        validateNewInput.buttonVal2 = false;
-        validateNewInput.buttonValMsg2 = this.props.t("step1FSInvalidDestination");
-        valid = false;
-      }  
-    } 
+    } else if(web3.utils.toBN(amount).lt(minamount)) {
+      validateNewInput.buttonVal1 = false;
+      validateNewInput.buttonValMsg1 = this.props.t("step1FSMinAmount");
+      valid = false;     
+    }
+    try {
+      sjs.utils.bitcoinjs.address.toOutputScript(userInput.destinationAddress, CONFIGURATION.SysNetwork)
+    } catch (e) {
+      console.log('e ' + e.message, " address " + userInput.destinationAddress)
+      validateNewInput.buttonVal1 = false;
+      validateNewInput.buttonValMsg1 = this.props.t("step1FSInvalidDestination");
+      valid = false;
+    }  
+    
     if(valid === false){
-      this.setState({buttonVal2: validateNewInput.buttonVal2, buttonValMsg2: validateNewInput.buttonValMsg2}); 
+      this.setState({buttonVal1: validateNewInput.buttonVal1, buttonValMsg1: validateNewInput.buttonValMsg1}); 
       return;
     }
     const provider = await detectEthereumProvider();
     if(!provider){
-      validateNewInput.buttonVal2 = false;
-      validateNewInput.buttonValMsg2 = this.props.t("step3InstallMetamask");
-      this.setState({buttonVal2: validateNewInput.buttonVal2, buttonValMsg2: validateNewInput.buttonValMsg2}); 
+      validateNewInput.buttonVal1 = false;
+      validateNewInput.buttonValMsg1 = this.props.t("step3InstallMetamask");
+      this.setState({buttonVal1: validateNewInput.buttonVal1, buttonValMsg1: validateNewInput.buttonValMsg1}); 
       return;  
     }
     let accounts = await web3.eth.getAccounts();
     if(!accounts || !accounts[0] || accounts[0] === 'undefined')
     {
-      validateNewInput.buttonVal2 = false;
-      validateNewInput.buttonValMsg2 = this.props.t("step3LoginMetamask");
-      this.setState({buttonVal2: validateNewInput.buttonVal2, buttonValMsg2: validateNewInput.buttonValMsg2}); 
+      validateNewInput.buttonVal1 = false;
+      validateNewInput.buttonValMsg1 = this.props.t("step3LoginMetamask");
+      this.setState({buttonVal1: validateNewInput.buttonVal1, buttonValMsg1: validateNewInput.buttonValMsg1}); 
       await window.ethereum.request({ method: 'eth_requestAccounts' });
       return;
     }
@@ -310,38 +343,39 @@ class Step1FS extends Component {
               }],
           });
         } catch (addError) {
-          validateNewInput.buttonVal2 = false;
-          validateNewInput.buttonValMsg2 = addError.message;
-          this.setState({buttonVal2: validateNewInput.buttonVal2, buttonValMsg2: validateNewInput.buttonValMsg2}); 
+          validateNewInput.buttonVal1 = false;
+          validateNewInput.buttonValMsg1 = addError.message;
+          this.setState({buttonVal1: validateNewInput.buttonVal1, buttonValMsg1: validateNewInput.buttonValMsg1}); 
           return;
         }
       } else {
-        validateNewInput.buttonVal2 = false;
-        validateNewInput.buttonValMsg2 = switchError.message;
-        this.setState({buttonVal2: validateNewInput.buttonVal2, buttonValMsg2: validateNewInput.buttonValMsg2}); 
+        validateNewInput.buttonVal1 = false;
+        validateNewInput.buttonValMsg1 = switchError.message;
+        this.setState({buttonVal1: validateNewInput.buttonVal1, buttonValMsg1: validateNewInput.buttonValMsg1}); 
         return;
       }
     }
     let ChainId = await web3.eth.getChainId();
     if(ChainId !== parseInt(CONFIGURATION.ChainId, 16)){
-      validateNewInput.buttonVal2 = false;
-      validateNewInput.buttonValMsg2 = "Invalid network";
-      this.setState({buttonVal2: validateNewInput.buttonVal2, buttonValMsg2: validateNewInput.buttonValMsg2}); 
+      validateNewInput.buttonVal1 = false;
+      validateNewInput.buttonValMsg1 = "Invalid network";
+      this.setState({buttonVal1: validateNewInput.buttonVal1, buttonValMsg1: validateNewInput.buttonValMsg1}); 
       return;        
     } 
     this.setState({working: true});
-    validateNewInput.buttonValMsg2 = this.props.t("step3AuthMetamask");
+    validateNewInput.buttonValMsg1 = this.props.t("step3AuthMetamask");
  
     let thisObj = this;
     web3.eth.sendTransaction({from: accounts[0], gas: 400000, to: this.state.NEVMADDRESS, value: amount.toString(), input: web3.utils.asciiToHex(userInput.destinationAddress)})
       .once('transactionHash', function(hash){
-        validateNewInput.buttonVal2 = true;
+        validateNewInput.buttonVal1 = true;
         validateNewInput.swapTxid = hash;
-        validateNewInput.buttonValMsg2 = thisObj.props.t("step3Success");
+        validateNewInput.buttonValMsg1 = thisObj.props.t("step3Success");
         thisObj.setState({working: false});
-        thisObj.setState({swapTxid: hash, buttonVal2: validateNewInput.buttonVal2, buttonValMsg2: validateNewInput.buttonValMsg2});
+        thisObj.setState({swapTxid: hash, buttonVal1: validateNewInput.buttonVal1, buttonValMsg1: validateNewInput.buttonValMsg1});
         thisObj.refs.swapTxid.value = hash;
         thisObj.saveToLocalStorage();
+        setTimeout(thisObj.fastSwap, 5000, thisObj);
       })
       .on('error', (error) => {
         thisObj.setState({working: false});
@@ -350,12 +384,12 @@ class Step1FS extends Component {
         }
         let message = error.message.toString();
         if(message.indexOf("might still be mined") === -1) {
-          validateNewInput.buttonVal2 = false;
-          validateNewInput.buttonValMsg2 = message; 
-          thisObj.setState({buttonVal2: validateNewInput.buttonVal2, buttonValMsg2: validateNewInput.buttonValMsg2});
+          validateNewInput.buttonVal1 = false;
+          validateNewInput.buttonValMsg1 = message; 
+          thisObj.setState({buttonVal1: validateNewInput.buttonVal1, buttonValMsg1: validateNewInput.buttonValMsg1});
         }
       })
-      this.setState({buttonVal2: validateNewInput.buttonVal2, buttonValMsg2: validateNewInput.buttonValMsg2});
+      this.setState({buttonVal1: validateNewInput.buttonVal1, buttonValMsg1: validateNewInput.buttonValMsg1});
   }
   _grabUserInput() {
     return {
@@ -374,19 +408,23 @@ class Step1FS extends Component {
       return this.props.t("step1FSStatusUnknown");
     }
   }
-  async fastSwap() {
-    let userInput = this._grabUserInput(); // grab user entered vals
+  async fastSwap(thisObj) {
+    let userInput = thisObj._grabUserInput(); // grab user entered vals
     let validateNewInput = userInput;
-    validateNewInput.buttonVal3 = true;
-    validateNewInput.buttonValMsg3 = "";
-    const txid = this.refs.swapTxid.value;
+    validateNewInput.buttonVal2 = true;
+    validateNewInput.buttonValMsg2 = "";
+    const txid = thisObj.refs.swapTxid.value;
     if(!txid || txid === ""){
-      validateNewInput.buttonVal3 = false;
-      validateNewInput.buttonValMsg3 = this.props.t("step1FSMissingTxid");
-      this.setState({buttonVal3: validateNewInput.buttonVal3, buttonValMsg3: validateNewInput.buttonValMsg3});
+      validateNewInput.buttonVal2 = false;
+      validateNewInput.buttonValMsg2 = thisObj.props.t("step1FSMissingTxid");
+      thisObj.setState({buttonVal2: validateNewInput.buttonVal2, buttonValMsg2: validateNewInput.buttonValMsg2});
       return;  
     }   
-    let thisObj = this; 
+    if(thisObj.fastSwapTimer) {
+      clearInterval(thisObj.fastSwapTimer);
+      thisObj.fastSwapTimer = null;
+    }
+    thisObj.fastSwapTimer = setInterval(thisObj.fastSwap, 5000, thisObj);
     await axios.post(CONFIGURATION.EasySwapAPI + "/fastswap/" + txid, {txid: txid})
     .then(function (response) {
         if(response.data.status === "success") {
@@ -415,11 +453,11 @@ class Step1FS extends Component {
             fsDestinationAddress: thisObj.state.fsDestinationAddress
           })
         } else if(response.data.status === "error") {
-          validateNewInput.buttonVal3 = false
-          validateNewInput.buttonValMsg3 = response.data.data
+          validateNewInput.buttonVal2 = false
+          validateNewInput.buttonValMsg2 = response.data.data
         } else {
-          validateNewInput.buttonVal3 = false
-          validateNewInput.buttonValMsg3 = "Unknown error"
+          validateNewInput.buttonVal2 = false
+          validateNewInput.buttonValMsg2 = "Unknown error"
         }
         
     })
@@ -429,10 +467,10 @@ class Step1FS extends Component {
         error = JSON.parse(error.message.substring(error.message.indexOf("{")));
       }
       let message = error.message.toString();
-      validateNewInput.buttonVal3 = false;
-      validateNewInput.buttonValMsg3 = message;
+      validateNewInput.buttonVal2 = false;
+      validateNewInput.buttonValMsg2 = message;
     });
-    this.setState({buttonVal3: validateNewInput.buttonVal3, buttonValMsg3: validateNewInput.buttonValMsg3});
+    thisObj.setState({buttonVal2: validateNewInput.buttonVal2, buttonValMsg2: validateNewInput.buttonValMsg2});
   }
 
   render() {
@@ -454,7 +492,7 @@ class Step1FS extends Component {
        notValidClasses.buttonCls2 = 'has-error';
        notValidClasses.buttonValGrpCls2 = 'val-err-tooltip';
     }  
-    if (typeof this.state.buttonVal3 != 'undefined' && !this.state.buttonVal3) {
+    if (typeof this.state.buttonVal2 != 'undefined' && !this.state.buttonVal2) {
       notValidClasses.buttonCls3 = 'has-error';
       notValidClasses.buttonValGrpCls3 = 'val-err-tooltip';
     }
@@ -513,18 +551,11 @@ class Step1FS extends Component {
               <div className="row">
               <div className="col-md-12 btn-group">
                 <div className={notValidClasses.buttonCls1}>
-                    <button disabled={this.state.working} type="button" className="form-control btn btn-default formbtn" aria-label={this.props.t("step1FSSendUTXO")} onClick={this.sendUTXO}>
+                    <button disabled={this.state.working} type="button" className="form-control btn btn-default formbtn" aria-label={this.props.t("step1FSSwap")} onClick={this.swap}>
                     <span className="glyphicon glyphicon-send" aria-hidden="true">&nbsp;</span>
-                    {this.props.t("step1FSSendUTXO")}
+                    {this.props.t("step1FSSwap")}
                     </button>
                   <div className={notValidClasses.buttonValGrpCls1}>{this.state.buttonValMsg1}</div>
-                </div>
-                <div className={notValidClasses.buttonCls2}>
-                    <button disabled={this.state.working} type="button" className="form-control btn btn-default formbtn" aria-label={this.props.t("step1FSSendNEVM")} onClick={this.sendNEVM}>
-                    <span className="glyphicon glyphicon-send" aria-hidden="true">&nbsp;</span>
-                    {this.props.t("step1FSSendNEVM")}
-                    </button>
-                  <div className={notValidClasses.buttonValGrpCls2}>{this.state.buttonValMsg2}</div>
                 </div>
               </div>
               </div>
@@ -548,11 +579,11 @@ class Step1FS extends Component {
               <div className="row">
               <div className="col-md-4 col-sm-12 col-centered">
                 <div className={notValidClasses.buttonCls3}>
-                    <button disabled={this.state.working} type="button" className="form-control btn btn-default formbtn" aria-label={this.props.t("step1FSStartButton")} onClick={this.fastSwap}>
+                    <button disabled={this.state.working} type="button" className="form-control btn btn-default formbtn" aria-label={this.props.t("step1FSStartButton")} onClick={this.fastSwap(this)}>
                     <span className="glyphicon glyphicon-send" aria-hidden="true">&nbsp;</span>
                     {this.props.t("step1FSStartButton")}
                     </button>
-                  <div className={notValidClasses.buttonValGrpCls3}>{this.state.buttonValMsg3}</div>
+                  <div className={notValidClasses.buttonValGrpCls3}>{this.state.buttonValMsg2}</div>
                 </div>
               </div>
               </div>
