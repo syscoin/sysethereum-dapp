@@ -409,6 +409,9 @@ class Step1FS extends Component {
     }
   }
   async fastSwap(thisObj) {
+    if(!thisObj) {
+      thisObj = this;
+    }
     let userInput = thisObj._grabUserInput(); // grab user entered vals
     let validateNewInput = userInput;
     validateNewInput.buttonVal2 = true;
@@ -579,7 +582,7 @@ class Step1FS extends Component {
               <div className="row">
               <div className="col-md-4 col-sm-12 col-centered">
                 <div className={notValidClasses.buttonCls3}>
-                    <button disabled={this.state.working} type="button" className="form-control btn btn-default formbtn" aria-label={this.props.t("step1FSStartButton")} onClick={this.fastSwap(this)}>
+                    <button disabled={this.state.working} type="button" className="form-control btn btn-default formbtn" aria-label={this.props.t("step1FSStartButton")} onClick={this.fastSwap}>
                     <span className="glyphicon glyphicon-send" aria-hidden="true">&nbsp;</span>
                     {this.props.t("step1FSStartButton")}
                     </button>
