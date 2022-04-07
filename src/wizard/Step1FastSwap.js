@@ -408,26 +408,24 @@ class Step1FS extends Component {
       return this.props.t("step1FSStatusUnknown");
     }
   }
-  async fastSwap(thisObj) {
-    if(!thisObj) {
-      thisObj = this;
-    }
-    let userInput = thisObj._grabUserInput(); // grab user entered vals
+  async fastSwap() {
+    let userInput = this._grabUserInput(); // grab user entered vals
     let validateNewInput = userInput;
     validateNewInput.buttonVal2 = true;
     validateNewInput.buttonValMsg2 = "";
-    const txid = thisObj.refs.swapTxid.value;
+    const txid = this.refs.swapTxid.value;
     if(!txid || txid === ""){
       validateNewInput.buttonVal2 = false;
-      validateNewInput.buttonValMsg2 = thisObj.props.t("step1FSMissingTxid");
-      thisObj.setState({buttonVal2: validateNewInput.buttonVal2, buttonValMsg2: validateNewInput.buttonValMsg2});
+      validateNewInput.buttonValMsg2 = this.props.t("step1FSMissingTxid");
+      this.setState({buttonVal2: validateNewInput.buttonVal2, buttonValMsg2: validateNewInput.buttonValMsg2});
       return;  
     }   
-    if(thisObj.fastSwapTimer) {
-      clearInterval(thisObj.fastSwapTimer);
-      thisObj.fastSwapTimer = null;
+    if(this.fastSwapTimer) {
+      clearInterval(this.fastSwapTimer);
+      this.fastSwapTimer = null;
     }
-    thisObj.fastSwapTimer = setInterval(thisObj.fastSwap, 5000, thisObj);
+    this.fastSwapTimer = setInterval(this.fastSwap, 10000, this);
+    let thisObj = this; 
     await axios.post(CONFIGURATION.EasySwapAPI + "/fastswap/" + txid, {txid: txid})
     .then(function (response) {
         if(response.data.status === "success") {
@@ -473,7 +471,7 @@ class Step1FS extends Component {
       validateNewInput.buttonVal2 = false;
       validateNewInput.buttonValMsg2 = message;
     });
-    thisObj.setState({buttonVal2: validateNewInput.buttonVal2, buttonValMsg2: validateNewInput.buttonValMsg2});
+    this.setState({buttonVal2: validateNewInput.buttonVal2, buttonValMsg2: validateNewInput.buttonValMsg2});
   }
 
   render() {
