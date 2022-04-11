@@ -183,12 +183,6 @@ class SysethereumDApp extends Component {
                   </div>
                 </a>
 
-               <a className="systosysx" href="#" onClick={this.onSysToSysx}>
-                  <div className="mybtn mybtn-two">
-                    <span>SYS ➜ SYSX</span>
-                  </div>
-                </a>
-
                 <a className="systoeth" href="#" onClick={this.onSysToEth}>
                   <div className="mybtn mybtn-two">
                     <span>SYSX ➜ NEVM</span>
