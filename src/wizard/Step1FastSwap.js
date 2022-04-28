@@ -409,6 +409,7 @@ class Step1FS extends Component {
     }
   }
   async fastSwap() {
+    this.setState({working: true});
     let userInput = this._grabUserInput(); // grab user entered vals
     let validateNewInput = userInput;
     validateNewInput.buttonVal2 = true;
@@ -460,6 +461,7 @@ class Step1FS extends Component {
           validateNewInput.buttonVal2 = false
           validateNewInput.buttonValMsg2 = "Unknown error"
         }
+        this.setState({working: false});
         
     })
     .catch(error => {
@@ -470,6 +472,7 @@ class Step1FS extends Component {
       let message = error.message.toString();
       validateNewInput.buttonVal2 = false;
       validateNewInput.buttonValMsg2 = message;
+      this.setState({working: false});
     });
     this.setState({buttonVal2: validateNewInput.buttonVal2, buttonValMsg2: validateNewInput.buttonValMsg2});
   }
