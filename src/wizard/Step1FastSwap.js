@@ -220,7 +220,6 @@ class Step1FS extends Component {
           this.refs.swapTxid.value = results.swapTxid;
           this.state.swapTxid = results.swapTxid;
           validateNewInput.buttonValMsg1 = this.props.t("step3Success");
-          this.setState({working: false});
           this.saveToLocalStorage();
           setTimeout(this.fastSwap, 5000, this);
         }
