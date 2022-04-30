@@ -206,7 +206,7 @@ class Step1FS extends Component {
     let self = this;
     
     if(valid === true){
-      this.setState({working: true});
+      this.setState({swapTxid: '', working: true});
     
       try {
         let results = await this.sysToNEVM(userInput.amount.toString(), xpub, sysChangeAddress, userInput.destinationAddress);
@@ -361,7 +361,7 @@ class Step1FS extends Component {
       this.setState({buttonVal1: validateNewInput.buttonVal1, buttonValMsg1: validateNewInput.buttonValMsg1}); 
       return;        
     } 
-    this.setState({working: true});
+    this.setState({swapTxid: '', working: true});
     validateNewInput.buttonValMsg1 = this.props.t("step3AuthMetamask");
  
     let thisObj = this;
@@ -370,7 +370,6 @@ class Step1FS extends Component {
         validateNewInput.buttonVal1 = true;
         validateNewInput.swapTxid = hash;
         validateNewInput.buttonValMsg1 = thisObj.props.t("step3Success");
-        thisObj.setState({working: false});
         thisObj.setState({swapTxid: hash, buttonVal1: validateNewInput.buttonVal1, buttonValMsg1: validateNewInput.buttonValMsg1});
         thisObj.refs.swapTxid.value = hash;
         thisObj.saveToLocalStorage();
@@ -460,7 +459,9 @@ class Step1FS extends Component {
           validateNewInput.buttonVal2 = false
           validateNewInput.buttonValMsg2 = "Unknown error"
         }
-        this.setState({working: false});
+        if(response.data.status !== 'error' && response.data.data !== 'Source transaction not chainlocked yet') {
+          this.setState({working: false});
+        }
         
     })
     .catch(error => {
