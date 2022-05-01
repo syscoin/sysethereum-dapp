@@ -459,9 +459,7 @@ class Step1FS extends Component {
           validateNewInput.buttonVal2 = false
           validateNewInput.buttonValMsg2 = "Unknown error"
         }
-        if(response.data.status !== 'error' && response.data.data !== 'Source transaction not chainlocked yet') {
-          this.setState({working: false});
-        }
+        this.setState({working: false});
         
     })
     .catch(error => {
