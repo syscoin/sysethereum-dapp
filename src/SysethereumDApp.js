@@ -203,7 +203,7 @@ class SysethereumDApp extends Component {
                     <span>Asset Registry</span>
                   </div>
                 </a>
-                <a className="fastswap" href="https://syscoin-bridge-nbj5hwv6f-syslabs.vercel.app/bridge-nevm-rollux">
+                <a className="fastswap" href="https://syscoin-bridge-git-bridge-dev-syslabs.vercel.app/bridge-nevm-rollux">
                   <div className="mybtn mybtn-two">
                     <span>Rollux Portal</span>
                   </div>
