@@ -36,7 +36,6 @@ class SysethereumDApp extends Component {
     this.onSysToEth = this.onSysToEth.bind(this);
     this.onEthToSys = this.onEthToSys.bind(this);
     this.onAssetRegistry = this.onAssetRegistry.bind(this);
-    this.onEasySwap = this.onEasySwap.bind(this);
     this.onHome = this.onHome.bind(this);
     this.handleEmailChange = this.handleEmailChange.bind(this);
     this.handleEmailSubmit = this.handleEmailSubmit.bind(this);
@@ -89,9 +88,6 @@ class SysethereumDApp extends Component {
   }
   onAssetRegistry() {
     this.setState({ introDisplay: false, ethToSysDisplay: false, assetRegistryDisplay: true, sysToEthDisplay: false, sysToSysxDisplay: false, sysxToSysDisplay: false, fastSwapDisplay: false});
-  }
-  onEasySwap() {
-    this.setState({ introDisplay: false, ethToSysDisplay: false, assetRegistryDisplay: false, sysToEthDisplay: false, sysToSysxDisplay: false, sysxToSysDisplay: false, fastSwapDisplay: true});
   }
   onHome() {
     this.setState({ introDisplay: true, ethToSysDisplay: false, assetRegistryDisplay: false, sysToEthDisplay: false, sysToSysxDisplay: false, sysxToSysDisplay: false, fastSwapDisplay: false});
@@ -207,9 +203,9 @@ class SysethereumDApp extends Component {
                     <span>Asset Registry</span>
                   </div>
                 </a>
-                <a className="fastswap" href="#" onClick={this.onEasySwap}>
+                <a className="fastswap" href="https://syscoin-bridge-git-bridge-dev-syslabs.vercel.app/bridge-nevm-rollux">
                   <div className="mybtn mybtn-two">
-                    <span>EasySwap</span>
+                    <span>Rollux Portal</span>
                   </div>
                 </a>
                 <object className="animation" type="image/svg+xml" data={bridgeAnim}></object>
