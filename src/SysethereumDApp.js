@@ -118,7 +118,7 @@ class SysethereumDApp extends Component {
         <div className="intro">
 
             <div className="left">
-              <a href="https://syscoin.org/" target="_blank" rel="noopener noreferrer" className="logo"></a>
+              <a href="https://syscoin.org/" target="_blank" rel="noopener noreferrer" className="logo"> </a>
               <h1>Syscoin - NEVM Bridge</h1>
 
               <div className="bottom">
