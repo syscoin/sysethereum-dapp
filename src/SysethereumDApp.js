@@ -330,7 +330,7 @@ class SysethereumDApp extends Component {
 
         <div className="section dark">
           <div className="faq">
-            <a className="anchor" href="/#" name="faq"></a>
+            <a className="anchor" href="/#" name="faq"> </a>
             <div className="ornament none"></div>
             <h1>FAQ</h1>
 
@@ -457,7 +457,7 @@ class SysethereumDApp extends Component {
 
         <div className="section contact">
           <div className="contact">
-            <a className="anchor" href="/#" name="contact"></a>
+            <a className="anchor" href="/#" name="contact"> </a>
             <div className="ornament"></div>
             <h1>Contact</h1>
 
@@ -490,7 +490,7 @@ class SysethereumDApp extends Component {
 
         <div className="section dark moreinfo">
           <div className="moreinfo">
-            <a className="anchor" href="/#" name="information"></a>
+            <a className="anchor" href="/#" name="information"> </a>
             <div className="ornament none"></div>
             <h1>More information</h1>
 
