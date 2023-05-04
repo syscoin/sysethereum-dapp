@@ -502,7 +502,7 @@ class SysethereumDApp extends Component {
               <a href="https://faucet.syscoin.org" target="_blank" rel="noopener noreferrer">Syscoin faucet</a>
               <a href="https://syscoin.network/syslinks/" target="_blank" rel="noopener noreferrer">Syscoin links</a>
               <a href="https://syscoin.readme.io/" target="_blank" rel="noopener noreferrer">Developer Portal</a>
-              <a href="https://sys1.bcfn.ca/" target="_blank" rel="noopener noreferrer">Syscoin explorer</a>
+              <a href="https://blockbook.elint.services/" target="_blank" rel="noopener noreferrer">Syscoin explorer</a>
               <a href="https://syscoin.org/whitepaper" target="_blank" rel="noopener noreferrer">Syscoin Whitepapers</a>
               <a href="https://github.com/syscoin" target="_blank" rel="noopener noreferrer">Syscoin Github</a>
             </div>
