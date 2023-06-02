@@ -1,27 +1,33 @@
-
 class PALICONNECT {
   constructor() {
-    this.connect()
+    this.connect();
   }
   async connect() {
-    if (window.ConnectionsController) {
-        var connectedAccount
-        try {
-          connectedAccount = await window.ConnectionsController.getConnectedAccount()
-          .catch(function(rejected){
-            console.log("paliConnect error: " + rejected)
+    let provider;
+    if (window.pali) {
+      let connectedAccount;
+      provider = window.pali;
+      try {
+        await provider
+          .request({ method: "sys_requestAccounts", params: [] })
+          .then(async () => {
+            try {
+              connectedAccount = await provider.request({
+                method: "wallet_getAccount",
+                params: [],
+              });
+            } catch (error) {
+              console.log("paliConnect error: " + error);
+            }
           });
-          if(!connectedAccount) {
-            await window.ConnectionsController.connectWallet()
-            .catch(function(rejected){
-              console.log("paliConnect error: " + rejected)
-            });
-          }
-        } catch(e) {
-          console.log("paliConnect error: " + e)
+
+        if (!connectedAccount) {
+          console.log(`paliConnect error: wallet isn't connected. Try again.`)
         }
+      } catch (e) {
+        console.log("paliConnect error: " + e);
       }
-    
+    }
   }
 }
 export default new PALICONNECT();
