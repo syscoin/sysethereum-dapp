@@ -6,7 +6,7 @@ import { getProof } from "bitcoin-proof";
 import Web3 from "web3";
 import CONFIGURATION from "../config";
 // This function detects most providers injected at window.ethereum
-import detectEthereumProvider from "@metamask/detect-provider";
+// import detectEthereumProvider from "@metamask/detect-provider";
 const web3 = new Web3(Web3.givenProvider);
 class Step3 extends Component {
   constructor(props) {
@@ -105,15 +105,15 @@ class Step3 extends Component {
   }
 
   async submitProofs() {
-    const provider = window.ethereum;
     const isBitcoinBased = window.pali.isBitcoinBased();
-    if (isBitcoinBased) {
+    if (isBitcoinBased && window.ethereum.wallet === "pali-v2") {
       await window.ethereum.request({
         method: "eth_changeUTXOEVM",
         params: [{ chainId: 57 }],
       });
+      return;
     }
-    if (!provider) {
+    if (!window.ethereum) {
       this.setState({
         buttonVal: false,
         buttonValMsg: this.props.t("step3InstallMetamask"),
@@ -131,7 +131,7 @@ class Step3 extends Component {
         buttonVal: false,
         buttonValMsg: this.props.t("step3LoginMetamask"),
       });
-      await window.ethereum.request({
+     await window.ethereum.request({
         method: "eth_requestAccounts",
         params: [],
       });
@@ -171,7 +171,8 @@ class Step3 extends Component {
         return;
       }
     }
-    let ChainId = await web3.eth.getChainId();
+    const provider = new Web3(window.ethereum);
+    let ChainId = await provider.eth.getChainId();
     console.log({ ChainId });
     if (ChainId !== parseInt(CONFIGURATION.ChainId, 16)) {
       console.log("entrou aqui");
@@ -179,6 +180,7 @@ class Step3 extends Component {
       return;
     }
     let SyscoinRelay = new web3.eth.Contract(rconfig.data, rconfig.contract);
+    SyscoinRelay.setProvider(provider);
     if (
       !SyscoinRelay ||
       !SyscoinRelay.methods ||
