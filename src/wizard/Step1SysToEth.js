@@ -149,6 +149,12 @@ class Step1 extends Component {
       });
       return;
     }
+    if (!window.pali.isBitcoinBased()) {
+      await window.pali.request({
+        method: "sys_changeUTXOEVM",
+        params: [{ chainId: 57 }],
+      });
+    }
     let connectedAccount;
     try {
       connectedAccount = await window.pali.request({
