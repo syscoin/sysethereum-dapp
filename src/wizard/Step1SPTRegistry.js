@@ -78,15 +78,15 @@ class Step1Reg extends Component {
     if (!userInput) {
       return;
     }
-    const provider = window.ethereum;
     const isBitcoinBased = window.ethereum.isBitcoinBased();
-    if (isBitcoinBased) {
+    if (isBitcoinBased && window.ethereum.wallet === 'pali-v2' ) {
       await window.ethereum.request({
         method: "eth_changeUTXOEVM",
         params: [{ chainId: 57 }],
       });
+      return;
     }
-    if (!provider) {
+    if (!window.ethereum) {
       this.setState({
         buttonVal: false,
         buttonValMsg: this.props.t("step3InstallMetamask"),
@@ -144,12 +144,14 @@ class Step1Reg extends Component {
         return;
       }
     }
-    let ChainId = await web3.eth.getChainId();
+    const provider = new Web3(window.ethereum);
+    let ChainId = await provider.eth.getChainId();
     if (ChainId !== parseInt(CONFIGURATION.ChainId, 16)) {
       this.setState({ buttonVal: false, buttonValMsg: "Invalid network" });
       return;
     }
     let SyscoinRelay = new web3.eth.Contract(rconfig.data, rconfig.contract);
+    SyscoinRelay.setProvider(provider);
     if (
       !SyscoinRelay ||
       !SyscoinRelay.methods ||

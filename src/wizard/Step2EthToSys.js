@@ -83,8 +83,6 @@ class Step2ES extends Component {
     };
     // will be auto filled based on ethtxid eth-proof
     const assetMap = null;
-    console.log("dentro", { ethTXID, xpub, sysChangeAddress });
-    console.log('Checking overral assets', assetOpts, assetOpts, assetMap, sysChangeAddress, feeRate, xpub) //Temp for debug
     const res = await this.syscoinjs.assetAllocationMint(
       assetOpts,
       txOpts,
@@ -93,21 +91,18 @@ class Step2ES extends Component {
       feeRate,
       xpub
     );
-    console.log('Check results',res); //Temp for deub
     let err = null;
     if (!res) {
       err = "Could not create transaction, not enough funds?";
       return { data: null, error: err };
     }
     const serializedResp = sjs.utils.exportPsbtToJson(res.psbt, res.assets);
-    console.log('check serialized response', serializedResp); //Temp for deub 
 
     const signRes = await window.pali.request({
       method: "sys_signAndSend",
       params: [serializedResp],
     });
 
-    console.log('sent response', signRes); //temp for deub
     const unserializedResp = sjs.utils.importPsbtFromJson(
       signRes,
       CONFIGURATION.SysNetwork
@@ -138,7 +133,6 @@ class Step2ES extends Component {
         method: "wallet_getAccount",
         params: [],
       });
-      console.log('Checking connected account', connectedAccount); //temp for debug
     } catch (e) {
       this.setState({ buttonVal: false, buttonValMsg: e.message || e });
       return;
@@ -168,7 +162,6 @@ class Step2ES extends Component {
       method: "wallet_getChangeAddress",
       params: [],
     });
-    console.log('sysChangeAddress', sysChangeAddress); //temp for deub
     if (!sysChangeAddress) {
       this.setState({
         buttonVal: false,
