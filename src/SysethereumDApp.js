@@ -70,7 +70,6 @@ class SysethereumDApp extends Component {
       window.removeEventListener("SyscoinStatus", callback);
     };
 
-    console.log("checking syscoin status");
 
     window.addEventListener("SyscoinStatus", callback);
   }

@@ -120,12 +120,16 @@ class Step3 extends Component {
       });
       return;
     }
-    let accounts = [
+    let accounts = null;
+    try {
+      accounts =
       await window.ethereum.request({
-        method: "wallet_getAddress",
+        method: "eth_accounts",
         params: [],
-      }),
-    ];
+      });
+    } catch (accountsError) {
+      console.log('Couldnt fetch accounts');
+    }
     if (!accounts || !accounts[0] || accounts[0] === "undefined") {
       this.setState({
         buttonVal: false,
@@ -175,7 +179,6 @@ class Step3 extends Component {
     let ChainId = await provider.eth.getChainId();
     console.log({ ChainId });
     if (ChainId !== parseInt(CONFIGURATION.ChainId, 16)) {
-      console.log("entrou aqui");
       this.setState({ buttonVal: false, buttonValMsg: "Invalid network" });
       return;
     }

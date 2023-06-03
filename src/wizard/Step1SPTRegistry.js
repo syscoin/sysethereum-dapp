@@ -78,7 +78,7 @@ class Step1Reg extends Component {
     if (!userInput) {
       return;
     }
-    const isBitcoinBased = window.ethereum.isBitcoinBased();
+    const isBitcoinBased = window.ethereum.isBitcoinBased ? window.ethereum.isBitcoinBased() : false;
     if (isBitcoinBased && window.ethereum.wallet === 'pali-v2' ) {
       await window.ethereum.request({
         method: "eth_changeUTXOEVM",
@@ -93,12 +93,16 @@ class Step1Reg extends Component {
       });
       return;
     }
-    let accounts = [
+    let accounts = null;
+    try {
+      accounts =
       await window.ethereum.request({
-        method: "wallet_getAddress",
+        method: "eth_accounts",
         params: [],
-      }),
-    ];
+      });
+    } catch (accountsError) {
+      console.log('Couldnt fetch accounts');
+    }
     if (!accounts || !accounts[0] || accounts[0] === "undefined") {
       this.setState({
         buttonVal: false,

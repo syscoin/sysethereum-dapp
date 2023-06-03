@@ -436,7 +436,7 @@ class Step1ES extends Component {
       return;
     }
     const provider = window.ethereum;
-    const isBitcoinBased = window.ethereum.isBitcoinBased();
+    const isBitcoinBased = window.ethereum.isBitcoinBased ? window.ethereum.isBitcoinBased() : false;
     if (isBitcoinBased) {
       await window.ethereum.request({
         method: "eth_changeUTXOEVM",
@@ -455,12 +455,16 @@ class Step1ES extends Component {
       );
       return;
     }
-    let accounts = [
+    let accounts = null;
+    try {
+      accounts =
       await window.ethereum.request({
-        method: "wallet_getAddress",
+        method: "eth_accounts",
         params: [],
-      }),
-    ];
+      });
+    } catch (accountsError) {
+      console.log('Couldnt fetch accounts');
+    }
     if (!accounts || !accounts[0] || accounts[0] === "undefined") {
       validateNewInput.buttonVal = false;
       validateNewInput.buttonValMsg = this.props.t("step3LoginMetamask");
