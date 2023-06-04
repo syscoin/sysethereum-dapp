@@ -134,7 +134,7 @@ class Step2ES extends Component {
         params: [],
       });
     } catch (e) {
-      this.setState({ buttonVal: false, buttonValMsg: e.message || e });
+      this.setState({ buttonVal: false, buttonValMsg:  (e.data ? e.data.message : undefined) || e.message || e  });
       return;
     }
     const locked = !(await window.pali.isUnlocked());
@@ -155,7 +155,7 @@ class Step2ES extends Component {
         params: [],
       });
     } catch (e) {
-      this.setState({ buttonVal1: false, buttonValMsg1: e.message || e });
+      this.setState({ buttonVal1: false, buttonValMsg1:  (e.data ? e.data.message : undefined) || e.message || e  });
       return;
     }
     const sysChangeAddress = await window.pali.request({
