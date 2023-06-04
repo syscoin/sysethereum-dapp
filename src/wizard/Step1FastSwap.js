@@ -1,45 +1,60 @@
-
-import React, { Component } from 'react';
-import Web3 from 'web3';
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import React, { Component } from "react";
+import Web3 from "web3";
+import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
-import CONFIGURATION from '../config';
+import CONFIGURATION from "../config";
 // This function detects most providers injected at window.ethereum
-import detectEthereumProvider from '@metamask/detect-provider';
-import axios from 'axios';
+import detectEthereumProvider from "@metamask/detect-provider";
+import axios from "axios";
 const satoshibitcoin = require("satoshi-bitcoin");
-const sjs = require('syscoinjs-lib');
+const sjs = require("syscoinjs-lib");
 const web3 = new Web3(Web3.givenProvider);
-async function balanceTimerCallback (thisObj) {
-  await axios.get(CONFIGURATION.EasySwapAPI + "balances")
-  .then(function (response) {
-      if(response.data.status === "success") {
-        thisObj.state.SYSBALANCE = web3.utils.fromWei(response.data.data.sysbalance, 'ether')
-        thisObj.state.sysBalanceLow = false
-        if(web3.utils.toBN(response.data.data.sysbalance).lt(web3.utils.toBN(web3.utils.toWei('100', 'ether')))) {
-          thisObj.state.sysBalanceLow = true
+async function balanceTimerCallback(thisObj) {
+  await axios
+    .get(CONFIGURATION.EasySwapAPI + "balances")
+    .then(function (response) {
+      if (response.data.status === "success") {
+        thisObj.state.SYSBALANCE = web3.utils.fromWei(
+          response.data.data.sysbalance,
+          "ether"
+        );
+        thisObj.state.sysBalanceLow = false;
+        if (
+          web3.utils
+            .toBN(response.data.data.sysbalance)
+            .lt(web3.utils.toBN(web3.utils.toWei("100", "ether")))
+        ) {
+          thisObj.state.sysBalanceLow = true;
         }
-        thisObj.state.NEVMBALANCE = web3.utils.fromWei(response.data.data.nevmbalance, 'ether')
-        thisObj.state.nevmBalanceLow = false
-        if(web3.utils.toBN(response.data.data.nevmbalance).lt(web3.utils.toBN(web3.utils.toWei('100', 'ether')))) {
-          thisObj.state.nevmBalanceLow = true
+        thisObj.state.NEVMBALANCE = web3.utils.fromWei(
+          response.data.data.nevmbalance,
+          "ether"
+        );
+        thisObj.state.nevmBalanceLow = false;
+        if (
+          web3.utils
+            .toBN(response.data.data.nevmbalance)
+            .lt(web3.utils.toBN(web3.utils.toWei("100", "ether")))
+        ) {
+          thisObj.state.nevmBalanceLow = true;
         }
-        thisObj.setState({SYSBALANCE: thisObj.state.SYSBALANCE,
+        thisObj.setState({
+          SYSBALANCE: thisObj.state.SYSBALANCE,
           NEVMBALANCE: thisObj.state.NEVMBALANCE,
           nevmBalanceLow: thisObj.state.nevmBalanceLow,
-          sysBalanceLow:  thisObj.state.sysBalanceLow
-        })
+          sysBalanceLow: thisObj.state.sysBalanceLow,
+        });
       }
-  })
-  .catch(error => {
-    console.error('Easy Swap balance fetch error:', error);
-  });
-  thisObj.balanceTimer = setTimeout(balanceTimerCallback, 10000, thisObj)
+    })
+    .catch((error) => {
+      console.error("Easy Swap balance fetch error:", error);
+    });
+  thisObj.balanceTimer = setTimeout(balanceTimerCallback, 10000, thisObj);
 }
 class Step1FS extends Component {
   constructor(props) {
     super(props);
-    let storageExists = typeof(Storage) !== "undefined";
+    let storageExists = typeof Storage !== "undefined";
     this.state = {
       destinationAddress: "",
       amount: "",
@@ -61,54 +76,77 @@ class Step1FS extends Component {
       SYSBALANCE: "",
       NEVMBALANCE: "",
       sysBalanceLow: false,
-      nevmBalanceLow: false
-
+      nevmBalanceLow: false,
     };
 
     this.fastSwap = this.fastSwap.bind(this);
     this.sendUTXO = this.sendUTXO.bind(this);
     this.sendNEVM = this.sendNEVM.bind(this);
     this.swap = this.swap.bind(this);
-    this.syscoinjs = new sjs.SyscoinJSLib(null, CONFIGURATION.BlockbookAPIURL, CONFIGURATION.SysNetwork)
-    if(this.balanceTimer){
-      clearTimeout(this.balanceTimer)
-      this.balanceTimer = null
+    this.syscoinjs = new sjs.SyscoinJSLib(
+      null,
+      CONFIGURATION.BlockbookAPIURL,
+      CONFIGURATION.SysNetwork
+    );
+    if (this.balanceTimer) {
+      clearTimeout(this.balanceTimer);
+      this.balanceTimer = null;
     }
-    if(this.fastSwapTimer){
-      clearInterval(this.fastSwapTimer)
-      this.fastSwapTimer = null
+    if (this.fastSwapTimer) {
+      clearInterval(this.fastSwapTimer);
+      this.fastSwapTimer = null;
     }
-    balanceTimerCallback(this)
+    balanceTimerCallback(this);
   }
   async componentDidMount() {
-    var thisObj = this
-    await axios.get(CONFIGURATION.EasySwapAPI + "settings")
-    .then(function (response) {
-        if(response.data.status === "success") {
-          thisObj.state.NEVMADDRESS = response.data.data.NEVMADDRESS
-          thisObj.state.SYSADDRESS = response.data.data.SYSADDRESS
-          thisObj.state.MEMOHEADER = response.data.data.MEMO
-          thisObj.setState({working: false, NEVMADDRESS: thisObj.state.NEVMADDRESS,
+    var thisObj = this;
+    await axios
+      .get(CONFIGURATION.EasySwapAPI + "settings")
+      .then(function (response) {
+        if (response.data.status === "success") {
+          thisObj.state.NEVMADDRESS = response.data.data.NEVMADDRESS;
+          thisObj.state.SYSADDRESS = response.data.data.SYSADDRESS;
+          thisObj.state.MEMOHEADER = response.data.data.MEMO;
+          thisObj.setState({
+            working: false,
+            NEVMADDRESS: thisObj.state.NEVMADDRESS,
             SYSADDRESS: thisObj.state.SYSADDRESS,
-            MEMOHEADER: thisObj.state.MEMOHEADER
-          })
-        } else if(response.data.status === "error") {
-          thisObj.setState({working: true, buttonVal1: false, buttonValMsg1: thisObj.props.t("step1FSNoSettings"),buttonVal2: false, buttonValMsg2: thisObj.props.t("step1FSNoSettings")});
+            MEMOHEADER: thisObj.state.MEMOHEADER,
+          });
+        } else if (response.data.status === "error") {
+          thisObj.setState({
+            working: true,
+            buttonVal1: false,
+            buttonValMsg1: thisObj.props.t("step1FSNoSettings"),
+            buttonVal2: false,
+            buttonValMsg2: thisObj.props.t("step1FSNoSettings"),
+          });
         } else {
-          thisObj.setState({working: true, buttonVal1: false, buttonValMsg1: thisObj.props.t("step1FSNoSettings"),buttonVal2: false, buttonValMsg2: thisObj.props.t("step1FSNoSettings")});
+          thisObj.setState({
+            working: true,
+            buttonVal1: false,
+            buttonValMsg1: thisObj.props.t("step1FSNoSettings"),
+            buttonVal2: false,
+            buttonValMsg2: thisObj.props.t("step1FSNoSettings"),
+          });
         }
-        
-    })
-    .catch(error => {
-      console.error('Easy Swap settings fetch error:', error);
-      thisObj.setState({working: true, buttonVal1: false, buttonValMsg1: thisObj.props.t("step1FSNoSettings"),buttonVal2: false, buttonValMsg2: thisObj.props.t("step1FSNoSettings")});
-    });
+      })
+      .catch((error) => {
+        console.error("Easy Swap settings fetch error:", error);
+        thisObj.setState({
+          working: true,
+          buttonVal1: false,
+          buttonValMsg1: thisObj.props.t("step1FSNoSettings"),
+          buttonVal2: false,
+          buttonValMsg2: thisObj.props.t("step1FSNoSettings"),
+        });
+      });
   }
   componentWillUnmount() {
-    clearTimeout(this.balanceTimer)
+    clearTimeout(this.balanceTimer);
   }
   saveToLocalStorage() {
-    if (typeof(Storage) !== "undefined") {
+    if (typeof Storage !== "undefined") {
       // Code for localStorage/sessionStorage.
       localStorage.setItem("swapTxid", this.state.swapTxid);
     } else {
@@ -116,106 +154,153 @@ class Step1FS extends Component {
     }
   }
   isString(s) {
-    return (typeof s === 'string' || s instanceof String);
+    return typeof s === "string" || s instanceof String;
   }
-  async sysToNEVM (amount, xpub, sysChangeAddress, destinationAddress) {
-    const feeRate = new sjs.utils.BN(10)
-    const memoHeader = Buffer.from( this.state.MEMOHEADER.data )
-    const txOpts = { rbf: true, memo: Buffer.from(destinationAddress), memoHeader: memoHeader }
+  async sysToNEVM(amount, xpub, sysChangeAddress, destinationAddress) {
+    const feeRate = new sjs.utils.BN(10);
+    const memoHeader = Buffer.from(this.state.MEMOHEADER.data);
+    const txOpts = {
+      rbf: true,
+      memo: Buffer.from(destinationAddress),
+      memoHeader: memoHeader,
+    };
     const outputsArr = [
-      { address: this.state.SYSADDRESS, value: new sjs.utils.BN(satoshibitcoin.toSatoshi(amount)) }
-    ]
-    const res = await this.syscoinjs.createTransaction(txOpts, sysChangeAddress, outputsArr, feeRate, xpub)
-    let err = null
+      {
+        address: this.state.SYSADDRESS,
+        value: new sjs.utils.BN(satoshibitcoin.toSatoshi(amount)),
+      },
+    ];
+    const res = await this.syscoinjs.createTransaction(
+      txOpts,
+      sysChangeAddress,
+      outputsArr,
+      feeRate,
+      xpub
+    );
+    let err = null;
     if (!res) {
-      err = 'Could not create transaction, not enough funds?';
-      return {data: null, error: err}
+      err = "Could not create transaction, not enough funds?";
+      return { data: null, error: err };
     }
     const serializedResp = sjs.utils.exportPsbtToJson(res.psbt, res.assets);
-    const signRes = await window.ConnectionsController.signAndSend(serializedResp);
-    const unserializedResp = sjs.utils.importPsbtFromJson(signRes, CONFIGURATION.SysNetwork);
-    return {swapTxid: unserializedResp.psbt.extractTransaction().getId(), error: null}
+    const signRes = await window.pali.request({
+      method: "sys_signAndSend",
+      params: [serializedResp],
+    });
+    const unserializedResp = sjs.utils.importPsbtFromJson(
+      signRes,
+      CONFIGURATION.SysNetwork
+    );
+    return {
+      swapTxid: unserializedResp.psbt.extractTransaction().getId(),
+      error: null,
+    };
   }
   async sendUTXO() {
-    if (!window.ConnectionsController) {
-      this.setState({buttonVal1: false, buttonValMsg1: this.props.t("step2InstallPali")});
-      return;  
+    if (!window.pali) {
+      this.setState({
+        buttonVal1: false,
+        buttonValMsg1: this.props.t("step2InstallPali"),
+      });
+      return;
     }
     let connectedAccount;
     try {
-      connectedAccount = await window.ConnectionsController.getConnectedAccount()
-      .catch(function(rejected){
-        this.setState({buttonVal1: false, buttonValMsg1: rejected});
-        return;  
+      connectedAccount = await window.pali.request({
+        method: "wallet_getAccount",
+        params: [],
       });
-    } catch(e) {
-      this.setState({buttonVal1: false, buttonValMsg1: e.message || e});
-      return;  
+    } catch (e) {
+      this.setState({ buttonVal1: false, buttonValMsg1:  (e.data ? e.data.message : undefined) || e.message || e  });
+      return;
     }
-    const locked = await window.ConnectionsController.isLocked()
-    if(locked) {
-      this.setState({buttonVal1: true, buttonValMsg1: this.props.t("step2UnlockPali")});
-      return
-    }
-    if (!connectedAccount || locked) {
-      await window.ConnectionsController.connectWallet()
+    // const locked = !(await window.pali.isUnlocked());
+    // if (locked) {
+    //   this.setState({
+    //     buttonVal1: true,
+    //     buttonValMsg1: this.props.t("step2UnlockPali"),
+    //   });
+    //   return;
+    // }
+    if (!connectedAccount ) {
+      await window.pali.request({ method: "sys_requestAccounts", params: [] });
     }
     let xpub;
     try {
-      xpub = await window.ConnectionsController.getConnectedAccountXpub()
-      .catch(function(rejected){
-        this.setState({buttonVal1: false, buttonValMsg1: rejected});
-        return;  
+      xpub = await window.pali.request({
+        method: "wallet_getPublicKey",
+        params: [],
       });
-    } catch(e) {
-      this.setState({buttonVal1: false, buttonValMsg1: e.message || e});
-      return;  
+    } catch (e) {
+      this.setState({ buttonVal1: false, buttonValMsg1: (e.data ? e.data.message : undefined) || e.message || e });
+      return;
     }
-    const sysChangeAddress = await window.ConnectionsController.getChangeAddress();
-    if(!sysChangeAddress) {
-      this.setState({buttonVal1: false, buttonValMsg1: this.props.t("step2SelectPaliAccount")});
-      return;  
+    const sysChangeAddress = await window.pali.request({
+      method: "wallet_getChangeAddress",
+      params: [],
+    });
+    if (!sysChangeAddress) {
+      this.setState({
+        buttonVal1: false,
+        buttonValMsg1: this.props.t("step2SelectPaliAccount"),
+      });
+      return;
     }
     let userInput = this._grabUserInput(); // grab user entered vals
     let validateNewInput = userInput;
     validateNewInput.buttonVal1 = true;
     validateNewInput.buttonValMsg1 = "";
     let valid = true;
-    var amount
-    const minamount = web3.utils.toBN(web3.utils.toWei('1', 'ether'));
-    amount = web3.utils.toWei(userInput.amount.toString(), 'ether');
-    if(web3.utils.toBN(amount).gt(web3.utils.toBN(web3.utils.toWei(this.state.NEVMBALANCE, 'ether')))) {
+    var amount;
+    const minamount = web3.utils.toBN(web3.utils.toWei("1", "ether"));
+    amount = web3.utils.toWei(userInput.amount.toString(), "ether");
+    if (
+      web3.utils
+        .toBN(amount)
+        .gt(web3.utils.toBN(web3.utils.toWei(this.state.NEVMBALANCE, "ether")))
+    ) {
       validateNewInput.buttonVal1 = false;
-      validateNewInput.buttonValMsg1 = this.props.t("step1FSInsufficientBalanceNEVM");
+      validateNewInput.buttonValMsg1 = this.props.t(
+        "step1FSInsufficientBalanceNEVM"
+      );
       valid = false;
-    } else if(web3.utils.toBN(amount).lt(minamount)) {
+    } else if (web3.utils.toBN(amount).lt(minamount)) {
       validateNewInput.buttonVal1 = false;
       validateNewInput.buttonValMsg1 = this.props.t("step1FSMinAmount");
-      valid = false;     
+      valid = false;
     }
     if (!web3.utils.isAddress(userInput.destinationAddress)) {
       validateNewInput.buttonVal1 = false;
-      validateNewInput.buttonValMsg1 = this.props.t("step1FSInvalidDestination");
+      validateNewInput.buttonValMsg1 = this.props.t(
+        "step1FSInvalidDestination"
+      );
       valid = false;
     }
-    
-    if(valid === false){
-      this.setState({buttonVal1: validateNewInput.buttonVal1, buttonValMsg1: validateNewInput.buttonValMsg1});
+
+    if (valid === false) {
+      this.setState({
+        buttonVal1: validateNewInput.buttonVal1,
+        buttonValMsg1: validateNewInput.buttonValMsg1,
+      });
       return;
     }
     let self = this;
-    
-    if(valid === true){
-      this.setState({swapTxid: '', working: true});
-    
+
+    if (valid === true) {
+      this.setState({ swapTxid: "", working: true });
+
       try {
-        let results = await this.sysToNEVM(userInput.amount.toString(), xpub, sysChangeAddress, userInput.destinationAddress);
-        if(results.error){
+        let results = await this.sysToNEVM(
+          userInput.amount.toString(),
+          xpub,
+          sysChangeAddress,
+          userInput.destinationAddress
+        );
+        if (results.error) {
           validateNewInput.buttonVal1 = false;
           validateNewInput.buttonValMsg1 = results.error;
-          self.setState({working: false});    
-        }
-        else if(results.swapTxid){
+          self.setState({ working: false });
+        } else if (results.swapTxid) {
           validateNewInput.buttonVal1 = true;
           this.refs.swapTxid.value = results.swapTxid;
           this.state.swapTxid = results.swapTxid;
@@ -223,50 +308,66 @@ class Step1FS extends Component {
           this.saveToLocalStorage();
           setTimeout(this.fastSwap, 5000, this);
         }
-      }catch(e) {
+      } catch (e) {
         validateNewInput.buttonVal1 = false;
-        validateNewInput.buttonValMsg1 = (e && e.message)? e.message: this.props.t("genericError");
-        this.setState({working: false});
+        validateNewInput.buttonValMsg1 =
+          e && e.message ? e.message : this.props.t("genericError");
+        this.setState({ working: false });
       }
-      
     }
-    this.setState({buttonVal1: validateNewInput.buttonVal1, buttonValMsg1: validateNewInput.buttonValMsg1}); 
+    this.setState({
+      buttonVal1: validateNewInput.buttonVal1,
+      buttonValMsg1: validateNewInput.buttonValMsg1,
+    });
   }
   async swap() {
     let valid = true;
     let userInput = this._grabUserInput(); // grab user entered vals
     let validateNewInput = userInput;
-    if(!userInput.amount || userInput.amount.toString() === "" || !userInput.destinationAddress || userInput.userInput === ""){
+    if (
+      !userInput.amount ||
+      userInput.amount.toString() === "" ||
+      !userInput.destinationAddress ||
+      userInput.userInput === ""
+    ) {
       validateNewInput.buttonVal1 = false;
       validateNewInput.buttonValMsg1 = this.props.t("step1FSInputMissing");
       valid = false;
     }
-    let sendNEVMFlag = false
-    let sendUTXOFlag = false
-    if(valid) {
+    let sendNEVMFlag = false;
+    let sendUTXOFlag = false;
+    if (valid) {
       try {
-        sjs.utils.bitcoinjs.address.toOutputScript(userInput.destinationAddress, CONFIGURATION.SysNetwork)
-        sendNEVMFlag = true
+        sjs.utils.bitcoinjs.address.toOutputScript(
+          userInput.destinationAddress,
+          CONFIGURATION.SysNetwork
+        );
+        sendNEVMFlag = true;
       } catch (e) {
-        sendNEVMFlag = false
-      }  
-      if(!sendNEVMFlag) {
+        sendNEVMFlag = false;
+      }
+      if (!sendNEVMFlag) {
         if (!web3.utils.isAddress(userInput.destinationAddress)) {
           validateNewInput.buttonVal1 = false;
-          validateNewInput.buttonValMsg1 = this.props.t("step1FSInvalidDestination");
+          validateNewInput.buttonValMsg1 = this.props.t(
+            "step1FSInvalidDestination"
+          );
           valid = false;
         } else {
-          sendUTXOFlag = true
+          sendUTXOFlag = true;
         }
       }
     }
-    if(valid === false){
-      this.setState({buttonVal1: validateNewInput.buttonVal1, buttonValMsg1: validateNewInput.buttonValMsg1}); 
+    if (valid === false) {
+      this.setState({
+        buttonVal1: validateNewInput.buttonVal1,
+        buttonValMsg1: validateNewInput.buttonValMsg1,
+      });
       return;
     }
-    if(sendUTXOFlag) {
+    if (sendUTXOFlag) {
       await this.sendUTXO();
-    } else if(sendNEVMFlag) {
+    } else if (sendNEVMFlag) {
       await this.sendNEVM();
     }
   }
@@ -276,51 +377,70 @@ class Step1FS extends Component {
     validateNewInput.buttonVal1 = true;
     validateNewInput.buttonValMsg1 = "";
     let valid = true;
-    var amount
-     
-    const minamount = web3.utils.toBN(web3.utils.toWei('1', 'ether'));
-    amount = web3.utils.toWei(userInput.amount.toString(), 'ether');
-    if(web3.utils.toBN(amount).gt(web3.utils.toBN(web3.utils.toWei(this.state.SYSBALANCE, 'ether')))) {
+    var amount;
+
+    const minamount = web3.utils.toBN(web3.utils.toWei("1", "ether"));
+    amount = web3.utils.toWei(userInput.amount.toString(), "ether");
+    if (
+      web3.utils
+        .toBN(amount)
+        .gt(web3.utils.toBN(web3.utils.toWei(this.state.SYSBALANCE, "ether")))
+    ) {
       validateNewInput.buttonVal1 = false;
-      validateNewInput.buttonValMsg1 = this.props.t("step1FSInsufficientBalanceSYS");
+      validateNewInput.buttonValMsg1 = this.props.t(
+        "step1FSInsufficientBalanceSYS"
+      );
       valid = false;
-    } else if(web3.utils.toBN(amount).lt(minamount)) {
+    } else if (web3.utils.toBN(amount).lt(minamount)) {
       validateNewInput.buttonVal1 = false;
       validateNewInput.buttonValMsg1 = this.props.t("step1FSMinAmount");
-      valid = false;     
+      valid = false;
     }
     try {
-      sjs.utils.bitcoinjs.address.toOutputScript(userInput.destinationAddress, CONFIGURATION.SysNetwork)
+      sjs.utils.bitcoinjs.address.toOutputScript(
+        userInput.destinationAddress,
+        CONFIGURATION.SysNetwork
+      );
     } catch (e) {
-      console.log('e ' + e.message, " address " + userInput.destinationAddress)
+      console.log("e " + e.message, " address " + userInput.destinationAddress);
       validateNewInput.buttonVal1 = false;
-      validateNewInput.buttonValMsg1 = this.props.t("step1FSInvalidDestination");
+      validateNewInput.buttonValMsg1 = this.props.t(
+        "step1FSInvalidDestination"
+      );
       valid = false;
-    }  
-    
-    if(valid === false){
-      this.setState({buttonVal1: validateNewInput.buttonVal1, buttonValMsg1: validateNewInput.buttonValMsg1}); 
+    }
+
+    if (valid === false) {
+      this.setState({
+        buttonVal1: validateNewInput.buttonVal1,
+        buttonValMsg1: validateNewInput.buttonValMsg1,
+      });
       return;
     }
     const provider = await detectEthereumProvider();
-    if(!provider){
+    if (!provider) {
       validateNewInput.buttonVal1 = false;
       validateNewInput.buttonValMsg1 = this.props.t("step3InstallMetamask");
-      this.setState({buttonVal1: validateNewInput.buttonVal1, buttonValMsg1: validateNewInput.buttonValMsg1}); 
-      return;  
+      this.setState({
+        buttonVal1: validateNewInput.buttonVal1,
+        buttonValMsg1: validateNewInput.buttonValMsg1,
+      });
+      return;
     }
     let accounts = await web3.eth.getAccounts();
-    if(!accounts || !accounts[0] || accounts[0] === 'undefined')
-    {
+    if (!accounts || !accounts[0] || accounts[0] === "undefined") {
       validateNewInput.buttonVal1 = false;
       validateNewInput.buttonValMsg1 = this.props.t("step3LoginMetamask");
-      this.setState({buttonVal1: validateNewInput.buttonVal1, buttonValMsg1: validateNewInput.buttonValMsg1}); 
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
+      this.setState({
+        buttonVal1: validateNewInput.buttonVal1,
+        buttonValMsg1: validateNewInput.buttonValMsg1,
+      });
+      await window.ethereum.request({ method: "eth_requestAccounts" });
       return;
     }
     try {
       await window.ethereum.request({
-        method: 'wallet_switchEthereumChain',
+        method: "wallet_switchEthereumChain",
         params: [{ chainId: CONFIGURATION.ChainId }],
       });
     } catch (switchError) {
@@ -328,185 +448,229 @@ class Step1FS extends Component {
       if (switchError.code === 4902) {
         try {
           await window.ethereum.request({
-            method: 'wallet_addEthereumChain',
-            params: [{
-              chainId: CONFIGURATION.ChainId,
-              chainName: CONFIGURATION.ChainName,
-              nativeCurrency: {
+            method: "wallet_addEthereumChain",
+            params: [
+              {
+                chainId: CONFIGURATION.ChainId,
+                chainName: CONFIGURATION.ChainName,
+                nativeCurrency: {
                   name: CONFIGURATION.NativeCurrencyName,
                   symbol: CONFIGURATION.NativeCurrencySymbol,
-                  decimals: 18
+                  decimals: 18,
+                },
+                rpcUrls: [CONFIGURATION.Web3URL],
+                blockExplorerUrls: [CONFIGURATION.NEVMExplorerURL],
               },
-              rpcUrls: [CONFIGURATION.Web3URL],
-              blockExplorerUrls: [CONFIGURATION.NEVMExplorerURL]
-              }],
+            ],
           });
         } catch (addError) {
           validateNewInput.buttonVal1 = false;
           validateNewInput.buttonValMsg1 = addError.message;
-          this.setState({buttonVal1: validateNewInput.buttonVal1, buttonValMsg1: validateNewInput.buttonValMsg1}); 
+          this.setState({
+            buttonVal1: validateNewInput.buttonVal1,
+            buttonValMsg1: validateNewInput.buttonValMsg1,
+          });
           return;
         }
       } else {
         validateNewInput.buttonVal1 = false;
         validateNewInput.buttonValMsg1 = switchError.message;
-        this.setState({buttonVal1: validateNewInput.buttonVal1, buttonValMsg1: validateNewInput.buttonValMsg1}); 
+        this.setState({
+          buttonVal1: validateNewInput.buttonVal1,
+          buttonValMsg1: validateNewInput.buttonValMsg1,
+        });
         return;
       }
     }
     let ChainId = await web3.eth.getChainId();
-    if(ChainId !== parseInt(CONFIGURATION.ChainId, 16)){
+    if (ChainId !== parseInt(CONFIGURATION.ChainId, 16)) {
       validateNewInput.buttonVal1 = false;
       validateNewInput.buttonValMsg1 = "Invalid network";
-      this.setState({buttonVal1: validateNewInput.buttonVal1, buttonValMsg1: validateNewInput.buttonValMsg1}); 
-      return;        
-    } 
-    this.setState({swapTxid: '', working: true});
+      this.setState({
+        buttonVal1: validateNewInput.buttonVal1,
+        buttonValMsg1: validateNewInput.buttonValMsg1,
+      });
+      return;
+    }
+    this.setState({ swapTxid: "", working: true });
     validateNewInput.buttonValMsg1 = this.props.t("step3AuthMetamask");
- 
+
     let thisObj = this;
-    web3.eth.sendTransaction({from: accounts[0], gas: 400000, to: this.state.NEVMADDRESS, value: amount.toString(), input: web3.utils.asciiToHex(userInput.destinationAddress)})
-      .once('transactionHash', function(hash){
+    web3.eth
+      .sendTransaction({
+        from: accounts[0],
+        gas: 400000,
+        to: this.state.NEVMADDRESS,
+        value: amount.toString(),
+        input: web3.utils.asciiToHex(userInput.destinationAddress),
+      })
+      .once("transactionHash", function (hash) {
         validateNewInput.buttonVal1 = true;
         validateNewInput.swapTxid = hash;
         validateNewInput.buttonValMsg1 = thisObj.props.t("step3Success");
-        thisObj.setState({swapTxid: hash, buttonVal1: validateNewInput.buttonVal1, buttonValMsg1: validateNewInput.buttonValMsg1});
+        thisObj.setState({
+          swapTxid: hash,
+          buttonVal1: validateNewInput.buttonVal1,
+          buttonValMsg1: validateNewInput.buttonValMsg1,
+        });
         thisObj.refs.swapTxid.value = hash;
         thisObj.saveToLocalStorage();
         setTimeout(thisObj.fastSwap, 5000, thisObj);
       })
-      .on('error', (error) => {
-        thisObj.setState({working: false});
-        if(error.message.length <= 512 && error.message.indexOf("{") !== -1){
-          error = JSON.parse(error.message.substring(error.message.indexOf("{")));
+      .on("error", (error) => {
+        thisObj.setState({ working: false });
+        if (error.message.length <= 512 && error.message.indexOf("{") !== -1) {
+          error = JSON.parse(
+            error.message.substring(error.message.indexOf("{"))
+          );
         }
         let message = error.message.toString();
-        if(message.indexOf("might still be mined") === -1) {
+        if (message.indexOf("might still be mined") === -1) {
           validateNewInput.buttonVal1 = false;
-          validateNewInput.buttonValMsg1 = message; 
-          thisObj.setState({buttonVal1: validateNewInput.buttonVal1, buttonValMsg1: validateNewInput.buttonValMsg1});
+          validateNewInput.buttonValMsg1 = message;
+          thisObj.setState({
+            buttonVal1: validateNewInput.buttonVal1,
+            buttonValMsg1: validateNewInput.buttonValMsg1,
+          });
         }
-      })
-      this.setState({buttonVal1: validateNewInput.buttonVal1, buttonValMsg1: validateNewInput.buttonValMsg1});
+      });
+    this.setState({
+      buttonVal1: validateNewInput.buttonVal1,
+      buttonValMsg1: validateNewInput.buttonValMsg1,
+    });
   }
   _grabUserInput() {
     return {
       destinationAddress: this.refs.destinationAddress.value,
-      amount: this.refs.amount.value
+      amount: this.refs.amount.value,
     };
   }
   statusToDisplay(status) {
-    if(!status) {
+    if (!status) {
       return this.props.t("step1FSStatusComplete");
-    } else if(status === 1) {
+    } else if (status === 1) {
       return this.props.t("step1FSStatusReceived");
-    } else if(status === 2) {
+    } else if (status === 2) {
       return this.props.t("step1FSStatusSent");
     } else {
       return this.props.t("step1FSStatusUnknown");
     }
   }
   async fastSwap() {
-    this.setState({working: true});
+    this.setState({ working: true });
     let userInput = this._grabUserInput(); // grab user entered vals
     let validateNewInput = userInput;
     validateNewInput.buttonVal2 = true;
     validateNewInput.buttonValMsg2 = "";
     const txid = this.refs.swapTxid.value;
-    if(!txid || txid === ""){
+    if (!txid || txid === "") {
       validateNewInput.buttonVal2 = false;
       validateNewInput.buttonValMsg2 = this.props.t("step1FSMissingTxid");
-      this.setState({buttonVal2: validateNewInput.buttonVal2, buttonValMsg2: validateNewInput.buttonValMsg2});
-      return;  
-    }   
-    if(this.fastSwapTimer) {
+      this.setState({
+        buttonVal2: validateNewInput.buttonVal2,
+        buttonValMsg2: validateNewInput.buttonValMsg2,
+      });
+      return;
+    }
+    if (this.fastSwapTimer) {
       clearInterval(this.fastSwapTimer);
       this.fastSwapTimer = null;
     }
     this.fastSwapTimer = setInterval(this.fastSwap, 10000, this);
-    let thisObj = this; 
-    await axios.post(CONFIGURATION.EasySwapAPI + "/fastswap/" + txid, {txid: txid})
-    .then(function (response) {
-        if(response.data.status === "success") {
-          thisObj.state.fsStatus = thisObj.statusToDisplay(response.data.data.status)
-          thisObj.state.fsAmount = web3.utils.fromWei(response.data.data.amount, 'ether') + " SYS"
-          thisObj.state.fsType = response.data.data.type
+    let thisObj = this;
+    await axios
+      .post(CONFIGURATION.EasySwapAPI + "/fastswap/" + txid, { txid: txid })
+      .then(function (response) {
+        if (response.data.status === "success") {
+          thisObj.state.fsStatus = thisObj.statusToDisplay(
+            response.data.data.status
+          );
+          thisObj.state.fsAmount =
+            web3.utils.fromWei(response.data.data.amount, "ether") + " SYS";
+          thisObj.state.fsType = response.data.data.type;
           if (thisObj.state.fsType === "utxo") {
-            thisObj.state.fsSrcTx = CONFIGURATION.SyscoinTxExplorerURL + response.data.data.srctxid
-            thisObj.state.fsDstTx = ""
-            if(response.data.data.dsttxid) {
-              thisObj.state.fsDstTx = CONFIGURATION.NEVMTxExplorerURL + response.data.data.dsttxid
+            thisObj.state.fsSrcTx =
+              CONFIGURATION.SyscoinTxExplorerURL + response.data.data.srctxid;
+            thisObj.state.fsDstTx = "";
+            if (response.data.data.dsttxid) {
+              thisObj.state.fsDstTx =
+                CONFIGURATION.NEVMTxExplorerURL + response.data.data.dsttxid;
             }
           } else if (thisObj.state.fsType === "nevm") {
-            thisObj.state.fsSrcTx = CONFIGURATION.NEVMTxExplorerURL + response.data.data.srctxid
-            thisObj.state.fsDstTx = ""
-            if(response.data.data.dsttxid) {
-              thisObj.state.fsDstTx = CONFIGURATION.SyscoinTxExplorerURL + response.data.data.dsttxid
+            thisObj.state.fsSrcTx =
+              CONFIGURATION.NEVMTxExplorerURL + response.data.data.srctxid;
+            thisObj.state.fsDstTx = "";
+            if (response.data.data.dsttxid) {
+              thisObj.state.fsDstTx =
+                CONFIGURATION.SyscoinTxExplorerURL + response.data.data.dsttxid;
             }
           }
-          thisObj.state.fsDestinationAddress = response.data.data.dstaddress
-          thisObj.setState({fsStatus: thisObj.state.fsStatus,
+          thisObj.state.fsDestinationAddress = response.data.data.dstaddress;
+          thisObj.setState({
+            fsStatus: thisObj.state.fsStatus,
             fsAmount: thisObj.state.fsAmount,
             fsType: thisObj.state.fsType,
             fsSrcTx: thisObj.state.fsSrcTx,
             fsDstTx: thisObj.state.fsDstTx,
-            fsDestinationAddress: thisObj.state.fsDestinationAddress
-          })
-        } else if(response.data.status === "error") {
-          validateNewInput.buttonVal2 = false
-          validateNewInput.buttonValMsg2 = response.data.data
+            fsDestinationAddress: thisObj.state.fsDestinationAddress,
+          });
+        } else if (response.data.status === "error") {
+          validateNewInput.buttonVal2 = false;
+          validateNewInput.buttonValMsg2 = response.data.data;
         } else {
-          validateNewInput.buttonVal2 = false
-          validateNewInput.buttonValMsg2 = "Unknown error"
+          validateNewInput.buttonVal2 = false;
+          validateNewInput.buttonValMsg2 = "Unknown error";
         }
-        this.setState({working: false});
-        
-    })
-    .catch(error => {
-      console.error('Easy Swap error:', error);
-      if(error.message.length <= 512 && error.message.indexOf("{") !== -1){
-        error = JSON.parse(error.message.substring(error.message.indexOf("{")));
-      }
-      let message = error.message.toString();
-      validateNewInput.buttonVal2 = false;
-      validateNewInput.buttonValMsg2 = message;
-      this.setState({working: false});
+        this.setState({ working: false });
+      })
+      .catch((error) => {
+        console.error("Easy Swap error:", error);
+        if (error.message.length <= 512 && error.message.indexOf("{") !== -1) {
+          error = JSON.parse(
+            error.message.substring(error.message.indexOf("{"))
+          );
+        }
+        let message = error.message.toString();
+        validateNewInput.buttonVal2 = false;
+        validateNewInput.buttonValMsg2 = message;
+        this.setState({ working: false });
+      });
+    this.setState({
+      buttonVal2: validateNewInput.buttonVal2,
+      buttonValMsg2: validateNewInput.buttonValMsg2,
     });
-    this.setState({buttonVal2: validateNewInput.buttonVal2, buttonValMsg2: validateNewInput.buttonValMsg2});
   }
 
   render() {
     // explicit class assigning based on validation
-    let notValidClasses = {};    
-    if (typeof this.state.buttonVal1 == 'undefined' || this.state.buttonVal1) {
-      notValidClasses.buttonCls1 = 'has-success';
-      notValidClasses.buttonValGrpCls1 = 'val-success-tooltip'; // use 'active' class if you want to actually use this (green) tooltip
-    }
-    else {
-       notValidClasses.buttonCls1 = 'has-error';
-       notValidClasses.buttonValGrpCls1 = 'val-err-tooltip';
-    }   
-    if (typeof this.state.buttonVal2 == 'undefined' || this.state.buttonVal2) {
-      notValidClasses.buttonCls2 = 'has-success';
-      notValidClasses.buttonValGrpCls2 = 'val-success-tooltip'; // use 'active' class if you want to actually use this (green) tooltip
-    }
-    else {
-       notValidClasses.buttonCls2 = 'has-error';
-       notValidClasses.buttonValGrpCls2 = 'val-err-tooltip';
-    }  
-    if (typeof this.state.buttonVal2 != 'undefined' && !this.state.buttonVal2) {
-      notValidClasses.buttonCls3 = 'has-error';
-      notValidClasses.buttonValGrpCls3 = 'val-err-tooltip';
-    }
-    if(this.state.sysBalanceLow) {
-      notValidClasses.sysBalanceCls = "text-danger"
+    let notValidClasses = {};
+    if (typeof this.state.buttonVal1 == "undefined" || this.state.buttonVal1) {
+      notValidClasses.buttonCls1 = "has-success";
+      notValidClasses.buttonValGrpCls1 = "val-success-tooltip"; // use 'active' class if you want to actually use this (green) tooltip
     } else {
-      notValidClasses.sysBalanceCls = "text-success"
+      notValidClasses.buttonCls1 = "has-error";
+      notValidClasses.buttonValGrpCls1 = "val-err-tooltip";
     }
-    if(this.state.nevmBalanceLow) {
-      notValidClasses.nevmBalanceCls = "text-danger"
+    if (typeof this.state.buttonVal2 == "undefined" || this.state.buttonVal2) {
+      notValidClasses.buttonCls2 = "has-success";
+      notValidClasses.buttonValGrpCls2 = "val-success-tooltip"; // use 'active' class if you want to actually use this (green) tooltip
     } else {
-      notValidClasses.nevmBalanceCls = "text-success"
+      notValidClasses.buttonCls2 = "has-error";
+      notValidClasses.buttonValGrpCls2 = "val-err-tooltip";
+    }
+    if (typeof this.state.buttonVal2 != "undefined" && !this.state.buttonVal2) {
+      notValidClasses.buttonCls3 = "has-error";
+      notValidClasses.buttonValGrpCls3 = "val-err-tooltip";
+    }
+    if (this.state.sysBalanceLow) {
+      notValidClasses.sysBalanceCls = "text-danger";
+    } else {
+      notValidClasses.sysBalanceCls = "text-success";
+    }
+    if (this.state.nevmBalanceLow) {
+      notValidClasses.nevmBalanceCls = "text-danger";
+    } else {
+      notValidClasses.nevmBalanceCls = "text-success";
     }
     return (
       <div className="step Step1FS">
@@ -515,104 +679,186 @@ class Step1FS extends Component {
             <div className="form-group">
               <label className="col-md-12">
                 <h1>{this.props.t("step1FSHead")}</h1>
-                <h3 dangerouslySetInnerHTML={{__html: this.props.t("step1FSDescription")}}></h3>
+                <h3
+                  dangerouslySetInnerHTML={{
+                    __html: this.props.t("step1FSDescription"),
+                  }}
+                ></h3>
               </label>
               <div className="row">
-              <div className="col-md-12">
-                <label className="control-label col-md-4">
-                  {this.props.t("step1FSEnterAmount")}
-                </label>
-                <div>
-                  <input
-                    ref="amount"
-                    autoComplete="off"
-                    type="number"
-                    placeholder={this.props.t("step1FSEnterAmount")}
-                    className="form-control"
-                    defaultValue={this.state.amount}
-                     />
-                     <small className="text-muted">SYS Balance: <b className={notValidClasses.sysBalanceCls}>{this.state.SYSBALANCE}</b>    NEVM Balance: <b className={notValidClasses.nevmBalanceCls}>{this.state.NEVMBALANCE}</b></small>
+                <div className="col-md-12">
+                  <label className="control-label col-md-4">
+                    {this.props.t("step1FSEnterAmount")}
+                  </label>
+                  <div>
+                    <input
+                      ref="amount"
+                      autoComplete="off"
+                      type="number"
+                      placeholder={this.props.t("step1FSEnterAmount")}
+                      className="form-control"
+                      defaultValue={this.state.amount}
+                    />
+                    <small className="text-muted">
+                      SYS Balance:{" "}
+                      <b className={notValidClasses.sysBalanceCls}>
+                        {this.state.SYSBALANCE}
+                      </b>{" "}
+                      NEVM Balance:{" "}
+                      <b className={notValidClasses.nevmBalanceCls}>
+                        {this.state.NEVMBALANCE}
+                      </b>
+                    </small>
+                  </div>
                 </div>
-              </div>
-              <div className="col-md-12">
-                <label className="control-label col-md-4">
-                  {this.props.t("step1FSEnterDestination")}
-                </label>
-                <div>
-                  <input
-                    ref="destinationAddress"
-                    autoComplete="off"
-                    type="string"
-                    placeholder={this.props.t("step1FSEnterDestination")}
-                    className="form-control"
-                    defaultValue={this.state.destinationAddress}
-                     />
-                </div>
-              </div>
-              </div>
-              <div className="row">
-              <div className="col-md-12 btn-group">
-                <div className={notValidClasses.buttonCls1}>
-                    <button disabled={this.state.working} type="button" className="form-control btn btn-default formbtn" aria-label={this.props.t("step1FSSwap")} onClick={this.swap}>
-                    <span className="glyphicon glyphicon-send" aria-hidden="true">&nbsp;</span>
-                    {this.props.t("step1FSSwap")}
-                    </button>
-                  <div className={notValidClasses.buttonValGrpCls1}>{this.state.buttonValMsg1}</div>
-                </div>
-              </div>
-              </div>
-              <div className="row">
-              <div className="col-md-12">
-                <label className="control-label col-md-4">
-                  {this.props.t("txidLabel")}
-                </label>
-                <div>
-                  <input
-                    ref="swapTxid"
-                    autoComplete="off"
-                    type="text"
-                    placeholder={this.props.t("step1FSEnterTx")}
-                    className="form-control"
-                    required
-                    defaultValue={this.state.swapTxid}/>
-                </div>
-              </div>
-              </div>
-              <div className="row">
-              <div className="col-md-4 col-sm-12 col-centered">
-                <div className={notValidClasses.buttonCls3}>
-                    <button disabled={this.state.working} type="button" className="form-control btn btn-default formbtn" aria-label={this.props.t("step1FSStartButton")} onClick={this.fastSwap}>
-                    <span className="glyphicon glyphicon-send" aria-hidden="true">&nbsp;</span>
-                    {this.props.t("step1FSStartButton")}
-                    </button>
-                  <div className={notValidClasses.buttonValGrpCls3}>{this.state.buttonValMsg2}</div>
-                </div>
-              </div>
-              </div>
-              <div className="row">
-                  <div className="col-md-12">
-                    <Tabs>
-                      <TabList>
-                        <Tab>{this.props.t("tabGeneral")}</Tab>
-                      </TabList>
-                      <TabPanel>
-                        <code className="block">
-                            <span className="dataname">{this.props.t("step1FSStatus")}:</span> <span className="result">{this.state.fsStatus}</span><br />
-                            <span className="dataname">{this.props.t("step1FSAmount")}:</span> <span className="result">{this.state.fsAmount}</span><br />
-                            <span className="dataname">{this.props.t("step1FSType")}:</span> <span className="result">{this.state.fsType}</span><br />
-                            <span className="dataname">{this.props.t("step1FSDestinationAddress")}:</span> <span className="result">{this.state.fsDestinationAddress}</span><br />
-                            <span className="dataname">{this.props.t("step1FSSrcTx")}:</span> <span className="result"><a href={this.state.fsSrcTx} target="_blank" rel="noopener noreferrer">{this.state.fsSrcTx}</a></span><br />
-                            <span className="dataname">{this.props.t("step1FSDstTx")}:</span> <span className="result"><a href={this.state.fsDstTx} target="_blank" rel="noopener noreferrer">{this.state.fsDstTx}</a></span><br />
-                        </code>
-                      </TabPanel>
-                    </Tabs>
+                <div className="col-md-12">
+                  <label className="control-label col-md-4">
+                    {this.props.t("step1FSEnterDestination")}
+                  </label>
+                  <div>
+                    <input
+                      ref="destinationAddress"
+                      autoComplete="off"
+                      type="string"
+                      placeholder={this.props.t("step1FSEnterDestination")}
+                      className="form-control"
+                      defaultValue={this.state.destinationAddress}
+                    />
                   </div>
                 </div>
               </div>
+              <div className="row">
+                <div className="col-md-12 btn-group">
+                  <div className={notValidClasses.buttonCls1}>
+                    <button
+                      disabled={this.state.working}
+                      type="button"
+                      className="form-control btn btn-default formbtn"
+                      aria-label={this.props.t("step1FSSwap")}
+                      onClick={this.swap}
+                    >
+                      <span
+                        className="glyphicon glyphicon-send"
+                        aria-hidden="true"
+                      >
+                        &nbsp;
+                      </span>
+                      {this.props.t("step1FSSwap")}
+                    </button>
+                    <div className={notValidClasses.buttonValGrpCls1}>
+                      {this.state.buttonValMsg1}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-md-12">
+                  <label className="control-label col-md-4">
+                    {this.props.t("txidLabel")}
+                  </label>
+                  <div>
+                    <input
+                      ref="swapTxid"
+                      autoComplete="off"
+                      type="text"
+                      placeholder={this.props.t("step1FSEnterTx")}
+                      className="form-control"
+                      required
+                      defaultValue={this.state.swapTxid}
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-md-4 col-sm-12 col-centered">
+                  <div className={notValidClasses.buttonCls3}>
+                    <button
+                      disabled={this.state.working}
+                      type="button"
+                      className="form-control btn btn-default formbtn"
+                      aria-label={this.props.t("step1FSStartButton")}
+                      onClick={this.fastSwap}
+                    >
+                      <span
+                        className="glyphicon glyphicon-send"
+                        aria-hidden="true"
+                      >
+                        &nbsp;
+                      </span>
+                      {this.props.t("step1FSStartButton")}
+                    </button>
+                    <div className={notValidClasses.buttonValGrpCls3}>
+                      {this.state.buttonValMsg2}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-md-12">
+                  <Tabs>
+                    <TabList>
+                      <Tab>{this.props.t("tabGeneral")}</Tab>
+                    </TabList>
+                    <TabPanel>
+                      <code className="block">
+                        <span className="dataname">
+                          {this.props.t("step1FSStatus")}:
+                        </span>{" "}
+                        <span className="result">{this.state.fsStatus}</span>
+                        <br />
+                        <span className="dataname">
+                          {this.props.t("step1FSAmount")}:
+                        </span>{" "}
+                        <span className="result">{this.state.fsAmount}</span>
+                        <br />
+                        <span className="dataname">
+                          {this.props.t("step1FSType")}:
+                        </span>{" "}
+                        <span className="result">{this.state.fsType}</span>
+                        <br />
+                        <span className="dataname">
+                          {this.props.t("step1FSDestinationAddress")}:
+                        </span>{" "}
+                        <span className="result">
+                          {this.state.fsDestinationAddress}
+                        </span>
+                        <br />
+                        <span className="dataname">
+                          {this.props.t("step1FSSrcTx")}:
+                        </span>{" "}
+                        <span className="result">
+                          <a
+                            href={this.state.fsSrcTx}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {this.state.fsSrcTx}
+                          </a>
+                        </span>
+                        <br />
+                        <span className="dataname">
+                          {this.props.t("step1FSDstTx")}:
+                        </span>{" "}
+                        <span className="result">
+                          <a
+                            href={this.state.fsDstTx}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {this.state.fsDstTx}
+                          </a>
+                        </span>
+                        <br />
+                      </code>
+                    </TabPanel>
+                  </Tabs>
+                </div>
+              </div>
+            </div>
           </form>
         </div>
       </div>
-    )
+    );
   }
 }
 
