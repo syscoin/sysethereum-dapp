@@ -214,15 +214,15 @@ class Step1FS extends Component {
       this.setState({ buttonVal1: false, buttonValMsg1:  (e.data ? e.data.message : undefined) || e.message || e  });
       return;
     }
-    const locked = !(await window.pali.isUnlocked());
-    if (locked) {
-      this.setState({
-        buttonVal1: true,
-        buttonValMsg1: this.props.t("step2UnlockPali"),
-      });
-      return;
-    }
-    if (!connectedAccount || locked) {
+    // const locked = !(await window.pali.isUnlocked());
+    // if (locked) {
+    //   this.setState({
+    //     buttonVal1: true,
+    //     buttonValMsg1: this.props.t("step2UnlockPali"),
+    //   });
+    //   return;
+    // }
+    if (!connectedAccount ) {
       await window.pali.request({ method: "sys_requestAccounts", params: [] });
     }
     let xpub;

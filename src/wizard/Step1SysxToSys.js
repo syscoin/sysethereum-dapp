@@ -148,15 +148,15 @@ class Step1XS extends Component {
       this.setState({ buttonVal: false, buttonValMsg:  (e.data ? e.data.message : undefined) || e.message || e  });
       return;
     }
-    const locked = !(await window.pali.isUnlocked());
-    if (locked) {
-      this.setState({
-        buttonVal: true,
-        buttonValMsg: this.props.t("step2UnlockPali"),
-      });
-      return;
-    }
-    if (!connectedAccount || locked) {
+    // const locked = !(await window.pali.isUnlocked());
+    // if (locked) {
+    //   this.setState({
+    //     buttonVal: true,
+    //     buttonValMsg: this.props.t("step2UnlockPali"),
+    //   });
+    //   return;
+    // }
+    if (!connectedAccount) {
       await window.pali.request({ method: "sys_requestAccounts", params: [] });
     }
     let xpub;
