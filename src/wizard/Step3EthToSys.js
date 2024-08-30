@@ -11,9 +11,7 @@ class Step3ES extends Component {
   }
   clearLocalStorage() {
     if (typeof(Storage) !== "undefined") {
-      localStorage.removeItem("sysxContract");
-      localStorage.removeItem("sysxFromAccount");
-      localStorage.removeItem("toSysAssetGUID");
+      localStorage.removeItem("nevmFromAccount");
       localStorage.removeItem("toSysAmount");
       localStorage.removeItem("syscoinWitnessAddress");
       localStorage.removeItem("receiptTxHash");

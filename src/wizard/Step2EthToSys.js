@@ -73,20 +73,11 @@ class Step2ES extends Component {
 
     return isDataValid;
   }
-  async assetMintToSys(ethTXID, xpub, sysChangeAddress) {
+  async sysBurnToUTXO(ethTXID, xpub, sysChangeAddress) {
     const feeRate = new sjs.utils.BN(10);
-    const txOpts = { rbf: true };
-    // web3 URL + ID and nevm burn txid
-    const assetOpts = {
-      web3url: CONFIGURATION.Web3URL,
-      ethtxid: ethTXID,
-    };
-    // will be auto filled based on ethtxid eth-proof
-    const assetMap = null;
-    const res = await this.syscoinjs.assetAllocationMint(
-      assetOpts,
+    const txOpts = { rbf: true, web3url: CONFIGURATION.Web3URL, ethtxid: ethTXID };
+    const res = await this.syscoinjs.sysMintFromNEVM(
       txOpts,
-      assetMap,
       sysChangeAddress,
       feeRate,
       xpub
@@ -96,7 +87,7 @@ class Step2ES extends Component {
       err = "Could not create transaction, not enough funds?";
       return { data: null, error: err };
     }
-    const serializedResp = sjs.utils.exportPsbtToJson(res.psbt, res.assets);
+    const serializedResp = sjs.utils.exportPsbtToJson(res.psbt);
 
     const signRes = await window.pali.request({
       method: "sys_signAndSend",
@@ -190,7 +181,7 @@ class Step2ES extends Component {
     let ethTXID = userInput.ethburntxid;
     console.log({ ethTXID, xpub, sysChangeAddress });
     try {
-      let results = await this.assetMintToSys(ethTXID, xpub, sysChangeAddress);
+      let results = await this.sysBurnToUTXO(ethTXID, xpub, sysChangeAddress);
       if (results.error) {
         console.log({ results });
         validateNewInput.buttonVal = false;

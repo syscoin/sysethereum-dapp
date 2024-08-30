@@ -2,8 +2,7 @@ import React, { Component } from "react";
 import Web3 from "web3";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
-import assetabi from "../SyscoinERC20I";
-import erc20Managerabi from "../SyscoinERC20Manager";
+import vaultManagerABI from "../VaultManager";
 import CONFIGURATION from "../config";
 // This function detects most providers injected at window.ethereum
 import detectEthereumProvider from "@metamask/detect-provider";
@@ -14,15 +13,9 @@ class Step1ES extends Component {
     super(props);
     let storageExists = typeof Storage !== "undefined";
     this.state = {
-      sysxContract:
-        (storageExists && localStorage.getItem("sysxContract")) ||
-        props.getStore().sysxContract,
-      sysxFromAccount:
-        (storageExists && localStorage.getItem("sysxFromAccount")) ||
-        props.getStore().sysxFromAccount,
-      toSysAssetGUID:
-        (storageExists && localStorage.getItem("toSysAssetGUID")) ||
-        props.getStore().toSysAssetGUID,
+      nevmFromAccount:
+        (storageExists && localStorage.getItem("nevmFromAccount")) ||
+        props.getStore().nevmFromAccount,
       toSysAmount:
         (storageExists && localStorage.getItem("toSysAmount")) ||
         props.getStore().toSysAmount,
@@ -63,9 +56,8 @@ class Step1ES extends Component {
     ) {
       if (
         this.props.getStore().receiptTxHash !== userInput.receiptTxHash ||
-        this.props.getStore().toSysAssetGUID !== userInput.toSysAssetGUID ||
         this.props.getStore().toSysAmount !== userInput.toSysAmount ||
-        this.props.getStore().sysxFromAccount !== userInput.sysxFromAccount ||
+        this.props.getStore().nevmFromAccount !== userInput.nevmFromAccount ||
         this.props.getStore().syscoinWitnessAddress !==
           userInput.syscoinWitnessAddress
       ) {
@@ -105,9 +97,7 @@ class Step1ES extends Component {
   saveToLocalStorage() {
     if (typeof Storage !== "undefined") {
       // Code for localStorage/sessionStorage.
-      localStorage.setItem("sysxContract", this.refs.sysxContract.value);
-      localStorage.setItem("sysxFromAccount", this.refs.sysxFromAccount.value);
-      localStorage.setItem("toSysAssetGUID", this.refs.toSysAssetGUID.value);
+      localStorage.setItem("nevmFromAccount", this.refs.nevmFromAccount.value);
       localStorage.setItem("toSysAmount", this.refs.toSysAmount.value);
       localStorage.setItem(
         "syscoinWitnessAddress",
@@ -135,9 +125,7 @@ class Step1ES extends Component {
 
   _validateData(data) {
     return {
-      sysxContractVal: true,
-      sysxFromAccountVal: true,
-      toSysAssetGUIDVal: true,
+      nevmFromAccountVal: true,
       toSysAmountVal: true,
       syscoinWitnessAddressVal: true,
       receiptStatusVal: true,
@@ -155,12 +143,9 @@ class Step1ES extends Component {
 
   _validationErrors(val) {
     const errMsgs = {
-      sysxFromAccountValMsg: val.sysxFromAccountVal
+      nevmFromAccountValMsg: val.nevmFromAccountVal
         ? ""
         : this.props.t("step2EthAddress"),
-      toSysAssetGUIDValMsg: val.toSysAssetGUIDVal
-        ? ""
-        : this.props.t("step2Asset"),
       toSysAmountValMsg: val.toSysAmountVal ? "" : this.props.t("step2Amount"),
       syscoinWitnessAddressValMsg: val.syscoinWitnessAddressVal
         ? ""
@@ -181,9 +166,7 @@ class Step1ES extends Component {
 
   _grabUserInput() {
     return {
-      sysxContract: "",
-      toSysAssetGUID: this.refs.toSysAssetGUID.value,
-      sysxFromAccount: this.refs.sysxFromAccount.value,
+      nevmFromAccount: this.refs.nevmFromAccount.value,
       toSysAmount: this.refs.toSysAmount.value,
       syscoinWitnessAddress: this.refs.syscoinWitnessAddress.value,
       receiptTxHash: this.state.receiptTxHash,
@@ -222,46 +205,22 @@ class Step1ES extends Component {
       error !== null ? error : this.props.t("step3Success");
   }
 
-  async getAssetContract(guid, validateNewInput) {
-    if (guid.length > 0) {
-      try {
-        let results = await sjs.utils.fetchBackendAsset(
-          CONFIGURATION.BlockbookAPIURL,
-          guid
-        );
-        if (results.error) {
-          validateNewInput.buttonVal = false;
-          validateNewInput.buttonValMsg = results.error;
-          return "";
-        } else if (results) {
-          return results.contract;
-        }
-      } catch (e) {
-        validateNewInput.buttonVal = false;
-        validateNewInput.buttonValMsg =
-          e && e.message ? e.message : this.props.t("genericError");
-        return "";
-      }
-    }
-    return "";
-  }
-  freezeBurnERC20(
-    syscoinTP,
+  freezeBurn(
+    syscoinContract,
     validateNewInput,
     thisObj,
     amount,
-    assetGUID,
     syscoinWitnessAddress,
     userInput,
     fromAccount
   ) {
     thisObj.state.receiptObj = null;
-    syscoinTP.methods
-      .freezeBurnERC20(amount, assetGUID, syscoinWitnessAddress)
+    syscoinContract.methods
+      .freezeBurn(amount, syscoinWitnessAddress)
       .send({
         from: fromAccount,
         gas: 400000,
-        value: assetGUID === CONFIGURATION.SYSXAsset ? amount : undefined,
+        value: amount,
       })
       .once("transactionHash", function (hash) {
         validateNewInput.buttonVal = true;
@@ -400,16 +359,10 @@ class Step1ES extends Component {
     let userInput = this._grabUserInput(); // grab user entered vals
     let validateNewInput = this._validateData(userInput); // run the new input against the validator
     validateNewInput.buttonVal = true;
-    validateNewInput.sysxContractVal = true;
-    validateNewInput.toSysAssetGUIDVal = true;
     validateNewInput.toSysAmountVal = true;
     validateNewInput.syscoinWitnessAddressVal = true;
-    validateNewInput.sysxFromAccountVal = true;
+    validateNewInput.nevmFromAccountVal = true;
     let valid = true;
-    if (!userInput.toSysAssetGUID || userInput.toSysAssetGUID === "") {
-      validateNewInput.toSysAssetGUIDVal = false;
-      valid = false;
-    }
     if (!userInput.toSysAmount || userInput.toSysAmount === "") {
       validateNewInput.toSysAmountVal = false;
       valid = false;
@@ -421,8 +374,8 @@ class Step1ES extends Component {
       validateNewInput.syscoinWitnessAddressVal = false;
       valid = false;
     }
-    if (!userInput.sysxFromAccount || userInput.sysxFromAccount === "") {
-      validateNewInput.sysxFromAccountVal = false;
+    if (!userInput.nevmFromAccount || userInput.nevmFromAccount === "") {
+      validateNewInput.nevmFromAccountVal = false;
       valid = false;
     }
     if (valid === false) {
@@ -545,21 +498,6 @@ class Step1ES extends Component {
       return;
     }
     this.setState({ working: true });
-    userInput.sysxContract = await this.getAssetContract(
-      userInput.toSysAssetGUID,
-      validateNewInput
-    );
-    if (userInput.sysxContract === "") {
-      this.setState(
-        Object.assign(
-          userInput,
-          validateNewInput,
-          this._validationErrors(validateNewInput)
-        )
-      );
-      this.setState({ working: false });
-      return;
-    }
     validateNewInput.buttonVal = true;
     validateNewInput.buttonValMsg = this.props.t("step3AuthMetamask");
     this.setState(
@@ -569,26 +507,11 @@ class Step1ES extends Component {
         this._validationErrors(validateNewInput)
       )
     );
-    let syscoinERC20Manager = new web3.eth.Contract(
-      erc20Managerabi,
-      CONFIGURATION.ERC20Manager
+    let vaultManager = new web3.eth.Contract(
+      vaultManagerABI,
+      CONFIGURATION.VaultManager
     );
-    let contractBase = new web3.eth.Contract(assetabi, userInput.sysxContract);
-    if (!web3.utils.isAddress(userInput.sysxFromAccount)) {
-      validateNewInput.buttonVal = false;
-      validateNewInput.buttonValMsg = this.props.t("step1InvalidNEVM");
-      this.setState({ working: false });
-      this.setState(
-        Object.assign(
-          userInput,
-          validateNewInput,
-          this._validationErrors(validateNewInput)
-        )
-      );
-      return;
-    }
-    let fromAccount = userInput.sysxFromAccount;
-    let assetGUID = userInput.toSysAssetGUID;
+    let fromAccount = userInput.nevmFromAccount;
     let syscoinWitnessAddress = userInput.syscoinWitnessAddress;
     try {
       sjs.utils.bitcoinjs.address.toOutputScript(
@@ -609,127 +532,18 @@ class Step1ES extends Component {
       this.setState({ working: false });
       return;
     }
-    let allowance = web3.utils.toBN(0);
-    if (assetGUID !== CONFIGURATION.SYSXAsset) {
-      allowance = await contractBase.methods
-        .allowance(fromAccount, CONFIGURATION.ERC20Manager)
-        .call();
-      allowance = web3.utils.toBN(allowance.toString());
-      let balance = await contractBase.methods.balanceOf(fromAccount).call();
-      balance = web3.utils.toBN(balance.toString());
-      let decimals = await contractBase.methods.decimals().call();
-      let amount = this.toBaseUnit(
-        userInput.toSysAmount,
-        decimals,
-        web3.utils.BN
-      );
-      if (amount.gt(balance)) {
-        // insufficient balance
-        validateNewInput.buttonVal = false;
-        validateNewInput.buttonValMsg = this.props.t(
-          "step3InsufficientTokenBalance"
-        );
-        this.setState(
-          Object.assign(
-            userInput,
-            validateNewInput,
-            this._validationErrors(validateNewInput)
-          )
-        );
-        this.setState({ working: false });
-        return;
-      }
-    }
     let amount = this.toBaseUnit(userInput.toSysAmount, 18, web3.utils.BN);
     let thisObj = this;
-    let bFirstConfirmation = true;
-    // we may need to get allowance of funds
-    if (assetGUID !== CONFIGURATION.SYSXAsset && allowance.lt(amount)) {
-      console.log("Allowance needed.");
-      contractBase.methods
-        .approve(CONFIGURATION.ERC20Manager, amount.toString())
-        .send({ from: fromAccount, gas: 400000 })
-        .once("transactionHash", function (hash) {
-          validateNewInput.buttonVal = true;
-          validateNewInput.buttonValMsg = thisObj.props.t(
-            "step3AuthAllowanceMetamask"
-          );
-          thisObj.setState(
-            Object.assign(
-              userInput,
-              validateNewInput,
-              thisObj._validationErrors(validateNewInput)
-            )
-          );
-        })
-        .once("confirmation", function (confirmationNumber, receipt) {
-          if (bFirstConfirmation) {
-            bFirstConfirmation = false;
-            thisObj.freezeBurnERC20(
-              syscoinERC20Manager,
-              validateNewInput,
-              thisObj,
-              amount.toString(),
-              assetGUID,
-              syscoinWitnessAddress,
-              userInput,
-              fromAccount
-            );
-          }
-        })
-        .on("error", (error, receipt) => {
-          thisObj.setState({ working: false });
-          if (
-            error.message.length <= 512 &&
-            error.message.indexOf("{") !== -1
-          ) {
-            error = JSON.parse(
-              error.message.substring(error.message.indexOf("{"))
-            );
-          }
-          let message = error.message
-            ? error.message.toString()
-            : "Unknown error";
-          if (message.indexOf("might still be mined") === -1) {
-            if (receipt) {
-              thisObj.setStateFromReceipt(
-                receipt,
-                message,
-                0,
-                validateNewInput
-              );
-              thisObj.setState(
-                Object.assign(
-                  userInput,
-                  validateNewInput,
-                  thisObj._validationErrors(validateNewInput)
-                )
-              );
-            } else {
-              validateNewInput.buttonVal = false;
-              validateNewInput.buttonValMsg = message;
-              thisObj.setState(
-                Object.assign(
-                  userInput,
-                  validateNewInput,
-                  thisObj._validationErrors(validateNewInput)
-                )
-              );
-            }
-          }
-        });
-    } else {
-      thisObj.freezeBurnERC20(
-        syscoinERC20Manager,
-        validateNewInput,
-        thisObj,
-        amount.toString(),
-        assetGUID,
-        syscoinWitnessAddress,
-        userInput,
-        fromAccount
-      );
-    }
+    thisObj.freezeBurn(
+      vaultManager,
+      validateNewInput,
+      thisObj,
+      amount.toString(),
+      syscoinWitnessAddress,
+      userInput,
+      fromAccount
+    );
+    
   }
 
   render() {
@@ -741,16 +555,6 @@ class Step1ES extends Component {
     } else {
       notValidClasses.buttonCls = "has-error";
       notValidClasses.buttonValGrpCls = "val-err-tooltip mb30";
-    }
-    if (
-      typeof this.state.toSysAssetGUIDVal == "undefined" ||
-      this.state.toSysAssetGUIDVal
-    ) {
-      notValidClasses.toSysAssetGUIDCls = "has-success";
-      notValidClasses.toSysAssetGUIDValGrpCls = "val-success-tooltip";
-    } else {
-      notValidClasses.toSysAssetGUIDCls = "has-error";
-      notValidClasses.toSysAssetGUIDValGrpCls = "val-err-tooltip";
     }
     if (
       typeof this.state.toSysAmountVal == "undefined" ||
@@ -773,16 +577,15 @@ class Step1ES extends Component {
       notValidClasses.syscoinWitnessAddressValGrpCls = "val-err-tooltip";
     }
     if (
-      typeof this.state.sysxFromAccountVal == "undefined" ||
-      this.state.sysxFromAccountVal
+      typeof this.state.nevmFromAccountVal == "undefined" ||
+      this.state.nevmFromAccountVal
     ) {
-      notValidClasses.sysxFromAccountCls = "has-success";
-      notValidClasses.sysxFromAccountValGrpCls = "val-success-tooltip";
+      notValidClasses.nevmFromAccountCls = "has-success";
+      notValidClasses.nevmFromAccountValGrpCls = "val-success-tooltip";
     } else {
-      notValidClasses.sysxFromAccountCls = "has-error";
-      notValidClasses.sysxFromAccountValGrpCls = "val-err-tooltip";
+      notValidClasses.nevmFromAccountCls = "has-error";
+      notValidClasses.nevmFromAccountValGrpCls = "val-err-tooltip";
     }
-
     return (
       <div className="step step1es">
         <div className="row">
@@ -799,39 +602,19 @@ class Step1ES extends Component {
               <div className="row">
                 <div className="col-md-12">
                   <label className="control-label col-md-4">
-                    {this.props.t("step2AssetLabel")}
-                  </label>
-                  <div className={notValidClasses.toSysAssetGUIDCls}>
-                    <input
-                      ref="toSysAssetGUID"
-                      autoComplete="off"
-                      type="number"
-                      placeholder={this.props.t("step2EnterAsset")}
-                      className="form-control"
-                      defaultValue={this.state.toSysAssetGUID}
-                    />
-                    <div className={notValidClasses.toSysAssetGUIDValGrpCls}>
-                      {this.state.toSysAssetGUIDValMsg}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="row">
-                <div className="col-md-12">
-                  <label className="control-label col-md-4">
                     {this.props.t("step1ESFromAccountLabel")}
                   </label>
-                  <div className={notValidClasses.sysxFromAccountCls}>
+                  <div className={notValidClasses.nevmFromAccountCls}>
                     <input
-                      ref="sysxFromAccount"
+                      ref="nevmFromAccount"
                       autoComplete="off"
                       type="text"
                       placeholder={this.props.t("step1ESEnterFromAccount")}
                       className="form-control"
-                      defaultValue={this.state.sysxFromAccount}
+                      defaultValue={this.state.nevmFromAccount}
                     />
-                    <div className={notValidClasses.sysxFromAccountValGrpCls}>
-                      {this.state.sysxFromAccountValMsg}
+                    <div className={notValidClasses.nevmFromAccountValGrpCls}>
+                      {this.state.nevmFromAccountValMsg}
                     </div>
                   </div>
                 </div>

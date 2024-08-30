@@ -1,4 +1,4 @@
-const erc20Managerabi = [
+const vaultManagerABI = [
   {
     "inputs": [
       {
@@ -271,4 +271,4 @@ const erc20Managerabi = [
     "payable": true
   }
 ]
-  export default erc20Managerabi;
+  export default vaultManagerABI;
