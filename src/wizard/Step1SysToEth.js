@@ -91,7 +91,7 @@ class Step1 extends Component {
     sysChangeAddress
   ) {
     const feeRate = new sjs.utils.BN(10);
-    const txOpts = { rbf: true, memo: Buffer.from(ethAddressStripped, "hex") };
+    const txOpts = { rbf: true };
     const dataScript = bitcoin.payments.embed({ data: [Buffer.from(ethAddressStripped, "hex")] }).output
     const dataOutput = {
       script: dataScript,
@@ -100,8 +100,8 @@ class Step1 extends Component {
     outputsArr.push(dataOutput)
     const res = await this.syscoinjs.createTransaction(
       txOpts,
-      outputsArr,
       sysChangeAddress,
+      outputsArr,
       feeRate,
       xpub
     );
