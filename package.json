@@ -8,22 +8,22 @@
     "bitcoin-proof": "^2.0.0",
     "i18next": "^12.0.0",
     "i18next-browser-languagedetector": "^2.2.3",
-    "joi": "^17.13.3",
-    "joi-validation-strategy": "^0.1.1",
+    "joi": "^10.2.2",
+    "joi-validation-strategy": "^0.3.3",
     "material-icons-react": "^1.0.4",
     "react": "^16.11.0",
     "react-beforeunload": "^2.1.0",
     "react-dom": "^16.11.0",
-    "react-i18next": "^15.0.1",
-    "react-scripts": "^3.0.1",
+    "react-i18next": "^8.1.0",
+    "react-scripts": "2.1.8",
     "react-search-field": "^1.0.0",
     "react-stepzilla": "^6.0.2",
     "react-tabs": "^3.0.0",
     "react-textarea-autosize": "^7.1.2",
     "react-validation-mixin": "^5.4.0",
     "satoshi-bitcoin": "^1.0.5",
-    "syscoinjs-lib": "^1.0.219",
-    "web3": "^4.12.1"
+    "syscoinjs-lib": "^1.0.212",
+    "web3": "^1.5.2"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -41,7 +41,7 @@
     "not op_mini all"
   ],
   "devDependencies": {
-    "gulp": "^5.0.0",
+    "gulp": "^4.0.2",
     "gulp-sass": "^5.0.0",
     "sass": "^1.38.2"
   }

@@ -11,6 +11,7 @@ class Step4 extends Component {
   }
   clearLocalStorage() {
     if (typeof(Storage) !== "undefined") {
+      localStorage.removeItem("asset");
       localStorage.removeItem("amount");
       localStorage.removeItem("ethaddress");
       localStorage.removeItem("txid");

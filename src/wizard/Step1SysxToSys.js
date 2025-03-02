@@ -1,22 +1,23 @@
 import React, { Component } from "react";
 import CONFIGURATION from "../config";
+const satoshibitcoin = require("satoshi-bitcoin");
 const sjs = require("syscoinjs-lib");
-
-class Step2ES extends Component {
+class Step1XS extends Component {
   constructor(props) {
     super(props);
     let storageExists = typeof Storage !== "undefined";
     this.state = {
-      minttxid:
-        (storageExists && localStorage.getItem("minttxid")) ||
-        props.getStore().minttxid,
-      ethburntxid:
-        (storageExists && localStorage.getItem("receiptTxHash")) ||
-        this.props.getStore().receiptTxHash,
+      amount:
+        (storageExists && localStorage.getItem("amount")) ||
+        props.getStore().amount,
+      txidburn:
+        (storageExists && localStorage.getItem("txidburn")) ||
+        props.getStore().txidburn,
       working: false,
     };
+
     this._validateOnDemand = true; // this flag enables onBlur validation as user fills forms
-    this.getMintTx = this.getMintTx.bind(this);
+    this.getTx = this.getTx.bind(this);
     this.validationCheck = this.validationCheck.bind(this);
     this.isValidated = this.isValidated.bind(this);
     this.syscoinjs = new sjs.SyscoinJSLib(
@@ -24,19 +25,21 @@ class Step2ES extends Component {
       CONFIGURATION.BlockbookAPIURL,
       CONFIGURATION.SysNetwork
     );
+    this.FaucetURL = CONFIGURATION.FaucetURL;
   }
+
+  componentDidMount() {}
+
+  componentWillUnmount() {}
   saveToLocalStorage() {
     if (typeof Storage !== "undefined") {
       // Code for localStorage/sessionStorage.
-      localStorage.setItem("receiptTxHash", this.refs.ethburntxid.value);
-      localStorage.setItem("minttxid", this.refs.minttxid.value);
+      localStorage.setItem("amount", this.refs.amount.value);
+      localStorage.setItem("txidburn", this.refs.txidburn.value);
     } else {
       // Sorry! No Web Storage support..
     }
   }
-  componentDidMount() {}
-  componentWillUnmount() {}
-
   isValidated() {
     const userInput = this._grabUserInput(); // grab user entered vals
     const validateNewInput = this._validateData(userInput); // run the new input against the validator
@@ -49,8 +52,8 @@ class Step2ES extends Component {
       })
     ) {
       if (
-        this.props.getStore().minttxid !== userInput.minttxid ||
-        this.props.getStore().ethburntxid !== userInput.ethburntxid
+        this.props.getStore().amount !== userInput.amount ||
+        this.props.getStore().txidburn !== userInput.txidburn
       ) {
         // only update store of something changed
         this.props.updateStore({
@@ -73,17 +76,28 @@ class Step2ES extends Component {
 
     return isDataValid;
   }
-  async assetMintToSys(ethTXID, xpub, sysChangeAddress) {
+
+  async sysXToSys(amount, xpub, sysChangeAddress) {
     const feeRate = new sjs.utils.BN(10);
     const txOpts = { rbf: true };
-    // web3 URL + ID and nevm burn txid
-    const assetOpts = {
-      web3url: CONFIGURATION.Web3URL,
-      ethtxid: ethTXID,
-    };
-    // will be auto filled based on ethtxid eth-proof
-    const assetMap = null;
-    const res = await this.syscoinjs.assetAllocationMint(
+    const assetGuid = CONFIGURATION.SYSXAsset;
+    const assetChangeAddress = sysChangeAddress;
+    const assetMap = new Map([
+      [
+        assetGuid,
+        {
+          changeAddress: assetChangeAddress,
+          outputs: [
+            {
+              value: new sjs.utils.BN(satoshibitcoin.toSatoshi(amount)),
+              address: sysChangeAddress,
+            },
+          ],
+        },
+      ],
+    ]);
+    const assetOpts = { ethaddress: Buffer.from("") };
+    const res = await this.syscoinjs.assetAllocationBurn(
       assetOpts,
       txOpts,
       assetMap,
@@ -97,22 +111,20 @@ class Step2ES extends Component {
       return { data: null, error: err };
     }
     const serializedResp = sjs.utils.exportPsbtToJson(res.psbt, res.assets);
-
     const signRes = await window.pali.request({
       method: "sys_signAndSend",
       params: [serializedResp],
     });
-
     const unserializedResp = sjs.utils.importPsbtFromJson(
       signRes,
       CONFIGURATION.SysNetwork
     );
     return {
-      txid: unserializedResp.psbt.extractTransaction().getId(),
+      txidburn: unserializedResp.psbt.extractTransaction().getId(),
       error: null,
     };
   }
-  async getMintTx() {
+  async getTx() {
     if (!window.pali) {
       this.setState({
         buttonVal: false,
@@ -120,7 +132,6 @@ class Step2ES extends Component {
       });
       return;
     }
-
     if (!window.pali.isBitcoinBased()) {
       await window.pali.request({
         method: "sys_changeUTXOEVM",
@@ -173,70 +184,67 @@ class Step2ES extends Component {
     let validateNewInput = this._validateData(userInput); // run the new input against the validator
     validateNewInput.buttonVal = true;
     validateNewInput.buttonValMsg = "";
-    validateNewInput.minttxidVal = true;
-    if (!userInput.ethburntxid || userInput.ethburntxid === "") {
-      validateNewInput.ethburntxidVal = false;
-      this.setState(
-        Object.assign(
-          userInput,
-          validateNewInput,
-          this._validationErrors(validateNewInput)
-        )
-      );
-      return;
+    validateNewInput.txidVal = true;
+    validateNewInput.txidValMsg = "";
+    let valid = true;
+    if (!userInput.amount || userInput.amount === "") {
+      validateNewInput.amountVal = false;
+      valid = false;
     }
     let self = this;
-    this.setState({ working: true });
-    let ethTXID = userInput.ethburntxid;
-    console.log({ ethTXID, xpub, sysChangeAddress });
-    try {
-      let results = await this.assetMintToSys(ethTXID, xpub, sysChangeAddress);
-      if (results.error) {
-        console.log({ results });
-        validateNewInput.buttonVal = false;
-        validateNewInput.buttonValMsg = results.error;
-        self.setState({ working: false });
-        self.setState(
-          Object.assign(
-            userInput,
-            validateNewInput,
-            this._validationErrors(validateNewInput)
-          )
-        );
-      } else if (results.txid) {
-        validateNewInput.buttonVal = false;
-        validateNewInput.minttxidVal = true;
-        this.refs.minttxid.value = results.txid;
-        userInput.minttxid = results.txid;
-        validateNewInput.buttonValMsg = "Success!";
-        self.setState({ working: false });
-        self.setState(
-          Object.assign(
-            userInput,
-            validateNewInput,
-            this._validationErrors(validateNewInput)
-          )
-        );
-        this.saveToLocalStorage();
-      }
-    } catch (e) {
-      console.log(e);
-      validateNewInput.minttxidVal = false;
-      validateNewInput.buttonVal = false;
-      validateNewInput.buttonValMsg =
-        e && e.message ? e.message : this.props.t("genericError");
-      self.setState({ working: false });
-      self.setState(
-        Object.assign(
-          userInput,
-          validateNewInput,
-          this._validationErrors(validateNewInput)
-        )
-      );
-    }
-    this.setState({ working: false });
-  }
 
+    if (valid === true) {
+      this.setState({ working: true });
+
+      try {
+        let results = await this.sysXToSys(
+          userInput.amount.toString(),
+          xpub,
+          sysChangeAddress
+        );
+        if (results.error) {
+          validateNewInput.buttonVal = false;
+          validateNewInput.buttonValMsg = results.error;
+          self.setState({ working: false });
+          self.setState(
+            Object.assign(
+              userInput,
+              validateNewInput,
+              this._validationErrors(validateNewInput)
+            )
+          );
+        } else if (results.txidburn) {
+          validateNewInput.buttonVal = false;
+          validateNewInput.txidVal = true;
+          this.refs.txidburn.value = results.txidburn;
+          validateNewInput.buttonValMsg = "Success!";
+          self.setState({ working: false });
+          self.setState(
+            Object.assign(
+              userInput,
+              validateNewInput,
+              this._validationErrors(validateNewInput)
+            )
+          );
+          self.saveToLocalStorage();
+        }
+      } catch (e) {
+        validateNewInput.buttonVal = false;
+        validateNewInput.txidVal = false;
+        validateNewInput.buttonValMsg =
+          e && e.message ? e.message : this.props.t("genericError");
+        this.refs.txidburn.value = "";
+        self.setState({ working: false });
+        self.setState(
+          Object.assign(
+            userInput,
+            validateNewInput,
+            this._validationErrors(validateNewInput)
+          )
+        );
+      }
+    }
+  }
   validationCheck() {
     if (!this._validateOnDemand) return;
 
@@ -254,26 +262,26 @@ class Step2ES extends Component {
 
   _validateData(data) {
     return {
-      ethburntxidVal: true,
-      minttxidVal: true,
+      amountVal: true,
+      txidVal: true,
     };
   }
 
   _validationErrors(val) {
     const errMsgs = {
-      ethburntxidValMsg:
-        val.ethburntxidVal && val.ethburntxidVal === true
+      amountValMsg:
+        val.amountVal && val.amountVal === true
           ? ""
-          : this.props.t("step2ESTxid"),
-      minttxidValMsg: val.minttxidVal ? "" : this.props.t("step2RawTx"),
+          : this.props.t("step2Amount"),
+      txidValMsg: val.txidVal ? "" : this.props.t("step2RawTx"),
     };
     return errMsgs;
   }
 
   _grabUserInput() {
     return {
-      ethburntxid: this.refs.ethburntxid.value,
-      minttxid: this.refs.minttxid.value,
+      amount: this.refs.amount.value,
+      txidburn: this.refs.txidburn.value,
     };
   }
 
@@ -281,27 +289,21 @@ class Step2ES extends Component {
     // explicit class assigning based on validation
     let notValidClasses = {};
 
-    if (
-      typeof this.state.ethburntxidVal == "undefined" ||
-      this.state.ethburntxidVal
-    ) {
-      notValidClasses.ethburntxidCls = "no-error";
+    if (typeof this.state.amountVal == "undefined" || this.state.amountVal) {
+      notValidClasses.amountCls = "no-error";
     } else {
-      notValidClasses.ethburntxidCls = "has-error";
-      notValidClasses.ethburntxidValGrpCls = "val-err-tooltip";
+      notValidClasses.amountCls = "has-error";
+      notValidClasses.amountValGrpCls = "val-err-tooltip";
     }
-    if (
-      typeof this.state.minttxidVal == "undefined" ||
-      this.state.minttxidVal
-    ) {
-      notValidClasses.minttxidCls = "no-error ";
+    if (typeof this.state.txidVal == "undefined" || this.state.txidVal) {
+      notValidClasses.txidCls = "no-error";
     } else {
-      notValidClasses.minttxidCls = "has-error";
-      notValidClasses.minttxidValGrpCls = "val-err-tooltip";
+      notValidClasses.txidCls = "has-error";
+      notValidClasses.txidValGrpCls = "val-err-tooltip";
     }
     if (typeof this.state.buttonVal == "undefined" || this.state.buttonVal) {
       notValidClasses.buttonCls = "no-error";
-    } else if (this.state.minttxidVal) {
+    } else if (this.state.txidVal) {
       notValidClasses.buttonCls = "has-success";
       notValidClasses.buttonValGrpCls = "val-success-tooltip active";
     } else {
@@ -309,54 +311,52 @@ class Step2ES extends Component {
       notValidClasses.buttonValGrpCls = "val-err-tooltip";
     }
     return (
-      <div className="step step2es">
+      <div className="step step1xs">
         <div className="row">
-          <form id="Form">
+          <form id="Form" className="form-horizontal">
             <div className="form-group">
               <label className="col-md-12">
                 <h1
                   dangerouslySetInnerHTML={{
-                    __html: this.props.t("step2ESHead"),
+                    __html: this.props.t("step1XSHead"),
                   }}
                 ></h1>
                 <h3
                   dangerouslySetInnerHTML={{
-                    __html: this.props.t("step2ESDescription"),
+                    __html: this.props.t("step1XSDescription"),
                   }}
                 ></h3>
               </label>
-
               <div className="row">
                 <div className="col-md-12">
                   <label className="control-label col-md-4">
-                    {this.props.t("txidLabel")}
+                    {this.props.t("step2AmountLabel")}
                   </label>
-                  <div className={notValidClasses.ethburntxidCls}>
+                  <div className={notValidClasses.amountCls}>
                     <input
-                      ref="ethburntxid"
+                      ref="amount"
                       autoComplete="off"
-                      type="text"
-                      placeholder={this.props.t("step2ESEnterTxid")}
+                      type="number"
+                      placeholder={this.props.t("step2EnterAmount")}
                       className="form-control"
                       required
-                      defaultValue={this.state.ethburntxid}
+                      defaultValue={this.state.amount}
                     />
-                    <div className={notValidClasses.ethburntxidValGrpCls}>
-                      {this.state.ethburntxidValMsg}
+                    <div className={notValidClasses.amountValGrpCls}>
+                      {this.state.amountValMsg}
                     </div>
                   </div>
                 </div>
               </div>
-
               <div className="row">
-                <div className="col-md-4 col-sm-12 col-centered">
+                <div className="col-md-12">
                   <div className={notValidClasses.buttonCls}>
                     <button
                       type="button"
                       disabled={this.state.working}
                       className="form-control btn btn-default formbtn"
-                      aria-label={this.props.t("step2Button")}
-                      onClick={this.getMintTx}
+                      aria-label={this.props.t("step1Button")}
+                      onClick={this.getTx}
                     >
                       <span
                         className="glyphicon glyphicon-send"
@@ -364,7 +364,7 @@ class Step2ES extends Component {
                       >
                         &nbsp;
                       </span>
-                      {this.props.t("step2Button")}
+                      {this.props.t("step1Button")}
                     </button>
                     <div className={notValidClasses.buttonValGrpCls}>
                       {this.state.buttonValMsg}
@@ -372,25 +372,23 @@ class Step2ES extends Component {
                   </div>
                 </div>
               </div>
-
               <div className="row">
                 <div className="col-md-12">
                   <label className="control-label col-md-4">
                     {this.props.t("step2TxLabel")}
                   </label>
-                  <div className={notValidClasses.minttxidCls}>
-                    <textarea
-                      rows="3"
-                      ref="minttxid"
+                  <div className={notValidClasses.txidCls}>
+                    <input
+                      ref="txidburn"
                       autoComplete="off"
                       type="text"
                       placeholder={this.props.t("step2EnterTx")}
                       className="form-control"
                       required
-                      defaultValue={this.state.minttxid}
+                      defaultValue={this.state.txidburn}
                     />
-                    <div className={notValidClasses.minttxidValGrpCls}>
-                      {this.state.minttxidValMsg}
+                    <div className={notValidClasses.txidValGrpCls}>
+                      {this.state.txidValMsg}
                     </div>
                   </div>
                 </div>
@@ -403,4 +401,4 @@ class Step2ES extends Component {
   }
 }
 
-export default Step2ES;
+export default Step1XS;

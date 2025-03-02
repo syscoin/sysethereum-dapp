@@ -4,7 +4,9 @@
 }
 
 .EthToSysWizard,
-.SysToEthWizard {
+.SysToEthWizard,
+.SysToSysxWizard,
+.SysxToSysWizard {
   max-width: 1000px;
   margin: 0 auto;
   background: rgba(113, 229, 255, 0.14);
@@ -20,7 +22,11 @@
 .EthToSysWizard input.form-control,
 .EthToSysWizard textarea.form-control,
 .SysToEthWizard input.form-control,
-.SysToEthWizard textarea.form-control {
+.SysToEthWizard textarea.form-control,
+.SysToSysxWizard input.form-control,
+.SysToSysxWizard textarea.form-control,
+.SysxToSysWizard input.form-control,
+.SysxToSysWizard textarea.form-control {
   color: #dedede;
   background-color: #1f1c5e85;
   background-image: none;
@@ -33,19 +39,29 @@
 .EthToSysWizard input.form-control::focus,
 .EthToSysWizard textarea.form-control::focus,
 .SysToEthWizard input.form-control::focus,
-.SysToEthWizard textarea.form-control::focus {
+.SysToEthWizard textarea.form-control::focus,
+.SysToSysxWizard input.form-control::focus,
+.SysToSysxWizard textarea.form-control::focus,
+.SysxToSysWizard input.form-control::focus,
+.SysxToSysWizard textarea.form-control::focus {
   background: #232e73ad;
 }
 .EthToSysWizard label,
-.SysToEthWizard label {
+.SysToEthWizard label,
+.SysToSysxWizard label,
+.SysxToSysWizard label {
   color: #d3dfff;
 }
 .EthToSysWizard label h1,
-.SysToEthWizard label h1 {
+.SysToEthWizard label h1,
+.SysToSysxWizard label h1,
+.SysxToSysWizard label h1 {
   text-align: center;
 }
 .EthToSysWizard .control-label,
-.SysToEthWizard .control-label {
+.SysToEthWizard .control-label,
+.SysToSysxWizard .control-label,
+.SysxToSysWizard .control-label {
   font-size: 16px;
   font-weight: 700;
   /* margin-bottom: 9px; */
@@ -59,12 +75,18 @@
 .EthToSysWizard input[type=number]::-webkit-inner-spin-button,
 .EthToSysWizard input[type=number]::-webkit-outer-spin-button,
 .SysToEthWizard input[type=number]::-webkit-inner-spin-button,
-.SysToEthWizard input[type=number]::-webkit-outer-spin-button {
+.SysToEthWizard input[type=number]::-webkit-outer-spin-button,
+.SysToSysxWizard input[type=number]::-webkit-inner-spin-button,
+.SysToSysxWizard input[type=number]::-webkit-outer-spin-button,
+.SysxToSysWizard input[type=number]::-webkit-inner-spin-button,
+.SysxToSysWizard input[type=number]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 .EthToSysWizard .val-err-tooltip,
-.SysToEthWizard .val-err-tooltip {
+.SysToEthWizard .val-err-tooltip,
+.SysToSysxWizard .val-err-tooltip,
+.SysxToSysWizard .val-err-tooltip {
   background-color: #981a1a75;
 }
 .EthToSysWizard .has-success input.form-control,
@@ -76,24 +98,50 @@
 .SysToEthWizard .has-error input.form-control,
 .SysToEthWizard .has-error textarea.form-control,
 .SysToEthWizard .no-error input.form-control,
-.SysToEthWizard .no-error textarea.form-control {
+.SysToEthWizard .no-error textarea.form-control,
+.SysToSysxWizard .has-success input.form-control,
+.SysToSysxWizard .has-success textarea.form-control,
+.SysToSysxWizard .has-error input.form-control,
+.SysToSysxWizard .has-error textarea.form-control,
+.SysToSysxWizard .no-error input.form-control,
+.SysToSysxWizard .no-error textarea.form-control,
+.SysxToSysWizard .has-success input.form-control,
+.SysxToSysWizard .has-success textarea.form-control,
+.SysxToSysWizard .has-error input.form-control,
+.SysxToSysWizard .has-error textarea.form-control,
+.SysxToSysWizard .no-error input.form-control,
+.SysxToSysWizard .no-error textarea.form-control {
   box-shadow: none !important;
   -webkit-box-shadow: none !important;
 }
 .EthToSysWizard .has-success .val-success-tooltip, .EthToSysWizard .has-error .val-success-tooltip, .EthToSysWizard .no-error .val-success-tooltip,
 .SysToEthWizard .has-success .val-success-tooltip,
 .SysToEthWizard .has-error .val-success-tooltip,
-.SysToEthWizard .no-error .val-success-tooltip {
+.SysToEthWizard .no-error .val-success-tooltip,
+.SysToSysxWizard .has-success .val-success-tooltip,
+.SysToSysxWizard .has-error .val-success-tooltip,
+.SysToSysxWizard .no-error .val-success-tooltip,
+.SysxToSysWizard .has-success .val-success-tooltip,
+.SysxToSysWizard .has-error .val-success-tooltip,
+.SysxToSysWizard .no-error .val-success-tooltip {
   padding: 0;
 }
 .EthToSysWizard .has-success .val-success-tooltip.active, .EthToSysWizard .has-error .val-success-tooltip.active, .EthToSysWizard .no-error .val-success-tooltip.active,
 .SysToEthWizard .has-success .val-success-tooltip.active,
 .SysToEthWizard .has-error .val-success-tooltip.active,
-.SysToEthWizard .no-error .val-success-tooltip.active {
+.SysToEthWizard .no-error .val-success-tooltip.active,
+.SysToSysxWizard .has-success .val-success-tooltip.active,
+.SysToSysxWizard .has-error .val-success-tooltip.active,
+.SysToSysxWizard .no-error .val-success-tooltip.active,
+.SysxToSysWizard .has-success .val-success-tooltip.active,
+.SysxToSysWizard .has-error .val-success-tooltip.active,
+.SysxToSysWizard .no-error .val-success-tooltip.active {
   padding: 3px 5px 3px 10px;
 }
 .EthToSysWizard .formbtn,
-.SysToEthWizard .formbtn {
+.SysToEthWizard .formbtn,
+.SysToSysxWizard .formbtn,
+.SysxToSysWizard .formbtn {
   margin: 30px auto 30px;
   background: #359ef6;
   text-shadow: none;
@@ -112,12 +160,20 @@
 .EthToSysWizard .formbtn:hover, .EthToSysWizard .formbtn:active, .EthToSysWizard .formbtn:focus,
 .SysToEthWizard .formbtn:hover,
 .SysToEthWizard .formbtn:active,
-.SysToEthWizard .formbtn:focus {
+.SysToEthWizard .formbtn:focus,
+.SysToSysxWizard .formbtn:hover,
+.SysToSysxWizard .formbtn:active,
+.SysToSysxWizard .formbtn:focus,
+.SysxToSysWizard .formbtn:hover,
+.SysxToSysWizard .formbtn:active,
+.SysxToSysWizard .formbtn:focus {
   background: #252c6c;
   color: white;
 }
 .EthToSysWizard .formbtnmini,
-.SysToEthWizard .formbtnmini {
+.SysToEthWizard .formbtnmini,
+.SysToSysxWizard .formbtnmini,
+.SysxToSysWizard .formbtnmini {
   background: #359ef6;
   text-shadow: none;
   color: white;
@@ -133,32 +189,46 @@
 .EthToSysWizard .formbtnmini:hover, .EthToSysWizard .formbtnmini:active, .EthToSysWizard .formbtnmini:focus,
 .SysToEthWizard .formbtnmini:hover,
 .SysToEthWizard .formbtnmini:active,
-.SysToEthWizard .formbtnmini:focus {
+.SysToEthWizard .formbtnmini:focus,
+.SysToSysxWizard .formbtnmini:hover,
+.SysToSysxWizard .formbtnmini:active,
+.SysToSysxWizard .formbtnmini:focus,
+.SysxToSysWizard .formbtnmini:hover,
+.SysxToSysWizard .formbtnmini:active,
+.SysxToSysWizard .formbtnmini:focus {
   background: #252c6c;
   color: white;
 }
 .EthToSysWizard code,
-.SysToEthWizard code {
+.SysToEthWizard code,
+.SysToSysxWizard code,
+.SysxToSysWizard code {
   line-height: 1em;
   padding: 3px;
   background-color: #d3dfff;
   left: 0;
 }
 .EthToSysWizard code .result,
-.SysToEthWizard code .result {
+.SysToEthWizard code .result,
+.SysToSysxWizard code .result,
+.SysxToSysWizard code .result {
   color: #1d5f96;
   display: inline-block;
   float: left;
 }
 .EthToSysWizard code .dataname,
-.SysToEthWizard code .dataname {
+.SysToEthWizard code .dataname,
+.SysToSysxWizard code .dataname,
+.SysxToSysWizard code .dataname {
   width: 280px;
   display: inline-block;
   float: left;
   clear: both;
 }
 .EthToSysWizard code.block,
-.SysToEthWizard code.block {
+.SysToEthWizard code.block,
+.SysToSysxWizard code.block,
+.SysxToSysWizard code.block {
   display: block;
   padding: 6px;
   line-height: 1.2em;
@@ -166,11 +236,15 @@
   word-break: break-all;
 }
 .EthToSysWizard code.blue,
-.SysToEthWizard code.blue{
+.SysToEthWizard code.blue,
+.SysToSysxWizard code.blue,
+.SysxToSysWizard code.blue {
   color: #1d5f96;
 }
 .EthToSysWizard em.step,
-.SysToEthWizard em.step{
+.SysToEthWizard em.step,
+.SysToSysxWizard em.step,
+.SysxToSysWizard em.step {
   color: #359ef6;
   font-weight: 700;
   font-style: normal;
@@ -195,12 +269,50 @@
 .SysToEthWizard fieldset[disabled] .btn-default.focus,
 .SysToEthWizard fieldset[disabled] .btn-default:active,
 .SysToEthWizard fieldset[disabled] .btn-default:focus,
-.SysToEthWizard fieldset[disabled] .btn-default:hover {
+.SysToEthWizard fieldset[disabled] .btn-default:hover,
+.SysToSysxWizard .btn-default.disabled,
+.SysToSysxWizard .btn-default.disabled.active,
+.SysToSysxWizard .btn-default.disabled.focus,
+.SysToSysxWizard .btn-default.disabled:active,
+.SysToSysxWizard .btn-default.disabled:focus,
+.SysToSysxWizard .btn-default.disabled:hover,
+.SysToSysxWizard .btn-default[disabled],
+.SysToSysxWizard .btn-default[disabled].active,
+.SysToSysxWizard .btn-default[disabled].focus,
+.SysToSysxWizard .btn-default[disabled]:active,
+.SysToSysxWizard .btn-default[disabled]:focus,
+.SysToSysxWizard .btn-default[disabled]:hover,
+.SysToSysxWizard fieldset[disabled] .btn-default,
+.SysToSysxWizard fieldset[disabled] .btn-default.active,
+.SysToSysxWizard fieldset[disabled] .btn-default.focus,
+.SysToSysxWizard fieldset[disabled] .btn-default:active,
+.SysToSysxWizard fieldset[disabled] .btn-default:focus,
+.SysToSysxWizard fieldset[disabled] .btn-default:hover,
+.SysxToSysWizard .btn-default.disabled,
+.SysxToSysWizard .btn-default.disabled.active,
+.SysxToSysWizard .btn-default.disabled.focus,
+.SysxToSysWizard .btn-default.disabled:active,
+.SysxToSysWizard .btn-default.disabled:focus,
+.SysxToSysWizard .btn-default.disabled:hover,
+.SysxToSysWizard .btn-default[disabled],
+.SysxToSysWizard .btn-default[disabled].active,
+.SysxToSysWizard .btn-default[disabled].focus,
+.SysxToSysWizard .btn-default[disabled]:active,
+.SysxToSysWizard .btn-default[disabled]:focus,
+.SysxToSysWizard .btn-default[disabled]:hover,
+.SysxToSysWizard fieldset[disabled] .btn-default,
+.SysxToSysWizard fieldset[disabled] .btn-default.active,
+.SysxToSysWizard fieldset[disabled] .btn-default.focus,
+.SysxToSysWizard fieldset[disabled] .btn-default:active,
+.SysxToSysWizard fieldset[disabled] .btn-default:focus,
+.SysxToSysWizard fieldset[disabled] .btn-default:hover {
   background-color: #6f6f6f;
   background-image: none;
 }
 .EthToSysWizard a.vivid,
-.SysToEthWizard a.vivid {
+.SysToEthWizard a.vivid,
+.SysToSysxWizard a.vivid,
+.SysxToSysWizard a.vivid {
   color: #88b2d6;
   background: #1f1c5e;
   padding: 3px 6px;
@@ -215,11 +327,15 @@
   box-shadow: 0 14px 32px 0 rgba(2, 92, 221, 0.3), 0 16px 32px 0 rgba(0, 0, 0, 0.12);
 }
 .EthToSysWizard a.vivid:hover,
-.SysToEthWizard a.vivid:hover {
+.SysToEthWizard a.vivid:hover,
+.SysToSysxWizard a.vivid:hover,
+.SysxToSysWizard a.vivid:hover {
   color: white;
 }
 .EthToSysWizard .mb30,
-.SysToEthWizard .mb30 {
+.SysToEthWizard .mb30,
+.SysToSysxWizard .mb30,
+.SysxToSysWizard .mb30 {
   margin-bottom: 30px;
 }
 

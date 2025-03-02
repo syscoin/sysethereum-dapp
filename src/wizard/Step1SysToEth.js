@@ -9,6 +9,9 @@ class Step1 extends Component {
     super(props);
     let storageExists = typeof Storage !== "undefined";
     this.state = {
+      asset:
+        (storageExists && localStorage.getItem("asset")) ||
+        props.getStore().asset,
       amount:
         (storageExists && localStorage.getItem("amount")) ||
         props.getStore().amount,
@@ -39,6 +42,7 @@ class Step1 extends Component {
   saveToLocalStorage() {
     if (typeof Storage !== "undefined") {
       // Code for localStorage/sessionStorage.
+      localStorage.setItem("asset", this.refs.asset.value);
       localStorage.setItem("amount", this.refs.amount.value);
       localStorage.setItem("ethaddress", this.refs.ethaddress.value);
       localStorage.setItem("txid", this.refs.txid.value);
@@ -58,6 +62,7 @@ class Step1 extends Component {
       })
     ) {
       if (
+        this.props.getStore().asset !== userInput.asset ||
         this.props.getStore().amount !== userInput.amount ||
         this.props.getStore().ethaddress !== userInput.ethaddress ||
         this.props.getStore().txid !== userInput.txid
@@ -84,23 +89,35 @@ class Step1 extends Component {
     return isDataValid;
   }
 
-  async sysBurnToNEVM(
+  async assetBurnToEth(
+    assetGuid,
     amount,
     ethAddressStripped,
     xpub,
     sysChangeAddress
   ) {
     const feeRate = new sjs.utils.BN(10);
-    const txOpts = { rbf: true, memo: Buffer.from(ethAddressStripped, "hex") };
-    const dataScript = bitcoin.payments.embed({ data: [Buffer.from(ethAddressStripped, "hex")] }).output
-    const dataOutput = {
-      script: dataScript,
-      value: new sjs.utils.BN(satoshibitcoin.toSatoshi(amount))
-    }
-    outputsArr.push(dataOutput)
-    const res = await this.syscoinjs.createTransaction(
+    const txOpts = { rbf: true };
+    const assetOpts = { ethaddress: Buffer.from(ethAddressStripped, "hex") };
+    const assetChangeAddress = sysChangeAddress;
+    const assetMap = new Map([
+      [
+        assetGuid,
+        {
+          changeAddress: assetChangeAddress,
+          outputs: [
+            {
+              value: new sjs.utils.BN(satoshibitcoin.toSatoshi(amount)),
+              address: sysChangeAddress,
+            },
+          ],
+        },
+      ],
+    ]);
+    const res = await this.syscoinjs.assetAllocationBurn(
+      assetOpts,
       txOpts,
-      outputsArr,
+      assetMap,
       sysChangeAddress,
       feeRate,
       xpub
@@ -110,7 +127,7 @@ class Step1 extends Component {
       err = "Could not create transaction, not enough funds?";
       return { data: null, error: err };
     }
-    const serializedResp = sjs.utils.exportPsbtToJson(res.psbt);
+    const serializedResp = sjs.utils.exportPsbtToJson(res.psbt, res.assets);
     const signRes = await window.pali.request({
       method: "sys_signAndSend",
       params: [serializedResp],
@@ -212,59 +229,67 @@ class Step1 extends Component {
 
     if (valid === true) {
       this.setState({ working: true });
-      let ethAddressStripped = userInput.ethaddress.toString();
-      if (ethAddressStripped && ethAddressStripped.startsWith("0x")) {
-        ethAddressStripped = ethAddressStripped.substr(
-          2,
-          ethAddressStripped.length
-        );
-      }
-      try {
-        let results = await this.sysBurnToNEVM(
-          userInput.amount.toString(),
-          ethAddressStripped,
-          xpub,
-          sysChangeAddress
-        );
-        if (results.error) {
-          validateNewInput.buttonVal = false;
-          validateNewInput.buttonValMsg = results.error;
-          self.setState({ working: false });
-          self.setState(
-            Object.assign(
-              userInput,
-              validateNewInput,
-              this._validationErrors(validateNewInput)
-            )
+      if (
+        userInput.asset.length > 0 &&
+        userInput.asset !== 0 &&
+        userInput.asset !== "0"
+      ) {
+        let assetGuid = userInput.asset.toString();
+        let ethAddressStripped = userInput.ethaddress.toString();
+        if (ethAddressStripped && ethAddressStripped.startsWith("0x")) {
+          ethAddressStripped = ethAddressStripped.substr(
+            2,
+            ethAddressStripped.length
           );
-        } else if (results.txid) {
-          validateNewInput.buttonVal = false;
-          validateNewInput.txidVal = true;
-          this.refs.txid.value = results.txid;
-          validateNewInput.buttonValMsg = "Success!";
-          self.setState({ working: false });
-          self.setState(
-            Object.assign(
-              userInput,
-              validateNewInput,
-              this._validationErrors(validateNewInput)
-            )
-          );
-          self.saveToLocalStorage();
         }
-      } catch (e) {
-        validateNewInput.txidVal = false;
-        validateNewInput.buttonVal = false;
-        validateNewInput.buttonValMsg =
-          e && e.message ? e.message : this.props.t("genericError");
-        self.setState({ working: false });
-        self.setState(
-          Object.assign(
-            userInput,
-            validateNewInput,
-            this._validationErrors(validateNewInput)
-          )
-        );
+        try {
+          let results = await this.assetBurnToEth(
+            assetGuid,
+            userInput.amount.toString(),
+            ethAddressStripped,
+            xpub,
+            sysChangeAddress
+          );
+          if (results.error) {
+            validateNewInput.buttonVal = false;
+            validateNewInput.buttonValMsg = results.error;
+            self.setState({ working: false });
+            self.setState(
+              Object.assign(
+                userInput,
+                validateNewInput,
+                this._validationErrors(validateNewInput)
+              )
+            );
+          } else if (results.txid) {
+            validateNewInput.buttonVal = false;
+            validateNewInput.txidVal = true;
+            this.refs.txid.value = results.txid;
+            validateNewInput.buttonValMsg = "Success!";
+            self.setState({ working: false });
+            self.setState(
+              Object.assign(
+                userInput,
+                validateNewInput,
+                this._validationErrors(validateNewInput)
+              )
+            );
+            self.saveToLocalStorage();
+          }
+        } catch (e) {
+          validateNewInput.txidVal = false;
+          validateNewInput.buttonVal = false;
+          validateNewInput.buttonValMsg =
+            e && e.message ? e.message : this.props.t("genericError");
+          self.setState({ working: false });
+          self.setState(
+            Object.assign(
+              userInput,
+              validateNewInput,
+              this._validationErrors(validateNewInput)
+            )
+          );
+        }
       }
     }
   }
@@ -285,6 +310,7 @@ class Step1 extends Component {
 
   _validateData(data) {
     return {
+      assetVal: true,
       amountVal: true,
       ethaddressVal: true,
       txidVal: true,
@@ -293,6 +319,7 @@ class Step1 extends Component {
 
   _validationErrors(val) {
     const errMsgs = {
+      assetValMsg: val.assetVal ? "" : this.props.t("step2Asset"),
       amountValMsg:
         val.amountVal && val.amountVal === true
           ? ""
@@ -307,6 +334,7 @@ class Step1 extends Component {
 
   _grabUserInput() {
     return {
+      asset: this.refs.asset.value,
       amount: this.refs.amount.value,
       ethaddress: this.refs.ethaddress.value,
       txid: this.refs.txid.value,
@@ -316,6 +344,13 @@ class Step1 extends Component {
   render() {
     // explicit class assigning based on validation
     let notValidClasses = {};
+
+    if (typeof this.state.assetVal == "undefined" || this.state.assetVal) {
+      notValidClasses.assetCls = "no-error";
+    } else {
+      notValidClasses.assetCls = "has-error";
+      notValidClasses.assetValGrpCls = "val-err-tooltip";
+    }
 
     if (typeof this.state.amountVal == "undefined" || this.state.amountVal) {
       notValidClasses.amountCls = "no-error";
@@ -379,6 +414,26 @@ class Step1 extends Component {
                   </a>
                 </h3>
               </label>
+              <div className="row">
+                <div className="col-md-12">
+                  <label className="control-label col-md-4">
+                    {this.props.t("step2AssetLabel")}
+                  </label>
+                  <div className={notValidClasses.assetCls}>
+                    <input
+                      ref="asset"
+                      autoComplete="off"
+                      type="number"
+                      placeholder={this.props.t("step2EnterAsset")}
+                      className="form-control"
+                      defaultValue={this.state.asset}
+                    />
+                    <div className={notValidClasses.assetValGrpCls}>
+                      {this.state.assetValMsg}
+                    </div>
+                  </div>
+                </div>
+              </div>
               <div className="row">
                 <div className="col-md-12">
                   <label className="control-label col-md-4">
