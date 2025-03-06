@@ -245,7 +245,7 @@ class Step1ES extends Component {
     }
     return "";
   }
-  freezeBurnERC20(
+  freezeBurn(
     syscoinTP,
     validateNewInput,
     thisObj,
@@ -257,7 +257,7 @@ class Step1ES extends Component {
   ) {
     thisObj.state.receiptObj = null;
     syscoinTP.methods
-      .freezeBurnERC20(amount, assetGUID, syscoinWitnessAddress)
+      .freezeBurn(amount, assetGUID === CONFIGURATION.SYSXAsset? 0: assetGUID, 0, syscoinWitnessAddress)
       .send({
         from: fromAccount,
         gas: 400000,
@@ -665,7 +665,7 @@ class Step1ES extends Component {
         .once("confirmation", function (confirmationNumber, receipt) {
           if (bFirstConfirmation) {
             bFirstConfirmation = false;
-            thisObj.freezeBurnERC20(
+            thisObj.freezeBurn(
               syscoinERC20Manager,
               validateNewInput,
               thisObj,
@@ -719,7 +719,7 @@ class Step1ES extends Component {
           }
         });
     } else {
-      thisObj.freezeBurnERC20(
+      thisObj.freezeBurn(
         syscoinERC20Manager,
         validateNewInput,
         thisObj,
