@@ -165,14 +165,14 @@ class Step1 extends Component {
       this.setState({ buttonVal: false, buttonValMsg:  (e.data ? e.data.message : undefined) || e.message || e  });
       return;
     }
-    // const locked = !(await window.pali.isUnlocked());
-    // if (locked) {
-    //   this.setState({
-    //     buttonVal: true,
-    //     buttonValMsg: this.props.t("step2UnlockPali"),
-    //   });
-    //   return;
-    // }
+    const locked = !(await window.pali.isUnlocked());
+    if (locked) {
+       this.setState({
+         buttonVal: false,
+         buttonValMsg: this.props.t("step2UnlockPali"),
+       });
+       return;
+    }
     if (!connectedAccount) {
       await window.pali.request({ method: "sys_requestAccounts", params: [] });
     }
@@ -186,10 +186,30 @@ class Step1 extends Component {
       this.setState({ buttonVal: false, buttonValMsg:  (e.data ? e.data.message : undefined) || e.message || e  });
       return;
     }
-    const sysChangeAddress = await window.pali.request({
-      method: "wallet_getChangeAddress",
-      params: [],
-    });
+    let sysChangeAddress
+    try {
+      sysChangeAddress = await window.pali.request({
+        method: "wallet_getChangeAddress",
+        params: [],
+      });
+    } catch (e) {
+      let errorMessage = 'Could not get change address. Make sure Pali is unlocked.';
+      if (e) {
+        if (e.data && e.data.message) {
+          errorMessage = e.data.message;
+        } else if (e.message) {
+          errorMessage = e.message;
+        } else if (typeof e === 'string') {
+          errorMessage = e;
+        } else if (Object.keys(e).length === 0) {
+          errorMessage = 'Could not get change address. Make sure Pali is unlocked.';
+        } else {
+          errorMessage = JSON.stringify(e);
+        }
+      }
+      this.setState({ buttonVal: false, buttonValMsg: errorMessage });
+      return;
+    }
     if (!sysChangeAddress) {
       this.setState({
         buttonVal: false,
@@ -213,16 +233,12 @@ class Step1 extends Component {
       valid = false;
     }
     if (!web3.utils.isAddress(userInput.ethaddress)) {
-      validateNewInput.buttonVal = false;
-      validateNewInput.buttonValMsg = this.props.t("step1FSInvalidDestination");
+
       this.setState({ working: false });
-      this.setState(
-        Object.assign(
-          userInput,
-          validateNewInput,
-          this._validationErrors(validateNewInput)
-        )
-      );
+      this.setState({
+        buttonVal: false,
+        buttonValMsg: this.props.t("step1FSInvalidDestination"),
+      });
       return;
     }
     let self = this;

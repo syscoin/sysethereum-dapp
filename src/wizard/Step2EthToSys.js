@@ -158,10 +158,30 @@ class Step2ES extends Component {
       this.setState({ buttonVal1: false, buttonValMsg1:  (e.data ? e.data.message : undefined) || e.message || e  });
       return;
     }
-    const sysChangeAddress = await window.pali.request({
-      method: "wallet_getChangeAddress",
-      params: [],
-    });
+    let sysChangeAddress
+    try {
+      sysChangeAddress = await window.pali.request({
+        method: "wallet_getChangeAddress",
+        params: [],
+      });
+    } catch (e) {
+      let errorMessage = 'Could not get change address. Make sure Pali is unlocked.';
+      if (e) {
+        if (e.data && e.data.message) {
+          errorMessage = e.data.message;
+        } else if (e.message) {
+          errorMessage = e.message;
+        } else if (typeof e === 'string') {
+          errorMessage = e;
+        } else if (Object.keys(e).length === 0) {
+          errorMessage = 'Could not get change address. Make sure Pali is unlocked.';
+        } else {
+          errorMessage = JSON.stringify(e);
+        }
+      }
+      this.setState({ buttonVal: false, buttonValMsg: errorMessage });
+      return;
+    }
     if (!sysChangeAddress) {
       this.setState({
         buttonVal: false,
