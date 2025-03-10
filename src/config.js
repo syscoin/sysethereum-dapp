@@ -18,7 +18,6 @@ class CONFIGURATION {
     this.SYSXAsset = "123456";
     this.TokenUnfreezeFn = '0x4f3215d035d7407ce0b19bc31b8e8e9269d0af49093fbf8ec1a11a2c58a73061';
     this.SysNetwork = sjs.utils.syscoinNetworks.mainnet;
-    this.EasySwapAPI = "http://localhost:8080/api/"
   }
 }
 export default new CONFIGURATION();

@@ -5,8 +5,6 @@ import SysToEthWizardi18n from "./wizard/SysToEthWizard";
 import SysToSysxWizardi18n from "./wizard/SysToSysxWizard";
 import SysxToSysWizardi18n from "./wizard/SysxToSysWizard";
 import EthToSysWizardi18n from "./wizard/EthToSysWizard";
-import FastSwapWizardi18n from "./wizard/FastSwapWizard";
-import SPTRegistryWizardi18n from "./wizard/SPTRegistryWizard";
 import { I18nextProvider } from "react-i18next";
 import i18n from "./wizard/i18n";
 import Textarea from "react-textarea-autosize";
@@ -22,7 +20,6 @@ class SysethereumDApp extends Component {
       sysToEthDisplay: false,
       sysToSysxDisplay: false,
       sysxToSysDisplay: false,
-      fastSwapDisplay: false,
       emailName: "",
       emailSender: "",
       emailMessage: "",
@@ -35,8 +32,6 @@ class SysethereumDApp extends Component {
     this.onSysxToSys = this.onSysxToSys.bind(this);
     this.onSysToEth = this.onSysToEth.bind(this);
     this.onEthToSys = this.onEthToSys.bind(this);
-    this.onAssetRegistry = this.onAssetRegistry.bind(this);
-    this.onEasySwap = this.onEasySwap.bind(this);
     this.onHome = this.onHome.bind(this);
     this.handleEmailChange = this.handleEmailChange.bind(this);
     this.handleEmailSubmit = this.handleEmailSubmit.bind(this);
@@ -78,77 +73,45 @@ class SysethereumDApp extends Component {
     this.setState({
       introDisplay: false,
       ethToSysDisplay: false,
-      assetRegistryDisplay: false,
       sysToEthDisplay: false,
       sysToSysxDisplay: true,
       sysxToSysDisplay: false,
-      fastSwapDisplay: false,
     });
   }
   onSysxToSys() {
     this.setState({
       introDisplay: false,
       ethToSysDisplay: false,
-      assetRegistryDisplay: false,
       sysToEthDisplay: false,
       sysToSysxDisplay: false,
       sysxToSysDisplay: true,
-      fastSwapDisplay: false,
     });
   }
   onSysToEth() {
     this.setState({
       introDisplay: false,
       ethToSysDisplay: false,
-      assetRegistryDisplay: false,
       sysToEthDisplay: true,
       sysToSysxDisplay: false,
       sysxToSysDisplay: false,
-      fastSwapDisplay: false,
     });
   }
   onEthToSys() {
     this.setState({
       introDisplay: false,
       ethToSysDisplay: true,
-      assetRegistryDisplay: false,
       sysToEthDisplay: false,
       sysToSysxDisplay: false,
       sysxToSysDisplay: false,
-      fastSwapDisplay: false,
-    });
-  }
-  onAssetRegistry() {
-    this.setState({
-      introDisplay: false,
-      ethToSysDisplay: false,
-      assetRegistryDisplay: true,
-      sysToEthDisplay: false,
-      sysToSysxDisplay: false,
-      sysxToSysDisplay: false,
-      fastSwapDisplay: false,
-    });
-  }
-  onEasySwap() {
-    this.setState({
-      introDisplay: false,
-      ethToSysDisplay: false,
-      assetRegistryDisplay: false,
-      sysToEthDisplay: false,
-      sysToSysxDisplay: false,
-      sysxToSysDisplay: false,
-      fastSwapDisplay: true,
     });
   }
   onHome() {
     this.setState({
       introDisplay: true,
       ethToSysDisplay: false,
-      assetRegistryDisplay: false,
       sysToEthDisplay: false,
       sysToSysxDisplay: false,
       sysxToSysDisplay: false,
-      fastSwapDisplay: false,
     });
   }
 
@@ -262,16 +225,6 @@ class SysethereumDApp extends Component {
                   </div>
                 </a>
 
-                <a className="ethtosys" href="#" onClick={this.onAssetRegistry}>
-                  <div className="mybtn mybtn-two">
-                    <span>Asset Registry</span>
-                  </div>
-                </a>
-                <a className="fastswap" href="#" onClick={this.onEasySwap}>
-                  <div className="mybtn mybtn-two">
-                    <span>EasySwap</span>
-                  </div>
-                </a>
                 {/* <object
                   className="animation"
                   type="image/svg+xml"
@@ -853,33 +806,6 @@ class SysethereumDApp extends Component {
             </div>
           </div>
         </div>
-        <div className={this.state.fastSwapDisplay ? "visible" : "hidden"}>
-          <div id="menu">
-            <div className="goHome" onClick={this.onHome}></div>
-            <div className="title">Walk over the Syscoin Bridge</div>
-          </div>
-
-          <div className="wizardTitleCont">
-            <div className="wizardTitle">EasySwap</div>
-          </div>
-
-          <I18nextProvider i18n={i18n}>
-            <FastSwapWizardi18n />
-          </I18nextProvider>
-
-          <button
-            type="button"
-            className="close closeButton wizardCancel"
-            aria-label="Close"
-            onClick={this.onHome}
-          >
-            <span
-              className="glyphicon glyphicon-remove"
-              aria-hidden="true"
-            ></span>{" "}
-            Close
-          </button>
-        </div>
         <div className={this.state.ethToSysDisplay ? "visible" : "hidden"}>
           <div id="menu">
             <div className="goHome" onClick={this.onHome}></div>
@@ -969,37 +895,6 @@ class SysethereumDApp extends Component {
             <span className="glyphicon glyphicon-remove" aria-hidden="true">
               &nbsp;
             </span>{" "}
-            Close
-          </button>
-        </div>
-        <div className={this.state.assetRegistryDisplay ? "visible" : "hidden"}>
-          <div id="menu">
-            <div className="goHome" onClick={this.onHome}></div>
-            <div className="title">Walk over the Syscoin Bridge</div>
-          </div>
-
-          <div className="wizardTitleCont">
-            <div className="wizardTitle">
-              <span className="sysl">SYSX</span>
-              <span className="direction">➜</span>
-              <span className="ethr">NEVM</span>
-            </div>
-          </div>
-
-          <I18nextProvider i18n={i18n}>
-            <SPTRegistryWizardi18n />
-          </I18nextProvider>
-
-          <button
-            type="button"
-            className="close closeButton wizardCancel"
-            aria-label="Close"
-            onClick={this.onHome}
-          >
-            <span
-              className="glyphicon glyphicon-remove"
-              aria-hidden="true"
-            ></span>{" "}
             Close
           </button>
         </div>
