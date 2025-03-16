@@ -1,4 +1,4 @@
-const erc20Managerabi = [
+const erc20Managerabi =  [
   {
     "inputs": [
       {
@@ -7,13 +7,13 @@ const erc20Managerabi = [
         "type": "address"
       },
       {
-        "internalType": "uint32",
+        "internalType": "uint64",
         "name": "_sysxGuid",
-        "type": "uint32"
+        "type": "uint64"
       },
       {
         "internalType": "address",
-        "name": "_erc20ContractAddress",
+        "name": "_initialOwner",
         "type": "address"
       }
     ],
@@ -21,16 +21,73 @@ const erc20Managerabi = [
     "type": "constructor"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnableInvalidOwner",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "OwnableUnauthorizedAccount",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ReentrancyGuardReentrantCall",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      }
+    ],
+    "name": "SafeERC20FailedOperation",
+    "type": "error"
+  },
+  {
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
-        "internalType": "uint32",
-        "name": "assetGUID",
-        "type": "uint32"
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
       },
       {
-        "indexed": false,
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint64",
+        "name": "assetGuid",
+        "type": "uint64"
+      },
+      {
+        "indexed": true,
         "internalType": "address",
         "name": "freezer",
         "type": "address"
@@ -38,14 +95,14 @@ const erc20Managerabi = [
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "value",
+        "name": "satoshiValue",
         "type": "uint256"
       },
       {
         "indexed": false,
-        "internalType": "uint256",
-        "name": "precisions",
-        "type": "uint256"
+        "internalType": "string",
+        "name": "syscoinAddr",
+        "type": "string"
       }
     ],
     "name": "TokenFreeze",
@@ -55,16 +112,22 @@ const erc20Managerabi = [
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "uint32",
-        "name": "assetGuid",
+        "name": "assetId",
         "type": "uint32"
       },
       {
         "indexed": false,
         "internalType": "address",
-        "name": "erc20ContractAddress",
+        "name": "assetContract",
         "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "enum SyscoinVaultManager.AssetType",
+        "name": "assetType",
+        "type": "uint8"
       }
     ],
     "name": "TokenRegistry",
@@ -74,15 +137,15 @@ const erc20Managerabi = [
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
-        "internalType": "uint32",
-        "name": "assetGUID",
-        "type": "uint32"
+        "indexed": true,
+        "internalType": "uint64",
+        "name": "assetGuid",
+        "type": "uint64"
       },
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "address",
-        "name": "receipient",
+        "name": "recipient",
         "type": "address"
       },
       {
@@ -96,24 +159,17 @@ const erc20Managerabi = [
     "type": "event"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      }
-    ],
-    "name": "assetBalances",
+    "inputs": [],
+    "name": "SYSAssetGuid",
     "outputs": [
       {
-        "internalType": "uint256",
+        "internalType": "uint64",
         "name": "",
-        "type": "uint256"
+        "type": "uint64"
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
   },
   {
     "inputs": [
@@ -126,24 +182,360 @@ const erc20Managerabi = [
     "name": "assetRegistry",
     "outputs": [
       {
-        "internalType": "address",
-        "name": "erc20ContractAddress",
-        "type": "address"
+        "internalType": "enum SyscoinVaultManager.AssetType",
+        "name": "assetType",
+        "type": "uint8"
       },
       {
-        "internalType": "uint64",
-        "name": "height",
-        "type": "uint64"
+        "internalType": "address",
+        "name": "assetContract",
+        "type": "address"
       },
       {
         "internalType": "uint8",
         "name": "precision",
         "type": "uint8"
+      },
+      {
+        "internalType": "uint32",
+        "name": "tokenIdCount",
+        "type": "uint32"
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "assetRegistryByAddress",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "value",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "assetAddr",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "syscoinAddr",
+        "type": "string"
+      }
+    ],
+    "name": "freezeBurn",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "assetId",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "tokenIdx",
+        "type": "uint32"
+      }
+    ],
+    "name": "getRealTokenIdFromTokenIdx",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint32",
+        "name": "assetId",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "realTokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getTokenIdxFromRealTokenId",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "globalAssetIdCount",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "bytes",
+        "name": "",
+        "type": "bytes"
+      }
+    ],
+    "name": "onERC1155BatchReceived",
+    "outputs": [
+      {
+        "internalType": "bytes4",
+        "name": "",
+        "type": "bytes4"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes",
+        "name": "",
+        "type": "bytes"
+      }
+    ],
+    "name": "onERC1155Received",
+    "outputs": [
+      {
+        "internalType": "bytes4",
+        "name": "",
+        "type": "bytes4"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes",
+        "name": "",
+        "type": "bytes"
+      }
+    ],
+    "name": "onERC721Received",
+    "outputs": [
+      {
+        "internalType": "bytes4",
+        "name": "",
+        "type": "bytes4"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "paused",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "txHash",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "value",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "destination",
+        "type": "address"
+      },
+      {
+        "internalType": "uint64",
+        "name": "assetGuid",
+        "type": "uint64"
+      }
+    ],
+    "name": "processTransaction",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bool",
+        "name": "_paused",
+        "type": "bool"
+      }
+    ],
+    "name": "setPaused",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes4",
+        "name": "interfaceId",
+        "type": "bytes4"
+      }
+    ],
+    "name": "supportsInterface",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
     "inputs": [],
@@ -156,119 +548,7 @@ const erc20Managerabi = [
       }
     ],
     "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "txHash",
-        "type": "uint256"
-      }
-    ],
-    "name": "wasSyscoinTxProcessed",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "txHash",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "value",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "destinationAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint32",
-        "name": "assetGUID",
-        "type": "uint32"
-      }
-    ],
-    "name": "processTransaction",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_txHash",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint32",
-        "name": "_assetGUID",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint64",
-        "name": "_height",
-        "type": "uint64"
-      },
-      {
-        "internalType": "address",
-        "name": "_erc20ContractAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint8",
-        "name": "_precision",
-        "type": "uint8"
-      }
-    ],
-    "name": "processAsset",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "value",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint32",
-        "name": "assetGUID",
-        "type": "uint32"
-      },
-      {
-        "internalType": "string",
-        "name": "syscoinAddress",
-        "type": "string"
-      }
-    ],
-    "name": "freezeBurnERC20",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "payable",
-    "type": "function",
-    "payable": true
   }
 ]
   export default erc20Managerabi;

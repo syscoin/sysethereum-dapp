@@ -2,15 +2,15 @@ const sjs = require('syscoinjs-lib')
 class CONFIGURATION {
   constructor() {
     this.Web3URL = "https://rpc.syscoin.org";
-    this.RelayContract = "0xD822557aC2F2b77A1988617308e4A29A89Cb95A6";
-    this.ERC20Manager = "0xA738a563F9ecb55e0b2245D1e9E380f0fE455ea1";
-    this.TokenFreezeFunction = "0x8f3b257b2cea086a69bcfbefab36555c9e6275fc56ada0f1d8796222f6874fec";
+    this.RelayContract = "0xd714E7915362FF89388025F584726E6dF26D20f9";
+    this.ERC20Manager = "0x7904299b3D3dC1b03d1DdEb45E9fDF3576aCBd5f";
+    this.TokenFreezeFunction = "0x0b8914e27c9a6c88836bc5547f82ccf331142c761f84e9f1d36934a6a31eefad";
     this.NEVMExplorerURL = "https://explorer.syscoin.org/";
     this.NEVMAddressExplorerURL = this.NEVMExplorerURL + "address/";
-    this.SyscoinTxExplorerURL = "https://blockbook.elint.services/tx/";
+    this.SyscoinTxExplorerURL = "https://blockbook.syscoin.org/tx/";
     this.NEVMTxExplorerURL = this.NEVMExplorerURL + "tx/";
     this.FaucetURL = "https://faucet.syscoin.org/";
-    this.BlockbookAPIURL = "https://blockbook.elint.services/";
+    this.BlockbookAPIURL = "https://blockbook.syscoin.org/";
     this.ChainId = "0x39"; // 5700 testnet, 57 mainnet
     this.ChainName = "Syscoin NEVM";
     this.NativeCurrencyName = "Syscoin";
