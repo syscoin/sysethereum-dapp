@@ -181,7 +181,7 @@ class Step2 extends Component {
                 <div className={notValidClasses.buttonCls}>
                     <button type="button" disabled={this.state.working} className="form-control btn btn-default formbtn" aria-label={this.props.t("step2Button")} onClick={this.getProofs}>
                     <span className="glyphicon glyphicon-search" aria-hidden="true">&nbsp;</span>
-                    {this.props.t("step3Button")}
+                    {this.props.t("step2Button")}
                     </button>
                   <div className={notValidClasses.buttonValGrpCls}>{this.state.buttonValMsg}</div>
                 </div>
