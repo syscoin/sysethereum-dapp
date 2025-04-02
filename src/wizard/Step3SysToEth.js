@@ -251,7 +251,7 @@ class Step3 extends Component {
         merkleProof.sibling,
         _syscoinBlockHeader
       )
-      .send({ from: accounts[0], gas: 400000 })
+      .send({ from: accounts[0], gas: 400000, transactionPollingTimeout: 1800})
       .once("transactionHash", function (hash) {
         thisObj.setState({
           receiptTxHash: hash,

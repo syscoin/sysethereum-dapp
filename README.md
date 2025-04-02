@@ -14,6 +14,9 @@ Syscoin itself enforces the SPV proof by running Geth in light mode to sync up t
 
 In the project directory, you can run:
 
+### `npm install`
+Installs the dependencies. You should use node version 16.
+
 ### `npm start`
 
 Runs the app in the development mode.<br>
@@ -22,6 +25,7 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 The page will reload if you make edits.<br>
 You will also see any lint errors in the console.
 
+set REACT_APP_USE_TESTNET=true in your env for testnet.
 ### `npm test`
 
 Launches the test runner in the interactive watch mode.<br>

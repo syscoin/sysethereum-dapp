@@ -265,13 +265,16 @@ class Step1ES extends Component {
     fromAccount
   ) {
     let thisObj = this
+
     thisObj.state.receiptObj = null;
+
     syscoinERC20Manager.methods
       .freezeBurn(amount, sysxContract, tokenId, syscoinWitnessAddress)
       .send({
         from: fromAccount,
         gas: 400000,
         value: tokenId === 0 ? amount : undefined,
+        transactionPollingTimeout: 1800,
       })
       .once("transactionHash", function (hash) {
         validateNewInput.buttonVal = true;
@@ -545,7 +548,7 @@ class Step1ES extends Component {
 
       if (allowance.lt(amount)) {
         await contractBase.methods.approve(CONFIGURATION.ERC20Manager, amount.toString())
-          .send({ from: fromAccount, gas: 400000 })
+          .send({ from: fromAccount, gas: 400000, transactionPollingTimeout: 1800 })
           .once("transactionHash", (hash) => {
             validateNewInput.buttonVal = true;
             validateNewInput.receiptTxHash = hash;
@@ -576,7 +579,7 @@ class Step1ES extends Component {
         let approved = await contractBase.methods.isApprovedForAll(fromAccount, CONFIGURATION.ERC20Manager).call();
         if (!approved) {
           await contractBase.methods.setApprovalForAll(CONFIGURATION.ERC20Manager, true)
-            .send({ from: fromAccount, gas: 400000 })
+            .send({ from: fromAccount, gas: 400000, transactionPollingTimeout: 1800 })
             .once("transactionHash", (hash) => {
               validateNewInput.buttonValMsg = this.props.t("step3AuthAllowanceMetamask");
               this.setState(Object.assign(userInput, validateNewInput, this._validationErrors(validateNewInput)));
@@ -606,6 +609,7 @@ class Step1ES extends Component {
       syscoinERC20Manager,
       validateNewInput,
       amount.toString(),
+      userInput.sysxContract,
       tokenId,
       syscoinWitnessAddress,
       userInput,
