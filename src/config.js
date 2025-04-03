@@ -4,7 +4,7 @@ class CONFIGURATION {
   constructor(useTestnet = false) {
     if (useTestnet) {
       // 🧪 TESTNET SETTINGS
-      this.Web3URL = "wss://rpc.tanenbaum.io/wss";
+      this.Web3URL = "https://rpc.tanenbaum.io";
       this.NEVMExplorerURL = "https://explorer.tanenbaum.io/";
       this.FaucetURL = "https://faucet.syscoin.org/";
       this.BlockbookAPIURL = "https://sys-test.org/";
@@ -13,7 +13,7 @@ class CONFIGURATION {
       this.SysNetwork = sjs.utils.syscoinNetworks.testnet;
     } else {
       // ✅ MAINNET SETTINGS
-      this.Web3URL = "wss://rpc.syscoin.org/wss";
+      this.Web3URL = "https://rpc.syscoin.org";
       this.NEVMExplorerURL = "https://explorer.syscoin.org/";
       this.FaucetURL = ""; // No faucet on mainnet
       this.BlockbookAPIURL = "https://blockbook.syscoin.org/";
