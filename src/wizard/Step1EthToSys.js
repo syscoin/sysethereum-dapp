@@ -9,6 +9,8 @@ import erc20Managerabi from "../SyscoinERC20Manager";
 import CONFIGURATION from "../config";
 // This function detects most providers injected at window.ethereum
 import detectEthereumProvider from "@metamask/detect-provider";
+const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+
 const sjs = require("syscoinjs-lib");
 const web3 = new Web3(Web3.givenProvider);
 class Step1ES extends Component {
@@ -609,7 +611,7 @@ class Step1ES extends Component {
       syscoinERC20Manager,
       validateNewInput,
       amount.toString(),
-      userInput.sysxContract,
+      userInput.sysxContract? userInput.sysxContract: ZERO_ADDRESS,
       tokenId,
       syscoinWitnessAddress,
       userInput,
