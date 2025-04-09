@@ -38,7 +38,7 @@ class SysethereumDApp extends Component {
     this.relayURL = CONFIGURATION.NEVMAddressExplorerURL + rconfig.contract;
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     const callback = (event) => {
       console.log({ event });
       if (event.detail.pali) {

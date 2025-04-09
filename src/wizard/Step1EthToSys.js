@@ -52,7 +52,7 @@ class Step1ES extends Component {
     this.isValidated = this.isValidated.bind(this);
     this.setStateFromReceipt = this.setStateFromReceipt.bind(this);
   }
-  async componentDidMount() {}
+  componentDidMount() {}
   isValidated() {
     const userInput = this._grabUserInput(); // grab user entered vals
     const validateNewInput = this._validateData(userInput); // run the new input against the validator

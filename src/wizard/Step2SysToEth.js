@@ -30,7 +30,7 @@ class Step2 extends Component {
     this.isValidated = this.isValidated.bind(this);
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     if(!this.props.getStore().txid){
       this.props.jumpToStep(0);
     }
