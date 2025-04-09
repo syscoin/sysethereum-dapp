@@ -193,7 +193,7 @@ class Step1ES extends Component {
     return {
       sysxContract: this.state.sysxContract,
       sysxFromAccount: this.refs.sysxFromAccount.value,
-      toSysAmount: this.refs.toSysAmount.value,
+      toSysAmount: this.state.assetType !== 'ERC721' ? this.refs.toSysAmount.value : null,
       syscoinWitnessAddress: this.refs.syscoinWitnessAddress.value,
       receiptTxHash: this.state.receiptTxHash,
       assetType: this.state.assetType,
