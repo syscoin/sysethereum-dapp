@@ -54,9 +54,11 @@ class EthToSysWizard extends Component {
           <div className="dropdown">
             <button className="dropbtn"><i className="glyphicon glyphicon-globe"></i><span className="selectedLang">{ i18n.language }</span></button>
             <div className="dropdown-content">
-              <button onClick={() =>  i18n.changeLanguage("en")}>EN</button>
-              <button onClick={() =>  i18n.changeLanguage("es")}>ES</button>
-              <button onClick={() =>  i18n.changeLanguage("fr")}>FR</button>
+              <button onClick={() =>  i18n.changeLanguage("en")}>English</button>
+              <button onClick={() => i18n.changeLanguage("zh-CN")}>中文</button>
+              <button onClick={() =>  i18n.changeLanguage("es")}>Español</button>
+              <button onClick={() => i18n.changeLanguage("ar")}>ﺎﻠﻋﺮﺒﻳﺓ</button>
+              <button onClick={() => i18n.changeLanguage("fr")}>Français</button>
             </div>
           </div>
         </div>
